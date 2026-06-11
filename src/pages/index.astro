@@ -1,11 +1,56 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Navbar from '../components/layout/Navbar.astro';
+import Hero from '../components/sections/Hero.astro';
+import About from '../components/sections/About.astro';
+import Areas from '../components/sections/Areas.astro';
+import Schedule from '../components/sections/Schedule.astro';
+import Speakers from '../components/sections/Speakers.astro';
+import RegistrationSection from '../components/sections/RegistrationSection.astro';
+import Fees from '../components/sections/Fees.astro';
+import GallerySection from '../components/sections/GallerySection.astro';
+import Faq from '../components/sections/Faq.astro';
+import Contact from '../components/sections/Contact.astro';
+import Footer from '../components/layout/Footer.astro';
 ---
 
 <Layout>
-	<Welcome />
+  <!-- Main sticky header -->
+  <Navbar />
+
+  <!-- Page Sections Container with Rainforest ambient gradients -->
+  <main class="flex-grow amazon-gradient-bg">
+    <!-- Hero Section -->
+    <Hero />
+
+    <!-- About the Event Section -->
+    <About />
+
+    <!-- Scientific Areas Cards Section -->
+    <Areas />
+
+    <!-- Timeline Program Schedule Section -->
+    <Schedule />
+
+    <!-- Speakers Profile Cards Section -->
+    <Speakers />
+
+    <!-- Pre-Registration Form Section -->
+    <RegistrationSection />
+
+    <!-- Certification Pricing Fees Section -->
+    <Fees />
+
+    <!-- Community Masonry Photos Gallery Section -->
+    <GallerySection />
+
+    <!-- Frequently Asked Questions Section -->
+    <Faq />
+
+    <!-- Contact & Direct Location Map Section -->
+    <Contact />
+  </main>
+
+  <!-- University Branded Footer -->
+  <Footer />
 </Layout>

@@ -1,0 +1,117 @@
+---
+import { MapPin, Phone, Mail, Send } from 'lucide-react';
+import { CONTACT_INFO } from '../../constants/eventData';
+
+const mapUrl =
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1d3981.18956972233!2d-73.27649558902509!3d-3.7845347434771694!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ea1023a9d59e35%3A0xe54d9200445d4c7b!2sEscuela%20de%20Postgrado%20-%20UNAP!5e0!3m2!1ses-419!2spe!4v1718100000000!5m2!1ses-419!2spe';
+---
+
+<section id="contacto" class="relative py-24 bg-dark/30 overflow-hidden">
+  <!-- Decorative leaf blur lights -->
+  <div
+    class="absolute top-1/2 left-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2"
+  >
+  </div>
+  <div
+    class="absolute bottom-0 right-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl pointer-events-none"
+  >
+  </div>
+
+  <div class="container mx-auto px-6 md:px-12 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-stretch">
+      <!-- Left Column: Details & WhatsApp Action -->
+      <div class="lg:col-span-5 flex flex-col justify-between gap-8">
+        <div class="flex flex-col gap-5">
+          <span
+            class="text-xs font-bold text-secondary uppercase tracking-widest border-l-2 border-secondary pl-3"
+          >
+            Atención Directa
+          </span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl text-white">
+            Póngase en <span class="text-glow text-accent">Contacto con Nosotros</span>
+          </h2>
+          <p class="text-sm sm:text-base text-light/75 leading-relaxed">
+            ¿Tiene dudas sobre el proceso de postulación, pagos, o acreditación horaria? Comuníquese
+            con la comisión organizadora por cualquiera de estos canales:
+          </p>
+
+          <div class="flex flex-col gap-4 mt-4">
+            {/* Address */}
+            <div class="flex gap-4 p-4 rounded-xl border border-accent/10 bg-primary/5">
+              <MapPin class="w-6 h-6 text-secondary shrink-0 mt-0.5" />
+              <div class="flex flex-col">
+                <span class="text-xs font-bold text-accent uppercase tracking-wider"
+                  >Dirección Física</span
+                >
+                <span class="text-xs sm:text-sm text-light/85 mt-0.5">{CONTACT_INFO.address}</span>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div class="flex gap-4 p-4 rounded-xl border border-accent/10 bg-primary/5">
+              <Mail class="w-6 h-6 text-secondary shrink-0 mt-0.5" />
+              <div class="flex flex-col">
+                <span class="text-xs font-bold text-accent uppercase tracking-wider"
+                  >Correo Institucional</span
+                >
+                <a
+                  href={`mailto:${CONTACT_INFO.emails[0]}`}
+                  class="text-xs sm:text-sm text-light/95 hover:text-white underline transition-colors mt-0.5"
+                >
+                  {CONTACT_INFO.emails[0]}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* WhatsApp Call to Actions Grid */}
+        <div class="flex flex-col gap-4">
+          <h3 class="font-display font-bold text-sm text-white uppercase tracking-wider">
+            Coordinadores Científicos (WhatsApp)
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {
+              CONTACT_INFO.phones.map((phone, i) => (
+                <a
+                  href={`https://wa.me/${CONTACT_INFO.whatsappNumbers[i]}?text=Hola,%20solicito%20información%20sobre%20el%20III%20Encuentro%20Científico%20EPG%20UNAP`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center justify-center gap-2 p-3 text-xs font-bold text-dark bg-secondary hover:bg-accent rounded-xl transition-all hover:scale-102 cursor-pointer shadow-md text-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    class="w-4 h-4 shrink-0"
+                  >
+                    <path d="M12.012 2c-5.506 0-9.988 4.482-9.988 9.988 0 1.761.459 3.479 1.332 5.003L2 22l5.161-1.353c1.47.8 3.111 1.22 4.84 1.22 5.507 0 9.99-4.482 9.99-9.988C22.002 6.482 17.519 2 12.012 2zm5.728 14.103c-.247.696-1.442 1.353-2.025 1.443-.5.077-1.157.103-1.85-.123-.448-.145-1.02-.387-1.745-.697-3.072-1.316-5.06-4.44-5.215-4.646-.154-.206-1.258-1.678-1.258-3.203 0-1.523.799-2.272 1.082-2.582.283-.31.618-.387.825-.387.206 0 .412.005.592.013.186.008.438-.073.686.52.257.618.875 2.138.953 2.293.077.155.129.335.026.541-.103.206-.155.335-.309.515-.154.18-.329.4-.469.535-.154.145-.314.305-.134.614.18.309.799 1.314 1.716 2.13 1.18 1.05 2.175 1.373 2.484 1.528.309.155.49.129.67-.077.18-.206.773-.902.979-1.21.206-.309.412-.257.696-.155.283.103 1.799.85 2.108.999.309.155.515.232.592.36.077.129.077.747-.17 1.443z" />
+                  </svg>
+                  Canal {i + 1}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Maps Layout -->
+      <div
+        class="lg:col-span-7 rounded-3xl overflow-hidden border border-accent/15 min-h-[360px] relative"
+      >
+        <iframe
+          src={mapUrl}
+          width="100%"
+          height="100%"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Ubicación física de la Escuela de Postgrado UNAP en San Juan Bautista"
+          class="absolute inset-0 w-full h-full min-h-[360px] filter grayscale invert brightness-90 contrast-90 hover:filter-none transition-all duration-500"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</section>

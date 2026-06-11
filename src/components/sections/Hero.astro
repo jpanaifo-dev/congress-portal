@@ -1,0 +1,94 @@
+---
+import { Calendar, MapPin, ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
+import { Countdown } from '../../features/home/components/Countdown';
+---
+
+<section
+  id="inicio"
+  class="relative min-h-screen flex items-center justify-start pt-28 pb-16 overflow-hidden"
+>
+  <!-- Video Background and Fallback Poster Image -->
+  <div class="absolute inset-0 z-0 select-none pointer-events-none">
+    <video
+      autoplay
+      loop
+      muted
+      playsinline
+      poster="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600&h=900"
+      class="absolute inset-0 w-full h-full object-cover filter grayscale contrast-110 brightness-[0.35] saturate-[0.60]"
+    >
+      <source src="/videos/banner_video.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <!-- Subtle Rainforest dot leaf texture overlay -->
+  <div class="absolute inset-0 leaf-overlay pointer-events-none z-[1] opacity-5"></div>
+
+  <div
+    class="container mx-auto px-6 md:px-12 relative z-10 w-full flex flex-col justify-between min-h-[75vh]"
+  >
+    <!-- Left Aligned Content Wrapper (No Right Column) -->
+    <div class="max-w-3xl flex flex-col gap-6 text-left my-auto">
+      <h1
+        class="font-display font-medium text-4xl sm:text-5xl lg:text-7xl leading-tight tracking-tight text-white uppercase"
+      >
+        III Encuentro <br />
+        Científico de la <br />
+        <span class="text-jsyellow font-bold"> Escuela de Postgrado </span>
+      </h1>
+
+      <div class="flex flex-col gap-2 border-l-2 border-secondary pl-4 py-1">
+        <p class="text-sm sm:text-lg italic max-w-sm">
+          "Ciencia que transforma la Amazonía, conocimiento que construye futuro"
+        </p>
+      </div>
+
+      {/* Countdown Timer nested directly in Left Column */}
+      <Countdown client:load />
+    </div>
+
+    {/* Bottom Bar: Location/Dates on the Left, Actions on the Right */}
+    <div
+      class="w-full flex flex-col lg:flex-row items-center justify-between gap-6 border-t border-accent/15 pt-8 mt-12"
+    >
+      <!-- Joined Location/Date Capsule - Faithful to User Screenshot -->
+      <div class="shrink-0">
+        <div
+          class="inline-flex items-center border border-secondary rounded-full overflow-hidden p-0.5 bg-dark/50 backdrop-blur-sm"
+        >
+          <div
+            class="inline-flex items-center gap-2 bg-secondary text-dark text-xs sm:text-sm font-black uppercase tracking-wider px-5 py-2.5 rounded-full shrink-0"
+          >
+            <svg class="w-4.5 h-3.5 rounded-sm border border-black/10 shrink-0" viewBox="0 0 3 2">
+              <rect width="1" height="2" fill="#d91414"></rect>
+              <rect width="1" height="2" x="1" fill="#fff"></rect>
+              <rect width="1" height="2" x="2" fill="#d91414"></rect>
+            </svg>
+            Iquitos
+          </div>
+          <span
+            class="text-xs sm:text-sm text-white font-display font-bold px-5 py-2.5 whitespace-nowrap underline decoration-secondary decoration-2 underline-offset-4"
+          >
+            02 y 03 de Julio, 2026
+          </span>
+        </div>
+      </div>
+
+      <!-- Action CTAs -->
+      <div class="flex flex-col sm:flex-row items-center gap-5 w-full lg:w-auto">
+        <a
+          href="#registro"
+          class="w-full sm:w-auto text-center inline-flex items-center justify-center font-display font-black text-base uppercase tracking-wider text-dark bg-secondary hover:bg-accent px-12 py-5 rounded-full transition-all cursor-pointer shadow-lg shadow-secondary/15 hover:shadow-secondary/25 active:scale-98"
+        >
+          Pre-inscribirse
+        </a>
+        <a
+          href="#cronograma"
+          class="w-full sm:w-auto text-center inline-flex items-center justify-center font-display font-black text-base uppercase tracking-wider text-white hover:text-dark hover:bg-white bg-transparent border border-white/20 hover:border-transparent px-12 py-5 rounded-full transition-all cursor-pointer active:scale-98"
+        >
+          Ver programa
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

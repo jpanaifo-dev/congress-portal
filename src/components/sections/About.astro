@@ -1,0 +1,105 @@
+---
+import { Target, ShieldCheck, Microscope, Trees } from 'lucide-react';
+
+const objectives = [
+  {
+    title: 'Divulgar la producción científica',
+    desc: 'Visibilizar investigaciones de maestría y doctorado orientadas a resolver problemáticas reales de la Amazonía.',
+    icon: Microscope,
+  },
+  {
+    title: 'Fomentar redes académicas',
+    desc: 'Conectar investigadores nacionales e internacionales para crear alianzas multidisciplinarias estables.',
+    icon: Target,
+  },
+  {
+    title: 'Impulsar políticas de desarrollo',
+    desc: 'Aportar datos científicos empíricos que ayuden a estructurar políticas públicas de impacto en Loreto.',
+    icon: ShieldCheck,
+  },
+];
+---
+
+<section id="sobre-evento" class="relative py-24 bg-dark/30 overflow-hidden">
+  <!-- Soft Ambient Glows -->
+  <div
+    class="absolute top-1/2 left-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2"
+  >
+  </div>
+
+  <div class="container mx-auto px-6 md:px-12 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <!-- Left Column: Description & Narrative -->
+      <div class="lg:col-span-7 flex flex-col gap-6">
+        <span
+          class="text-xs font-bold text-secondary uppercase tracking-widest border-l-2 border-secondary pl-3"
+        >
+          El Encuentro
+        </span>
+        <h2
+          class="font-display font-bold text-3xl sm:text-4xl md:text-5xl text-white leading-tight"
+        >
+          Espacio de convergencia científica para <span class="text-glow text-accent"
+            >construir el futuro amazónico</span
+          >
+        </h2>
+        <p class="text-sm sm:text-base text-light/85 leading-relaxed">
+          El <strong>III Encuentro Científico de la Escuela de Postgrado - UNAP</strong> es el principal
+          foro de discusión e intercambio académico de la Universidad Nacional de la Amazonía Peruana.
+          Este evento busca consolidar un espacio dinámico donde graduandos, docentes e investigadores
+          de renombre expongan sus aportes en favor del desarrollo sustentable.
+        </p>
+        <p class="text-sm sm:text-base text-light/75 leading-relaxed">
+          En esta tercera edición, bajo el lema <em
+            >"Ciencia que transforma la Amazonía, conocimiento que construye futuro"</em
+          >, nos enfocamos en visibilizar cómo la rigurosidad científica se traduce en soluciones
+          ecológicas, tecnológicas e interculturales aplicables a la cuenca amazónica y al país.
+        </p>
+
+        {/* Highlight Banner on Scientific Importance */}
+        <div
+          class="mt-4 p-5 rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/10 border border-primary/20 flex gap-4 items-start"
+        >
+          <Trees />
+          <div class="flex flex-col gap-1.5">
+            <h4 class="font-display font-semibold text-white text-base">
+              Impacto y Conservación Regional
+            </h4>
+            <p class="text-xs sm:text-sm text-light/75 leading-relaxed">
+              La Amazonía es crucial para el equilibrio climático global. La investigación local con
+              rigor internacional es indispensable para frenar la degradación forestal y asegurar la
+              salud de sus comunidades nativas.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Objectives Accordion-like cards -->
+      <div class="lg:col-span-5 flex flex-col gap-5">
+        <div class="text-left mb-2">
+          <h3 class="font-display font-bold text-xl text-white">Objetivos Estratégicos</h3>
+          <p class="text-xs text-light/50 mt-1">Metas fundamentales del III Encuentro Científico</p>
+        </div>
+
+        {
+          objectives.map((obj) => {
+            const IconComponent = obj.icon;
+            return (
+              <div class="glass-card rounded-2xl p-5 border border-accent/10 hover:border-secondary/25 transition-all duration-300 flex gap-4">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 border border-accent/10 flex items-center justify-center text-secondary shrink-0">
+                  <IconComponent />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <h4 class="font-display font-semibold text-white text-base leading-snug">
+                    {obj.title}
+                  </h4>
+                  <p class="text-xs text-light/70 leading-relaxed">{obj.desc}</p>
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  </div>
+</section>

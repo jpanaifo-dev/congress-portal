@@ -1,0 +1,31 @@
+---
+import { Accordion } from '../ui/Accordion';
+import { FAQS } from '../../constants/eventData';
+---
+
+<section id="faq" class="relative py-24 bg-dark">
+  <!-- Soft forest green glow -->
+  <div
+    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl pointer-events-none"
+  >
+  </div>
+
+  <div class="container mx-auto px-6 md:px-12 relative z-10">
+    <!-- Section Header -->
+    <div class="text-center mx-auto mb-16 flex flex-col gap-4">
+      <span class="text-xs font-bold text-secondary uppercase tracking-widest">
+        Dudas Frecuentes
+      </span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-white">
+        Preguntas Frecuentes
+      </h2>
+      <p class="text-sm sm:text-base text-light/75 leading-relaxed">
+        Encuentre respuestas rápidas sobre las modalidades de asistencia, pagos, inscripciones y
+        acreditación horaria académica de la Escuela de Postgrado.
+      </p>
+    </div>
+
+    {/* Accordion Component Embed */}
+    <Accordion items={FAQS} client:visible />
+  </div>
+</section>

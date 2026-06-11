@@ -1,0 +1,30 @@
+---
+import { Timeline } from '../../features/home/components/Timeline';
+---
+
+<section id="cronograma" class="relative py-24 bg-dark schedule-crowd-bg">
+  <!-- Soft forest green glow -->
+  <div
+    class="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"
+  >
+  </div>
+
+  <div class="container mx-auto px-6 md:px-12 relative z-10">
+    <!-- Section Header -->
+    <div class="text-center mx-auto mb-16 flex flex-col gap-4">
+      <span class="text-xs font-bold text-secondary uppercase tracking-widest">
+        Cronograma Académico
+      </span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-white">
+        Programa Científico y Ponencias
+      </h2>
+      <p class="text-sm sm:text-base text-light/75 leading-relaxed">
+        El Encuentro se estructurará en conferencias magistrales, mesas redondas, y exposiciones de
+        avances de tesis organizados por áreas científicas.
+      </p>
+    </div>
+
+    {/* Timeline Component Embed (loaded when visible to user) */}
+    <Timeline client:visible />
+  </div>
+</section>

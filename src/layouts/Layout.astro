@@ -1,23 +1,111 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import { SEO } from 'astro-seo';
+import '../styles/global.css';
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "III Encuentro Científico - Escuela de Postgrado UNAP",
+  description = "III Encuentro Científico de la Escuela de Postgrado de la UNAP: 'Ciencia que transforma la Amazonía, conocimiento que construye futuro'. 02 y 03 de julio de 2026."
+} = Astro.props;
+
+// JSON-LD Structured Data
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "EducationEvent",
+  "name": "III Encuentro Científico de la Escuela de Postgrado - UNAP",
+  "description": "Ciencia que transforma la Amazonía, conocimiento que construye futuro.",
+  "startDate": "2026-07-02T08:00:00-05:00",
+  "endDate": "2026-07-03T18:00:00-05:00",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/MixedEventAttendanceMode",
+  "location": [
+    {
+      "@type": "Place",
+      "name": "Escuela de Postgrado - UNAP",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Los Rosales s/n, San Juan Bautista",
+        "addressLocality": "Maynas",
+        "addressRegion": "Loreto",
+        "addressCountry": "PE"
+      }
+    }
+  ],
+  "organizer": {
+    "@type": "EducationalOrganization",
+    "name": "Universidad Nacional de la Amazonía Peruana - Escuela de Postgrado",
+    "url": "https://www.unapiquitos.edu.pe"
+  },
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Certificación Estudiantes Pregrado",
+      "price": "25.00",
+      "priceCurrency": "PEN",
+      "category": "Pregrado"
+    },
+    {
+      "@type": "Offer",
+      "name": "Certificación Estudiantes Postgrado",
+      "price": "50.00",
+      "priceCurrency": "PEN",
+      "category": "Postgrado"
+    },
+    {
+      "@type": "Offer",
+      "name": "Certificación Público General",
+      "price": "60.00",
+      "priceCurrency": "PEN",
+      "category": "Público General"
+    }
+  ]
+};
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <SEO
+      title={title}
+      description={description}
+      openGraph={{
+        basic: {
+          title: title,
+          type: "website",
+          image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200&h=630",
+        },
+        optional: {
+          locale: "es_PE",
+          siteName: "UNAP Escuela de Postgrado",
+        }
+      }}
+      twitter={{
+        card: "summary_large_image",
+        title: title,
+        description: description,
+        image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200&h=630",
+      }}
+      extend={{
+        link: [
+          { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+          { rel: "icon", href: "/favicon.ico" },
+          { rel: "preconnect", href: "https://fonts.googleapis.com" },
+          { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "true" }
+        ]
+      }}
+    />
+
+    <!-- JSON-LD Structured Data Injection -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body class="bg-dark text-light font-sans antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col">
+    <slot />
+  </body>
+</html>
