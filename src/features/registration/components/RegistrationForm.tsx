@@ -136,7 +136,7 @@ const RegistrationFormContent: React.FC = () => {
 
       // Pre-registration mutation
       const profileId = existingProfile?.id || (crypto.randomUUID ? crypto.randomUUID() : 'b51bb9e5-9fa5-45d2-a7f4-ee1fa42921f0');
-      
+
       let activeEditionId: string | null = null;
       let graphqlErrorMsg: string | null = null;
       try {
@@ -149,7 +149,7 @@ const RegistrationFormContent: React.FC = () => {
             }
           `
         });
-        
+
         if (editionResp.body.errors && editionResp.body.errors.length > 0) {
           graphqlErrorMsg = editionResp.body.errors.map((e: any) => e.message).join(', ');
         } else {
@@ -243,7 +243,7 @@ const RegistrationFormContent: React.FC = () => {
       setSubmittedData(data);
       setIsSubmitted(true);
       reset();
-      
+
       // Trigger premium confetti animations on success
       try {
         confetti({
@@ -252,7 +252,7 @@ const RegistrationFormContent: React.FC = () => {
           origin: { y: 0.6 },
           colors: ['#4ade80', '#fbbf24', '#38bdf8', '#ec4899', '#f8fafc']
         });
-        
+
         // Dynamic multi-burst sidebar effects for extra premium feel
         setTimeout(() => {
           confetti({
@@ -262,7 +262,7 @@ const RegistrationFormContent: React.FC = () => {
             origin: { x: 0, y: 0.75 }
           });
         }, 200);
-        
+
         setTimeout(() => {
           confetti({
             particleCount: 60,
@@ -282,7 +282,7 @@ const RegistrationFormContent: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-dark/60 backdrop-blur-xl rounded-3xl p-6 sm:p-10 relative overflow-hidden">
+    <div className="w-full max-w-2xl mx-auto bg-dark/60 backdrop-blur-xl rounded-3xl p-6 lg:p-8 border relative overflow-hidden">
       {/* Decorative leaf glows */}
       <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
       <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-secondary/5 rounded-full blur-2xl"></div>
@@ -300,7 +300,6 @@ const RegistrationFormContent: React.FC = () => {
             noValidate
           >
             <div className="text-center sm:text-left mb-2">
-              <h3 className="font-display font-bold text-2xl text-white">Ficha de Pre-Inscripción</h3>
               <p className="text-sm text-light/75 mt-1.5">
                 Complete el formulario con sus datos reales para reservar su cupo académico en el Encuentro.
               </p>
@@ -318,9 +317,8 @@ const RegistrationFormContent: React.FC = () => {
                   id="firstNames"
                   placeholder="Ej: Juan Carlos"
                   {...register('firstNames')}
-                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.firstNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.firstNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                    }`}
                   aria-invalid={errors.firstNames ? 'true' : 'false'}
                   aria-describedby={errors.firstNames ? 'firstNames-error' : undefined}
                 />
@@ -341,9 +339,8 @@ const RegistrationFormContent: React.FC = () => {
                   id="lastNames"
                   placeholder="Ej: Pérez Gómez"
                   {...register('lastNames')}
-                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.lastNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.lastNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                    }`}
                   aria-invalid={errors.lastNames ? 'true' : 'false'}
                   aria-describedby={errors.lastNames ? 'lastNames-error' : undefined}
                 />
@@ -408,9 +405,8 @@ const RegistrationFormContent: React.FC = () => {
                       setDocCheckStatus('idle');
                     }
                   }}
-                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                    }`}
                   aria-invalid={errors.documentNumber ? 'true' : 'false'}
                   aria-describedby={errors.documentNumber ? 'documentNumber-error' : undefined}
                 />
@@ -437,9 +433,8 @@ const RegistrationFormContent: React.FC = () => {
                   id="email"
                   placeholder="Ej: jperez@unap.edu.pe"
                   {...register('email')}
-                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.email ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.email ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                    }`}
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
                 />
@@ -460,9 +455,8 @@ const RegistrationFormContent: React.FC = () => {
                   id="phone"
                   placeholder="Ej: +51 912345678"
                   {...register('phone')}
-                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.phone ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.phone ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                    }`}
                   aria-invalid={errors.phone ? 'true' : 'false'}
                   aria-describedby={errors.phone ? 'phone-error' : undefined}
                 />
@@ -483,9 +477,8 @@ const RegistrationFormContent: React.FC = () => {
                   id="institution"
                   placeholder="Ej: Universidad Nacional de la Amazonía Peruana"
                   {...register('institution')}
-                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.institution ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.institution ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                    }`}
                   aria-invalid={errors.institution ? 'true' : 'false'}
                   aria-describedby={errors.institution ? 'institution-error' : undefined}
                 />
@@ -525,9 +518,8 @@ const RegistrationFormContent: React.FC = () => {
                 <select
                   id="researchArea"
                   {...register('researchArea')}
-                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.researchArea ? 'border-red-500/60' : 'border-accent/15'
-                  }`}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.researchArea ? 'border-red-500/60' : 'border-accent/15'
+                    }`}
                   aria-invalid={errors.researchArea ? 'true' : 'false'}
                   aria-describedby={errors.researchArea ? 'researchArea-error' : undefined}
                 >
@@ -567,11 +559,17 @@ const RegistrationFormContent: React.FC = () => {
                 </>
               ) : (
                 <>
-                  Enviar Pre-Inscripción
+                  Enviar Inscripción
                   <Send className="w-4 h-4" />
                 </>
               )}
             </button>
+            <a
+              href="/"
+              className="w-full text-center inline-block mt-4 text-xs font-semibold text-white/50 hover:text-white transition-colors hover:underline cursor-pointer"
+            >
+              Volver al Inicio
+            </a>
           </motion.form>
         ) : (
           <motion.div
@@ -584,8 +582,8 @@ const RegistrationFormContent: React.FC = () => {
             <div className="w-16 h-16 bg-secondary/20 rounded-full border border-secondary/40 flex items-center justify-center text-secondary mb-6 shadow-[0_0_20px_rgba(76,175,80,0.25)]">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            
-            <h3 className="font-display font-bold text-2xl text-white mb-2">¡Pre-Inscripción Exitosa!</h3>
+
+            <h3 className="font-display font-bold text-2xl text-white mb-2">¡Inscripción Exitosa!</h3>
             <p className="text-sm text-light/80 max-w-md mb-8">
               Su solicitud ha sido recibida con éxito. Se ha enviado un correo de confirmación con los pasos detallados para realizar el pago de la certificación.
             </p>
@@ -614,13 +612,21 @@ const RegistrationFormContent: React.FC = () => {
               </div>
             </div>
 
-            <button
-              onClick={() => setIsSubmitted(false)}
-              className="inline-flex items-center gap-2 text-xs font-semibold text-secondary hover:text-accent border border-secondary/20 hover:border-accent/40 bg-transparent py-2.5 px-5 rounded-full transition-all cursor-pointer"
-            >
-              Registrar otra persona
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 mt-4">
+              <button
+                onClick={() => setIsSubmitted(false)}
+                className="inline-flex items-center justify-center gap-2 text-xs font-semibold text-secondary hover:text-accent border border-secondary/20 hover:border-accent/40 bg-transparent py-2.5 px-5 rounded-full transition-all cursor-pointer"
+              >
+                Registrar otra persona
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <a
+                href="/"
+                className="inline-flex items-center justify-center gap-2 text-xs font-semibold text-white/70 hover:text-white border border-white/10 hover:border-white/20 bg-white/5 py-2.5 px-5 rounded-full transition-all cursor-pointer"
+              >
+                Volver al Inicio
+              </a>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
