@@ -9,7 +9,7 @@ const navLinks = [
   { href: '#tarifas', label: 'Inversión' },
   { href: '#faq', label: 'FAQ' },
   { href: '#contacto', label: 'Contacto' },
-  { href: '#registro', label: 'Registro' },
+  { href: '/registro', label: 'Registro' },
 ];
 ---
 
@@ -35,7 +35,7 @@ const navLinks = [
     <nav class="hidden lg:flex items-center gap-6">
       {
         navLinks.map((link, index) => {
-          const isRegister = link.href === '#registro';
+          const isRegister = link.href === '#registro' || link.href === '/registro';
           return (
             <a
               href={link.href}
@@ -86,7 +86,7 @@ const navLinks = [
     </nav>
     <div class="mt-8">
       <a
-        href="#registro"
+        href="/registro"
         class="mobile-nav-link w-full text-center inline-block font-display font-semibold text-dark bg-secondary hover:bg-accent py-4 rounded-xl transition-colors shadow-lg shadow-secondary/10"
       >
         Registrarse ahora

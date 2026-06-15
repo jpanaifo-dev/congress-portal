@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Loader2, Send, ArrowRight, FileCheck } from 'lucide-react';
 import type { RegistrationInput } from '../../../types';
 import { nhost } from '../../../lib/nhost';
+import confetti from 'canvas-confetti';
 
 const registrationSchema = z.object({
   firstNames: z
@@ -242,6 +243,37 @@ const RegistrationFormContent: React.FC = () => {
       setSubmittedData(data);
       setIsSubmitted(true);
       reset();
+      
+      // Trigger premium confetti animations on success
+      try {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#4ade80', '#fbbf24', '#38bdf8', '#ec4899', '#f8fafc']
+        });
+        
+        // Dynamic multi-burst sidebar effects for extra premium feel
+        setTimeout(() => {
+          confetti({
+            particleCount: 60,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0.75 }
+          });
+        }, 200);
+        
+        setTimeout(() => {
+          confetti({
+            particleCount: 60,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1, y: 0.75 }
+          });
+        }, 400);
+      } catch (e) {
+        console.error('Confetti animation error:', e);
+      }
     },
   });
 
