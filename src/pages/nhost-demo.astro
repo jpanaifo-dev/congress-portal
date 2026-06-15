@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+import { NhostDemo } from '../features/registration/components/NhostDemo';
+---
+
+<Layout title="Consola de Integración Nhost - EPG UNAP">
+  <Navbar />
+
+  <main class="flex-grow amazon-gradient-bg py-28">
+    <div class="container mx-auto px-6 md:px-12">
+      <div class="mb-12">
+        <span class="text-xs font-bold text-secondary uppercase tracking-widest block mb-2">
+          Desarrollo & Base de Datos
+        </span>
+        <h1 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-white">
+          Integración con Nhost GraphQL
+        </h1>
+        <p class="text-sm sm:text-base text-light/75 leading-relaxed mt-2 max-w-3xl">
+          Visualiza el estado de las consultas a la base de datos de tu aplicación de congresos. Esta interfaz permite probar la obtención de ponentes y la inserción transaccional de pre-inscripciones.
+        </p>
+      </div>
+
+      <NhostDemo client:load />
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
