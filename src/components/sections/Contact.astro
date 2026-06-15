@@ -3,7 +3,7 @@ import { MapPin, Phone, Mail, Send } from 'lucide-react';
 import { CONTACT_INFO } from '../../constants/eventData';
 
 const mapUrl =
-  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1d3981.18956972233!2d-73.27649558902509!3d-3.7845347434771694!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ea1023a9d59e35%3A0xe54d9200445d4c7b!2sEscuela%20de%20Postgrado%20-%20UNAP!5e0!3m2!1ses-419!2spe!4v1718100000000!5m2!1ses-419!2spe';
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1990.5876471555948!2d-73.29493157116421!3d-3.77200632046194!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ea0fc8b03af903%3A0xa30ac2bf7c0720a3!2sGraduate%20School%20-%20UNAP!5e0!3m2!1spt-BR!2spe!4v1781546159808!5m2!1spt-BR!2spe';
 ---
 
 <section id="contacto" class="relative py-24 bg-dark/30 overflow-hidden">
@@ -38,7 +38,7 @@ const mapUrl =
           <div class="flex flex-col gap-4 mt-4">
             {/* Address */}
             <div class="flex gap-4 p-4 rounded-xl border border-accent/10 bg-primary/5">
-              <MapPin class="w-6 h-6 text-secondary shrink-0 mt-0.5" />
+              <MapPin className="w-6 h-6 text-secondary shrink-0 mt-0.5" />
               <div class="flex flex-col">
                 <span class="text-xs font-bold text-accent uppercase tracking-wider"
                   >Dirección Física</span
@@ -49,7 +49,7 @@ const mapUrl =
 
             {/* Email */}
             <div class="flex gap-4 p-4 rounded-xl border border-accent/10 bg-primary/5">
-              <Mail class="w-6 h-6 text-secondary shrink-0 mt-0.5" />
+              <Mail className="w-6 h-6 text-secondary shrink-0 mt-0.5" />
               <div class="flex flex-col">
                 <span class="text-xs font-bold text-accent uppercase tracking-wider"
                   >Correo Institucional</span

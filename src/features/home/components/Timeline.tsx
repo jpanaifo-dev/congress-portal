@@ -1,17 +1,150 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, Award, BookOpen, Coffee, HelpCircle, BookCheck, ClipboardList, Info } from 'lucide-react';
-import { SCHEDULE, SPEAKERS } from '../../../constants/eventData';
+import { Calendar, Clock, Award, BookOpen, Coffee, HelpCircle } from 'lucide-react';
 import type { ScheduleActivity } from '../../../types';
-
-type SelectedBlock = 'workshops' | 'day1' | 'day2' | 'publishing';
+import { nhost } from '../../../lib/nhost';
 
 export const Timeline: React.FC = () => {
-  const [selectedBlock, setSelectedBlock] = useState<SelectedBlock>('day1');
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [dbError, setDbError] = useState<string | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<string>('day-1');
 
-  // Map day1 / day2 to standard SCHEDULE list
-  const activeDay = selectedBlock === 'day1' ? 1 : selectedBlock === 'day2' ? 2 : 1;
-  const currentDayData = SCHEDULE.find(d => d.day === activeDay) || SCHEDULE[0];
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const resp = await nhost.graphql.request<any>({
+          query: `
+            query GetActiveEditionDetails {
+              editions(where: { is_active: { _eq: true } }) {
+                id
+                start_date
+                end_date
+                sessions(order_by: { start_time: asc }) {
+                  id
+                  title
+                  description
+                  type
+                  start_time
+                  end_time
+                  location
+                  session_speakers {
+                    speaker {
+                      id
+                      full_name
+                      specialty
+                      photo_url
+                    }
+                  }
+                }
+              }
+            }
+          `
+        });
+
+        if (resp.body.errors && resp.body.errors.length > 0) {
+          console.warn("GraphQL errors loading sessions:", resp.body.errors);
+          setDbError(resp.body.errors[0].message);
+        } else {
+          const activeEd = resp.body.data?.editions?.[0];
+          if (activeEd?.sessions && activeEd.sessions.length > 0) {
+            setSessions(activeEd.sessions);
+          }
+        }
+      } catch (err: any) {
+        console.warn("Failed to load sessions from database:", err);
+        setDbError(err.message || String(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSessions();
+  }, []);
+
+  // Group database sessions by date string
+  let displaySchedule: any[] = [];
+  
+  if (sessions.length > 0) {
+    const grouped: { [date: string]: any[] } = {};
+    sessions.forEach(sess => {
+      let dateKey = 'Fecha desconocida';
+      try {
+        const d = new Date(sess.start_time);
+        const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+        const formatted = d.toLocaleDateString('es-ES', options);
+        dateKey = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      } catch (e) {
+        console.error(e);
+      }
+      
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      
+      let timeStr = '00:00';
+      try {
+        const start = new Date(sess.start_time);
+        const end = new Date(sess.end_time);
+        const formatTime = (date: Date) => {
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          return `${hours}:${minutes}`;
+        };
+        timeStr = `${formatTime(start)} - ${formatTime(end)}`;
+      } catch (e) {
+        console.error(e);
+      }
+      
+      const speakerData = sess.session_speakers?.[0]?.speaker;
+      
+      grouped[dateKey].push({
+        id: sess.id,
+        time: timeStr,
+        title: sess.title,
+        description: sess.description || '',
+        type: sess.type,
+        speaker: speakerData ? {
+          name: speakerData.full_name,
+          specialty: speakerData.specialty,
+          photoUrl: speakerData.photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=400'
+        } : null
+      });
+    });
+    
+    const sortedDates = Object.keys(grouped).sort((a, b) => {
+      const sessA = sessions.find(s => {
+        const d = new Date(s.start_time);
+        const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+        const formatted = d.toLocaleDateString('es-ES', options);
+        const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+        return key === a;
+      });
+      const sessB = sessions.find(s => {
+        const d = new Date(s.start_time);
+        const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+        const formatted = d.toLocaleDateString('es-ES', options);
+        const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+        return key === b;
+      });
+      if (sessA && sessB) {
+        return new Date(sessA.start_time).getTime() - new Date(sessB.start_time).getTime();
+      }
+      return 0;
+    });
+    
+    displaySchedule = sortedDates.map((dateStr, idx) => ({
+      day: idx + 1,
+      dateString: dateStr,
+      activities: grouped[dateStr]
+    }));
+  }
+
+  // Adjust activeDayIndex to remain within bounds
+  const activeDayIndex = selectedBlock.startsWith('day-') 
+    ? Math.min(Math.max(0, parseInt(selectedBlock.split('-')[1], 10) - 1), displaySchedule.length - 1)
+    : 0;
+  const currentDayData = displaySchedule[activeDayIndex] || displaySchedule[0];
 
   const getActivityIcon = (type: ScheduleActivity['type']) => {
     switch (type) {
@@ -50,131 +183,96 @@ export const Timeline: React.FC = () => {
     }
   };
 
+  const getGridColsClass = (count: number) => {
+    if (count <= 1) return 'lg:grid-cols-1 max-w-md mx-auto';
+    if (count === 2) return 'lg:grid-cols-2 max-w-3xl mx-auto';
+    if (count === 3) return 'lg:grid-cols-3';
+    return 'lg:grid-cols-4';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3 bg-dark/40 backdrop-blur-md rounded-3xl border border-accent/10 p-8 w-full relative z-10">
+        <svg className="w-8 h-8 text-secondary animate-spin" viewBox="0 0 24 24" fill="none">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+        </svg>
+        <span className="text-xs text-light/60">Cargando cronograma científico...</span>
+      </div>
+    );
+  }
+
+  if (displaySchedule.length === 0) {
+    return (
+      <div className="w-full text-center py-16 bg-dark/40 backdrop-blur-md rounded-3xl border border-accent/10 p-8 flex flex-col items-center justify-center gap-4 relative z-10">
+        <Calendar className="w-12 h-12 text-accent/40 mx-auto" />
+        <h3 className="font-display font-bold text-lg text-white">No hay actividades registradas</h3>
+        <p className="text-xs sm:text-sm text-light/65 max-w-md mx-auto text-center">
+          Actualmente no se encuentran sesiones de cronograma registradas en la base de datos para la edición activa del evento.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full relative z-10">
-      {/* 4 Cards Selector Row - Responsive Swipeable on Mobile, Grid on Desktop */}
+      {/* Cards Selector Row */}
       <div
-        className="flex overflow-x-auto snap-x gap-5 pb-8 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:pb-12 container mx-auto px-1 scrollbar-thin scrollbar-thumb-primary/20"
+        className={`flex overflow-x-auto snap-x gap-5 pb-8 lg:grid ${getGridColsClass(displaySchedule.length)} lg:gap-6 lg:overflow-visible lg:pb-12 container mx-auto px-1 scrollbar-thin scrollbar-thumb-primary/20`}
         role="tablist"
         aria-label="Bloques del programa académico"
       >
+        {displaySchedule.map((dayData, idx) => {
+          const dayNumber = idx + 1;
+          const blockKey = `day-${dayNumber}`;
+          const isSelected = selectedBlock === blockKey;
+          
+          let dateNum = String(dayNumber).padStart(2, '0');
+          let weekdayShort = 'Día';
+          let monthName = 'Julio';
+          try {
+            const parts = dayData.dateString.split(',');
+            weekdayShort = parts[0]?.trim().slice(0, 3) || 'Día';
+            const dateParts = parts[1]?.trim().split(' de ');
+            dateNum = dateParts[0] || dateNum;
+            monthName = dateParts[1] || monthName;
+            
+            // Capitalize
+            weekdayShort = weekdayShort.charAt(0).toUpperCase() + weekdayShort.slice(1);
+            monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+          } catch (e) {}
 
-        {/* Card 1: Workshops (Image Background style from reference) */}
-        <button
-          role="tab"
-          aria-selected={selectedBlock === 'workshops'}
-          aria-controls="program-detail-panel"
-          onClick={() => setSelectedBlock('workshops')}
-          className={`snap-start shrink-0 w-[290px] sm:w-auto relative min-h-[380px] rounded-3xl overflow-hidden border flex flex-col justify-end p-6 text-left group transition-all duration-300 hover:scale-[1.02] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${selectedBlock === 'workshops'
-              ? 'border-secondary shadow-[0_0_25px_rgba(76,175,80,0.25)] ring-2 ring-secondary/35 scale-[1.01]'
-              : 'border-accent/10 hover:border-secondary/40'
-            }`}
-        >
-          {/* Background Image of Scientist/Workshops */}
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=600&h=800')] bg-cover bg-center transition-transform duration-700 group-hover:scale-103"></div>
-          {/* Dark Overlay Gradient matching the image style */}
-          <div className="absolute inset-0 bg-gradient-to-t from-dark/95 via-dark/75 to-transparent z-0"></div>
+          return (
+            <button
+              key={blockKey}
+              role="tab"
+              aria-selected={isSelected}
+              aria-controls="program-detail-panel"
+              onClick={() => setSelectedBlock(blockKey)}
+              className={`snap-start shrink-0 w-[290px] sm:w-auto relative min-h-[380px] rounded-3xl overflow-hidden border bg-dark/75 backdrop-blur-md flex flex-col justify-between p-6 text-left group transition-all duration-300 hover:scale-[1.02] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${isSelected
+                  ? 'border-secondary shadow-[0_0_25px_rgba(76,175,80,0.25)] ring-2 ring-secondary/35 scale-[1.01]'
+                  : 'border-accent/10 hover:border-secondary/40'
+                }`}
+            >
+              <div className="flex items-center justify-between w-full text-accent/60 font-bold text-[10px] uppercase tracking-widest">
+                <span>{monthName}</span>
+                <span>{weekdayShort}</span>
+              </div>
 
-          <div className="relative z-10 w-full flex flex-col gap-2">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-accent/80 block">Julio</span>
+              <div className="flex flex-col gap-2">
+                <span className="text-7xl font-display font-black text-white text-glow leading-none">{dateNum}</span>
 
-            <h3 className="font-display font-black text-2xl leading-none text-glow text-[#fcd34d] uppercase mb-1">
-              TALLERES Y POSTERS
-            </h3>
+                <h3 className="font-display font-bold text-lg leading-tight text-white uppercase group-hover:text-secondary transition-colors mt-2">
+                  DÍA {dayNumber}
+                </h3>
 
-            <p className="text-xs text-light/85 leading-relaxed">
-              Sesiones prácticas de redacción científica de alto impacto y exposición presencial de posters científicos.
-            </p>
-          </div>
-        </button>
-
-        {/* Card 2: Day 1 (Glassmorphism) */}
-        <button
-          role="tab"
-          aria-selected={selectedBlock === 'day1'}
-          aria-controls="program-detail-panel"
-          onClick={() => setSelectedBlock('day1')}
-          className={`snap-start shrink-0 w-[290px] sm:w-auto relative min-h-[380px] rounded-3xl overflow-hidden border bg-dark/75 backdrop-blur-md flex flex-col justify-between p-6 text-left group transition-all duration-300 hover:scale-[1.02] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${selectedBlock === 'day1'
-              ? 'border-secondary shadow-[0_0_25px_rgba(76,175,80,0.25)] ring-2 ring-secondary/35 scale-[1.01]'
-              : 'border-accent/10 hover:border-secondary/40'
-            }`}
-        >
-          <div className="flex items-center justify-between w-full text-accent/60 font-bold text-[10px] uppercase tracking-widest">
-            <span>Julio</span>
-            <span>Jue</span>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <span className="text-7xl font-display font-black text-white text-glow leading-none">02</span>
-
-            <h3 className="font-display font-bold text-lg leading-tight text-white uppercase group-hover:text-secondary transition-colors mt-2">
-              DÍA 1: CONFERENCIAS
-            </h3>
-
-            <p className="text-xs text-light/75 leading-relaxed">
-              Ceremonia oficial de bienvenida, conferencias magistrales en biodiversidad amazónica y ponencias libres.
-            </p>
-          </div>
-        </button>
-
-        {/* Card 3: Day 2 (Glassmorphism) */}
-        <button
-          role="tab"
-          aria-selected={selectedBlock === 'day2'}
-          aria-controls="program-detail-panel"
-          onClick={() => setSelectedBlock('day2')}
-          className={`snap-start shrink-0 w-[290px] sm:w-auto relative min-h-[380px] rounded-3xl overflow-hidden border bg-dark/75 backdrop-blur-md flex flex-col justify-between p-6 text-left group transition-all duration-300 hover:scale-[1.02] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${selectedBlock === 'day2'
-              ? 'border-secondary shadow-[0_0_25px_rgba(76,175,80,0.25)] ring-2 ring-secondary/35 scale-[1.01]'
-              : 'border-accent/10 hover:border-secondary/40'
-            }`}
-        >
-          <div className="flex items-center justify-between w-full text-accent/60 font-bold text-[10px] uppercase tracking-widest">
-            <span>Julio</span>
-            <span>Vie</span>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <span className="text-7xl font-display font-black text-white text-glow leading-none">03</span>
-
-            <h3 className="font-display font-bold text-lg leading-tight text-white uppercase group-hover:text-secondary transition-colors mt-2">
-              DÍA 2: PONENCIAS
-            </h3>
-
-            <p className="text-xs text-light/75 leading-relaxed">
-              Ciencia de datos aplicada, satélites, talleres metodológicos avanzados y clausura oficial.
-            </p>
-          </div>
-        </button>
-
-        {/* Card 4: ISBN/Publishing (Glassmorphism) */}
-        <button
-          role="tab"
-          aria-selected={selectedBlock === 'publishing'}
-          aria-controls="program-detail-panel"
-          onClick={() => setSelectedBlock('publishing')}
-          className={`snap-start shrink-0 w-[290px] sm:w-auto relative min-h-[380px] rounded-3xl overflow-hidden border bg-dark/75 backdrop-blur-md flex flex-col justify-between p-6 text-left group transition-all duration-300 hover:scale-[1.02] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${selectedBlock === 'publishing'
-              ? 'border-secondary shadow-[0_0_25px_rgba(76,175,80,0.25)] ring-2 ring-secondary/35 scale-[1.01]'
-              : 'border-accent/10 hover:border-secondary/40'
-            }`}
-        >
-          <div className="flex items-center justify-between w-full text-accent/60 font-bold text-[10px] uppercase tracking-widest">
-            <span>Julio</span>
-            <span>ISBN</span>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <span className="text-5xl sm:text-6xl font-display font-black text-white text-glow leading-none uppercase">Libro</span>
-
-            <h3 className="font-display font-bold text-lg leading-tight text-white uppercase group-hover:text-secondary transition-colors mt-2">
-              PUBLICACIONES
-            </h3>
-
-            <p className="text-xs text-light/75 leading-relaxed">
-              Indexación oficial y publicación digital de los resúmenes científicos aprobados por el comité de postgrado.
-            </p>
-          </div>
-        </button>
-
+                <p className="text-xs text-light/75 leading-relaxed">
+                  {dayData.activities.length} {dayData.activities.length === 1 ? 'actividad programada' : 'actividades programadas'} para esta jornada.
+                </p>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Date panel / content section below cards */}
@@ -191,8 +289,7 @@ export const Timeline: React.FC = () => {
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Timeline View for Day 1 and Day 2 */}
-            {(selectedBlock === 'day1' || selectedBlock === 'day2') && (
+            {selectedBlock.startsWith('day-') && currentDayData && (
               <div>
                 <div className="text-center mb-8">
                   <h4 className="text-accent font-display font-medium text-lg flex items-center justify-center gap-2">
@@ -207,7 +304,7 @@ export const Timeline: React.FC = () => {
                     <div className="absolute top-[80px] left-0 right-0 h-[2px] bg-gradient-to-r from-primary/10 via-secondary/40 to-primary/10 -z-10"></div>
 
                     {currentDayData.activities.map((act, index) => {
-                      const speaker = SPEAKERS.find(s => s.id === act.speakerId);
+                      const speaker = (act as any).speaker;
                       const isKeynote = act.type === 'keynote';
 
                       return (
@@ -227,14 +324,14 @@ export const Timeline: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Individual Event Card - Styled Tal cual la Imagen */}
+                          {/* Individual Event Card */}
                           <div
                             className={`rounded-2xl p-5 relative w-full overflow-hidden transition-all duration-300 flex flex-col justify-between min-h-[240px] border ${isKeynote
                                 ? 'border-[#fcd34d]/30 hover:border-secondary/40 shadow-lg'
                                 : 'glass-card border-accent/10 hover:border-secondary/35 shadow-md'
                               }`}
                           >
-                            {/* If Keynote, load a background image with dark overlay to match Card 1 */}
+                            {/* If Keynote, load a background image with dark overlay */}
                             {isKeynote && (
                               <>
                                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&q=80&w=400&h=300')] bg-cover bg-center -z-10 group-hover:scale-103 transition-transform duration-500"></div>
@@ -244,7 +341,7 @@ export const Timeline: React.FC = () => {
 
                             <div>
                               <div className="flex items-center justify-between gap-2 mb-3">
-                                <span className={`text-xs font-bold flex items-center gap-1 ${isKeynote ? 'text-[#fcd34d]' : 'text-secondary'}`}>
+                                <span className={`text-xs font-bold flex items-center gap-1.5 ${isKeynote ? 'text-[#fcd34d]' : 'text-secondary'}`}>
                                   <Clock className="w-3.5 h-3.5" />
                                   {act.time}
                                 </span>
@@ -286,7 +383,7 @@ export const Timeline: React.FC = () => {
                 {/* Mobile/Tablet Vertical Timeline */}
                 <div className="lg:hidden flex flex-col relative px-4 pl-8 border-l border-primary/20 gap-8">
                   {currentDayData.activities.map((act, index) => {
-                    const speaker = SPEAKERS.find(s => s.id === act.speakerId);
+                    const speaker = (act as any).speaker;
                     const isKeynote = act.type === 'keynote';
 
                     return (
@@ -299,7 +396,7 @@ export const Timeline: React.FC = () => {
                       >
                         <div className="absolute -left-[45px] top-1.5 flex items-center justify-center">
                           <div className={`w-8 h-8 rounded-full border flex items-center justify-center bg-dark z-10 ${isKeynote || act.type === 'research'
-                              ? 'border-secondary text-secondary shadow-[0_0_10px_rgba(76,175,80,0.2)]'
+                              ? 'border-secondary text-secondary shadow-[0_0_10px_rgba(76,175,80,0.25)]'
                               : 'border-accent/20 text-light/50'
                             }`}>
                             {React.cloneElement(getActivityIcon(act.type), { className: 'w-4 h-4' })}
@@ -356,127 +453,6 @@ export const Timeline: React.FC = () => {
                       </motion.div>
                     );
                   })}
-                </div>
-              </div>
-            )}
-
-            {/* Detailed View for Workshops */}
-            {selectedBlock === 'workshops' && (
-              <div className="max-w-4xl mx-auto px-4 flex flex-col gap-6">
-                <div className="text-center mb-6">
-                  <h4 className="text-accent font-display font-medium text-lg flex items-center justify-center gap-2">
-                    <ClipboardList className="w-5 h-5 text-secondary" />
-                    Programa de Talleres y Posters Científicos
-                  </h4>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Workshop block */}
-                  <div className="glass-card rounded-2xl p-6 border border-accent/15 flex flex-col justify-between min-h-[220px]">
-                    <div>
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-xs text-secondary font-bold flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          Viernes 03 • 14:30 - 16:30
-                        </span>
-                        <span className="text-[10px] bg-accent/15 text-accent border border-accent/20 uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md">
-                          Taller
-                        </span>
-                      </div>
-                      <h5 className="text-white font-display font-bold text-lg mb-2">Redacción Científica de Alto Impacto</h5>
-                      <p className="text-xs sm:text-sm text-light/75 leading-relaxed mb-4">
-                        Taller práctico intensivo dictado por editores experimentados enfocado en la estructuración, redacción y postulación exitosa de artículos a revistas indexadas (Scopus / Web of Science).
-                      </p>
-                    </div>
-                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs text-accent">
-                      Requisitos: Llevar laptop y un avance de su resumen de investigación.
-                    </div>
-                  </div>
-
-                  {/* Posters block */}
-                  <div className="glass-card rounded-2xl p-6 border border-accent/15 flex flex-col justify-between min-h-[220px]">
-                    <div>
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-xs text-secondary font-bold flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          Jueves y Viernes • Coffe Breaks
-                        </span>
-                        <span className="text-[10px] bg-secondary/15 text-secondary border border-secondary/20 uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md">
-                          Posters
-                        </span>
-                      </div>
-                      <h5 className="text-white font-display font-bold text-lg mb-2">Exhibición de Posters Científicos</h5>
-                      <p className="text-xs sm:text-sm text-light/75 leading-relaxed mb-4">
-                        Espacio interactivo de networking y debate en el hall principal del evento, donde estudiantes de maestría y doctorado expondrán los avances de sus tesis de grado y responderán consultas del jurado.
-                      </p>
-                    </div>
-                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-xs text-accent">
-                      Coordinación: Los posters aprobados por el comité deben instalarse el 02 de Julio antes de las 08:00 AM.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Detailed View for Publications */}
-            {selectedBlock === 'publishing' && (
-              <div className="max-w-3xl mx-auto px-4 flex flex-col gap-6 text-left">
-                <div className="text-center mb-6">
-                  <h4 className="text-accent font-display font-medium text-lg flex items-center justify-center gap-2">
-                    <BookCheck className="w-5 h-5 text-secondary" />
-                    Publicación en Libro de Actas (ISBN)
-                  </h4>
-                </div>
-
-                <div className="glass-card rounded-2xl p-6 border border-accent/15 flex flex-col gap-6">
-                  <p className="text-xs sm:text-sm text-light/85 leading-relaxed">
-                    Todos los trabajos de investigación aceptados por el Comité Científico del III Encuentro (ponencias presenciales y posters) serán publicados de manera oficial en formato de Libro de Actas Científico de la Escuela de Postgrado de la UNAP.
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-accent/5">
-                    <div className="flex flex-col gap-2">
-                      <span className="text-xs text-secondary font-bold uppercase tracking-wider font-display">Indexación y Respaldo</span>
-                      <ul className="flex flex-col gap-2 text-xs text-light/70">
-                        <li className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
-                          Código ISBN registrado en la Biblioteca Nacional.
-                        </li>
-                        <li className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
-                          Publicación oficial en el Repositorio de la UNAP.
-                        </li>
-                        <li className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
-                          Certificación académica individual para los autores.
-                        </li>
-                      </ul>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <span className="text-xs text-secondary font-bold uppercase tracking-wider font-display">Fechas del Proceso</span>
-                      <div className="flex flex-col gap-2 text-xs text-light/75">
-                        <div className="flex justify-between">
-                          <span>Recepción de resúmenes:</span>
-                          <span className="font-semibold text-white">Hasta el 15 de Junio</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Resultados de evaluación:</span>
-                          <span className="font-semibold text-white">22 de Junio</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Publicación del libro:</span>
-                          <span className="font-semibold text-white">Julio de 2026</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 flex gap-3 items-start mt-2">
-                    <Info className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
-                    <p className="text-xs text-accent/90 leading-relaxed">
-                      La plantilla de presentación, estructura del abstract (máximo 500 palabras, formato IMRyD) y los enlaces de envío se enviarán directamente al correo electrónico tras completar su registro.
-                    </p>
-                  </div>
                 </div>
               </div>
             )}
