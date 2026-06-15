@@ -377,42 +377,47 @@ const RegistrationFormContent: React.FC = () => {
                 <label htmlFor="documentNumber" className="text-xs font-semibold text-accent uppercase tracking-wider">
                   Número de Documento
                 </label>
-                <input
-                  type="text"
-                  id="documentNumber"
-                  placeholder="Ej: 71234567"
-                  {...register('documentNumber')}
-                  onBlur={async () => {
-                    const value = getValues('documentNumber');
-                    const docType = getValues('docType');
-                    if (!value || !docType) { setDocCheckStatus('idle'); return; }
-                    setDocCheckStatus('checking');
-                    try {
-                      const resp = await nhost.graphql.request<any>({
-                        query: `
-                          query CheckDoc($docType: document_type!, $docNumber: String!) {
-                            profiles(where: { _and: [{ doc_type: { _eq: $docType } }, { doc_number: { _eq: $docNumber } }] }) {
-                              id
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="documentNumber"
+                    placeholder="Ej: 71234567"
+                    {...register('documentNumber')}
+                    onBlur={async () => {
+                      const value = getValues('documentNumber');
+                      const docType = getValues('docType');
+                      if (!value || !docType) { setDocCheckStatus('idle'); return; }
+                      setDocCheckStatus('checking');
+                      try {
+                        const resp = await nhost.graphql.request<any>({
+                          query: `
+                            query CheckDoc($docType: document_type!, $docNumber: String!) {
+                              profiles(where: { _and: [{ doc_type: { _eq: $docType } }, { doc_number: { _eq: $docNumber } }] }) {
+                                id
+                              }
                             }
-                          }
-                        `,
-                        variables: { docType, docNumber: value },
-                      });
-                      const exists = resp.body.data?.profiles?.length > 0;
-                      setDocCheckStatus(exists ? 'taken' : 'available');
-                    } catch (e) {
-                      console.error(e);
-                      setDocCheckStatus('idle');
-                    }
-                  }}
-                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                    }`}
-                  aria-invalid={errors.documentNumber ? 'true' : 'false'}
-                  aria-describedby={errors.documentNumber ? 'documentNumber-error' : undefined}
-                />
-                {docCheckStatus === 'available' && (
-                  <CheckCircle2 className="w-5 h-5 text-green-500 absolute right-3 top-3" />
-                )}
+                          `,
+                          variables: { docType, docNumber: value },
+                        });
+                        const exists = resp.body.data?.profiles?.length > 0;
+                        setDocCheckStatus(exists ? 'taken' : 'available');
+                      } catch (e) {
+                        console.error(e);
+                        setDocCheckStatus('idle');
+                      }
+                    }}
+                    className={`w-full bg-dark/50 border rounded-xl pl-4 pr-10 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                      }`}
+                    aria-invalid={errors.documentNumber ? 'true' : 'false'}
+                    aria-describedby={errors.documentNumber ? 'documentNumber-error' : undefined}
+                  />
+                  {docCheckStatus === 'checking' && (
+                    <Loader2 className="w-4 h-4 text-secondary animate-spin absolute right-3 top-3.5" />
+                  )}
+                  {docCheckStatus === 'available' && (
+                    <CheckCircle2 className="w-4 h-4 text-green-500 absolute right-3 top-3.5" />
+                  )}
+                </div>
                 {docCheckStatus === 'taken' && (
                   <span className="text-xs text-red-500 mt-1">El documento ya está registrado.</span>
                 )}
