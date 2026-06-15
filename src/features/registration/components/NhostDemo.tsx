@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { nhost } from '../../../lib/nhost';
 import { GET_SPEAKERS, CREATE_PARTICIPANT_REGISTRATION } from '../../../lib/queries';
-import type { DbSpeaker, DbParticipationType, DbResearchArea } from '../../../types';
+import type { DbSpeaker, DbParticipationType, DbResearchArea, DbDocumentType } from '../../../types';
 import { 
   Users, 
   Database, 
@@ -22,9 +22,12 @@ export const NhostDemo: React.FC = () => {
   const [isMockMode, setIsMockMode] = useState<boolean>(false);
 
   // Mutation Form States
-  const [fullName, setFullName] = useState<string>('');
+  const [firstNames, setFirstNames] = useState<string>('');
+  const [lastNames, setLastNames] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
+  const [docType, setDocType] = useState<DbDocumentType>('DNI');
+  const [docNumber, setDocNumber] = useState<string>('');
   const [institution, setInstitution] = useState<string>('');
   const [participationType, setParticipationType] = useState<DbParticipationType>('pregrado');
   const [researchArea, setResearchArea] = useState<DbResearchArea>('ciencias_salud');
@@ -91,6 +94,29 @@ export const NhostDemo: React.FC = () => {
 
       setSpeakers(resp.body.data?.speakers || []);
       setIsMockMode(false);
+
+      // Try to fetch a valid edition ID to pre-populate customEditionId
+      try {
+        const editionResp = await nhost.graphql.request<any>({
+          query: `
+            query GetActiveEdition {
+              editions(order_by: { is_active: desc }, limit: 1) {
+                id
+              }
+            }
+          `
+        });
+        if (editionResp.body.errors && editionResp.body.errors.length > 0) {
+          console.warn("GraphQL errors fetching active edition ID:", editionResp.body.errors);
+        } else {
+          const firstEdition = editionResp.body.data?.editions?.[0];
+          if (firstEdition?.id) {
+            setCustomEditionId(firstEdition.id);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch active edition ID, keeping default:", err);
+      }
     } catch (err: any) {
       console.warn("Nhost GraphQL failed, falling back to mock mode:", err.message);
       setError(err.message || 'Error al conectar con Nhost GraphQL');
@@ -118,7 +144,10 @@ export const NhostDemo: React.FC = () => {
           profile: {
             id: customProfileId,
             email,
-            full_name: fullName,
+            first_names: firstNames,
+            last_names: lastNames,
+            doc_type: docType,
+            doc_number: docNumber,
             role: 'participant'
           },
           registration: {
@@ -140,7 +169,10 @@ export const NhostDemo: React.FC = () => {
         variables: {
           profileId: customProfileId,
           email,
-          fullName,
+          firstNames,
+          lastNames,
+          docType,
+          docNumber,
           phone: phone || null,
           institution: institution || null,
           editionId: customEditionId,
@@ -352,13 +384,50 @@ export const NhostDemo: React.FC = () => {
 
             {/* User details */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1 col-span-2">
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Nombre Completo</label>
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Nombres</label>
                 <input
                   type="text"
-                  placeholder="Juan Pérez"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Juan Carlos"
+                  value={firstNames}
+                  onChange={(e) => setFirstNames(e.target.value)}
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Apellidos</label>
+                <input
+                  type="text"
+                  placeholder="Pérez"
+                  value={lastNames}
+                  onChange={(e) => setLastNames(e.target.value)}
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Tipo Documento</label>
+                <select
+                  value={docType}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDocType(e.target.value as DbDocumentType)}
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                >
+                  <option value="DNI">DNI</option>
+                  <option value="CARNET_EXTRANJERIA">Carnet de Extranjería</option>
+                  <option value="PASAPORTE">Pasaporte</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Nro Documento</label>
+                <input
+                  type="text"
+                  placeholder="71234567"
+                  value={docNumber}
+                  onChange={(e) => setDocNumber(e.target.value)}
                   className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
                   required
                 />

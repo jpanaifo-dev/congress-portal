@@ -73,31 +73,38 @@ export const CREATE_PARTICIPANT_REGISTRATION = `
   mutation CreateParticipantRegistration(
     $profileId: uuid!,
     $email: String!,
-    $fullName: String!,
+    $firstNames: String!,
+    $lastNames: String!,
+    $docType: document_type!,
+    $docNumber: String!,
     $phone: String,
     $institution: String,
     $editionId: uuid!,
-    $participationType: participation_type_enum!,
-    $researchArea: research_area_enum,
+    $participationType: participation_type!,
+    $researchArea: research_area,
     $voucherUrl: String
   ) {
     insert_profiles_one(
       object: {
         id: $profileId,
         email: $email,
-        full_name: $fullName,
+        first_names: $firstNames,
+        last_names: $lastNames,
+        doc_type: $docType,
+        doc_number: $docNumber,
         phone: $phone,
         institution: $institution,
         role: participant
       },
       on_conflict: {
         constraint: profiles_pkey,
-        update_columns: [full_name, phone, institution]
+        update_columns: [first_names, last_names, doc_type, doc_number, phone, institution]
       }
     ) {
       id
       email
-      full_name
+      first_names
+      last_names
       role
     }
     insert_registrations_one(
@@ -118,3 +125,18 @@ export const CREATE_PARTICIPANT_REGISTRATION = `
     }
   }
 `;
+
+export const GET_REGISTRATIONS_BY_PROFILE_ID = `
+  query GetRegistrationsByProfileId($profileId: uuid!) {
+    registrations(where: { profile_id: { _eq: $profileId } }) {
+      id
+      edition_id
+      participation_type
+      research_area
+      payment_status
+      voucher_url
+      created_at
+    }
+  }
+`;
+

@@ -48,10 +48,14 @@ export interface FAQItem {
   answer: string;
 }
 
+export type DbDocumentType = 'DNI' | 'CARNET_EXTRANJERIA' | 'PASAPORTE';
+
 export interface RegistrationInput {
-  fullName: string;
+  firstNames: string;
+  lastNames: string;
   email: string;
   phone: string;
+  docType: DbDocumentType;
   documentNumber: string;
   institution: string;
   participantType: 'Pregrado' | 'Postgrado' | 'Público General';
@@ -71,7 +75,10 @@ export type DbPaymentStatus = 'pending' | 'verified' | 'rejected';
 export interface DbProfile {
   id: string; // UUID coinciding with auth.users id
   email: string;
-  full_name: string;
+  first_names: string;
+  last_names: string;
+  doc_type: DbDocumentType;
+  doc_number: string;
   phone: string | null;
   institution: string | null;
   role: DbUserRole;

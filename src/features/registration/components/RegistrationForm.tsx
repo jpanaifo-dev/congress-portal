@@ -3,17 +3,23 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
+// Duplicate import removed
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Loader2, Send, ArrowRight, FileCheck } from 'lucide-react';
 import type { RegistrationInput } from '../../../types';
 import { nhost } from '../../../lib/nhost';
 
 const registrationSchema = z.object({
-  fullName: z
+  firstNames: z
     .string()
-    .min(3, { message: 'El nombre completo debe tener al menos 3 caracteres.' })
-    .max(100, { message: 'El nombre completo es demasiado largo.' })
+    .min(2, { message: 'El nombre completo debe tener al menos 2 caracteres.' })
+    .max(50, { message: 'El nombre es demasiado largo.' })
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El nombre debe contener solo letras y espacios.' }),
+  lastNames: z
+    .string()
+    .min(2, { message: 'El apellido debe tener al menos 2 caracteres.' })
+    .max(50, { message: 'El apellido es demasiado largo.' })
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El apellido debe contener solo letras y espacios.' }),
   email: z
     .string()
     .email({ message: 'Ingrese un correo electrónico válido.' }),
@@ -22,6 +28,9 @@ const registrationSchema = z.object({
     .min(9, { message: 'El teléfono debe tener al menos 9 dígitos.' })
     .max(15, { message: 'El teléfono es demasiado largo.' })
     .regex(/^[+0-9\s]+$/, { message: 'El teléfono debe contener solo números, espacios o "+".' }),
+  docType: z.enum(['DNI', 'CARNET_EXTRANJERIA', 'PASAPORTE'], {
+    message: 'Seleccione un tipo de documento válido.',
+  }),
   documentNumber: z
     .string()
     .min(8, { message: 'El documento de identidad debe tener al menos 8 dígitos.' })
@@ -43,6 +52,7 @@ const queryClient = new QueryClient();
 
 // Internal Form Content Component that uses useMutation
 const RegistrationFormContent: React.FC = () => {
+  const [docCheckStatus, setDocCheckStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState<RegistrationInput | null>(null);
 
@@ -50,13 +60,16 @@ const RegistrationFormContent: React.FC = () => {
     register,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<RegistrationInput>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
-      fullName: '',
+      firstNames: '',
+      lastNames: '',
       email: '',
       phone: '',
+      docType: 'DNI',
       documentNumber: '',
       institution: '',
       participantType: 'Pregrado',
@@ -79,15 +92,20 @@ const RegistrationFormContent: React.FC = () => {
         return data;
       }
 
-      // Live Mode check if email or documentNumber is already registered
+      // Live Mode check if email or (doc_type, doc_number) is already registered
       const checkResp = await nhost.graphql.request<any>({
         query: `
-          query CheckRegistered($email: String!, $docPattern: String!) {
+          query CheckRegistered($email: String!, $docType: document_type!, $docNumber: String!) {
             profiles(
               where: {
                 _or: [
                   { email: { _eq: $email } },
-                  { phone: { _like: $docPattern } }
+                  {
+                    _and: [
+                      { doc_type: { _eq: $docType } },
+                      { doc_number: { _eq: $docNumber } }
+                    ]
+                  }
                 ]
               }
             ) {
@@ -101,7 +119,8 @@ const RegistrationFormContent: React.FC = () => {
         `,
         variables: {
           email: data.email,
-          docPattern: `%Doc: ${data.documentNumber}%`
+          docType: data.docType,
+          docNumber: data.documentNumber
         }
       });
 
@@ -116,32 +135,71 @@ const RegistrationFormContent: React.FC = () => {
 
       // Pre-registration mutation
       const profileId = existingProfile?.id || (crypto.randomUUID ? crypto.randomUUID() : 'b51bb9e5-9fa5-45d2-a7f4-ee1fa42921f0');
-      const activeEditionId = 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d'; // fallback default active edition
+      
+      let activeEditionId: string | null = null;
+      let graphqlErrorMsg: string | null = null;
+      try {
+        const editionResp = await nhost.graphql.request<any>({
+          query: `
+            query GetActiveEdition {
+              editions(order_by: { is_active: desc }, limit: 1) {
+                id
+              }
+            }
+          `
+        });
+        
+        if (editionResp.body.errors && editionResp.body.errors.length > 0) {
+          graphqlErrorMsg = editionResp.body.errors.map((e: any) => e.message).join(', ');
+        } else {
+          const firstEdition = editionResp.body.data?.editions?.[0];
+          if (firstEdition?.id) {
+            activeEditionId = firstEdition.id;
+          }
+        }
+      } catch (err: any) {
+        console.error('Error fetching active edition:', err);
+        graphqlErrorMsg = err.message || String(err);
+      }
+
+      if (graphqlErrorMsg) {
+        throw new Error(`Error al consultar ediciones: ${graphqlErrorMsg}. Asegúrate de que la tabla "editions" esté registrada (tracked) y tenga permisos de lectura (SELECT) en el Nhost Console.`);
+      }
+
+      if (!activeEditionId) {
+        throw new Error('No se encontró ninguna edición del evento en la tabla "editions". Por favor, agrega al menos una edición en tu base de datos.');
+      }
 
       const mutationResp = await nhost.graphql.request<any>({
         query: `
           mutation CreatePreRegistration(
             $profileId: uuid!,
             $email: String!,
-            $fullName: String!,
+            $firstNames: String!,
+            $lastNames: String!,
+            $docType: document_type!,
+            $docNumber: String!,
             $phone: String,
             $institution: String,
             $editionId: uuid!,
-            $participationType: participation_type_enum!,
-            $researchArea: research_area_enum
+            $participationType: participation_type!,
+            $researchArea: research_area
           ) {
             insert_profiles_one(
               object: {
                 id: $profileId,
                 email: $email,
-                full_name: $fullName,
+                first_names: $firstNames,
+                last_names: $lastNames,
+                doc_type: $docType,
+                doc_number: $docNumber,
                 phone: $phone,
                 institution: $institution,
                 role: participant
               },
               on_conflict: {
                 constraint: profiles_pkey,
-                update_columns: [full_name, phone, institution]
+                update_columns: [first_names, last_names, doc_type, doc_number, phone, institution]
               }
             ) {
               id
@@ -162,8 +220,11 @@ const RegistrationFormContent: React.FC = () => {
         variables: {
           profileId,
           email: data.email,
-          fullName: data.fullName,
-          phone: `${data.phone} | Doc: ${data.documentNumber}`,
+          firstNames: data.firstNames,
+          lastNames: data.lastNames,
+          docType: data.docType,
+          docNumber: data.documentNumber,
+          phone: data.phone,
           institution: data.institution,
           editionId: activeEditionId,
           participationType: data.participantType === 'Pregrado' ? 'pregrado' : data.participantType === 'Postgrado' ? 'postgrado' : 'publico_general',
@@ -215,45 +276,118 @@ const RegistrationFormContent: React.FC = () => {
 
             {/* Form Fields Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* Full Name */}
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label htmlFor="fullName" className="text-xs font-semibold text-accent uppercase tracking-wider">
-                  Nombre Completo
+              {/* Nombres */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="firstNames" className="text-xs font-semibold text-accent uppercase tracking-wider">
+                  Nombres
                 </label>
                 <input
                   type="text"
-                  id="fullName"
-                  placeholder="Ej: Juan Pérez Flores"
-                  {...register('fullName')}
+                  id="firstNames"
+                  placeholder="Ej: Juan Carlos"
+                  {...register('firstNames')}
                   className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.fullName ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                    errors.firstNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
                   }`}
-                  aria-invalid={errors.fullName ? 'true' : 'false'}
-                  aria-describedby={errors.fullName ? 'fullName-error' : undefined}
+                  aria-invalid={errors.firstNames ? 'true' : 'false'}
+                  aria-describedby={errors.firstNames ? 'firstNames-error' : undefined}
                 />
-                {errors.fullName && (
-                  <span id="fullName-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
-                    {errors.fullName.message}
+                {errors.firstNames && (
+                  <span id="firstNames-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
+                    {errors.firstNames.message}
                   </span>
                 )}
               </div>
 
-              {/* Document Number */}
+              {/* Apellidos */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="lastNames" className="text-xs font-semibold text-accent uppercase tracking-wider">
+                  Apellidos
+                </label>
+                <input
+                  type="text"
+                  id="lastNames"
+                  placeholder="Ej: Pérez Gómez"
+                  {...register('lastNames')}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
+                    errors.lastNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                  }`}
+                  aria-invalid={errors.lastNames ? 'true' : 'false'}
+                  aria-describedby={errors.lastNames ? 'lastNames-error' : undefined}
+                />
+                {errors.lastNames && (
+                  <span id="lastNames-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
+                    {errors.lastNames.message}
+                  </span>
+                )}
+              </div>
+
+              {/* Tipo de Documento */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="docType" className="text-xs font-semibold text-accent uppercase tracking-wider">
+                  Tipo de Documento
+                </label>
+                <select
+                  id="docType"
+                  {...register('docType')}
+                  className="w-full bg-dark/50 border border-accent/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
+                >
+                  <option value="DNI">DNI</option>
+                  <option value="CARNET_EXTRANJERIA">Carnet de Extranjería</option>
+                  <option value="PASAPORTE">Pasaporte</option>
+                </select>
+                {errors.docType && (
+                  <span className="text-xs text-red-400 font-medium mt-0.5" role="alert">
+                    {errors.docType.message}
+                  </span>
+                )}
+              </div>
+
+              {/* Número de Documento */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="documentNumber" className="text-xs font-semibold text-accent uppercase tracking-wider">
-                  Número de Documento (DNI/Pasaporte)
+                  Número de Documento
                 </label>
                 <input
                   type="text"
                   id="documentNumber"
                   placeholder="Ej: 71234567"
                   {...register('documentNumber')}
+                  onBlur={async () => {
+                    const value = getValues('documentNumber');
+                    const docType = getValues('docType');
+                    if (!value || !docType) { setDocCheckStatus('idle'); return; }
+                    setDocCheckStatus('checking');
+                    try {
+                      const resp = await nhost.graphql.request<any>({
+                        query: `
+                          query CheckDoc($docType: document_type!, $docNumber: String!) {
+                            profiles(where: { _and: [{ doc_type: { _eq: $docType } }, { doc_number: { _eq: $docNumber } }] }) {
+                              id
+                            }
+                          }
+                        `,
+                        variables: { docType, docNumber: value },
+                      });
+                      const exists = resp.body.data?.profiles?.length > 0;
+                      setDocCheckStatus(exists ? 'taken' : 'available');
+                    } catch (e) {
+                      console.error(e);
+                      setDocCheckStatus('idle');
+                    }
+                  }}
                   className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
                     errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
                   }`}
                   aria-invalid={errors.documentNumber ? 'true' : 'false'}
                   aria-describedby={errors.documentNumber ? 'documentNumber-error' : undefined}
                 />
+                {docCheckStatus === 'available' && (
+                  <CheckCircle2 className="w-5 h-5 text-green-500 absolute right-3 top-3" />
+                )}
+                {docCheckStatus === 'taken' && (
+                  <span className="text-xs text-red-500 mt-1">El documento ya está registrado.</span>
+                )}
                 {errors.documentNumber && (
                   <span id="documentNumber-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
                     {errors.documentNumber.message}
@@ -391,7 +525,7 @@ const RegistrationFormContent: React.FC = () => {
             {/* Submit button */}
             <button
               type="submit"
-              disabled={registrationMutation.isPending}
+              disabled={registrationMutation.isPending || docCheckStatus === 'checking' || docCheckStatus === 'taken'}
               className="mt-4 w-full bg-secondary hover:bg-accent disabled:bg-primary/30 disabled:text-light/50 text-dark font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
             >
               {registrationMutation.isPending ? (
@@ -432,7 +566,10 @@ const RegistrationFormContent: React.FC = () => {
               </div>
               <div className="grid grid-cols-3 text-xs gap-y-2.5">
                 <span className="text-light/50 font-medium col-span-1">Participante:</span>
-                <span className="text-white font-semibold col-span-2 truncate">{submittedData?.fullName}</span>
+                <span className="text-white font-semibold col-span-2 truncate">{submittedData?.firstNames} {submittedData?.lastNames}</span>
+
+                <span className="text-light/50 font-medium col-span-1">Documento:</span>
+                <span className="text-white font-semibold col-span-2">{submittedData?.docType}: {submittedData?.documentNumber}</span>
 
                 <span className="text-light/50 font-medium col-span-1">Correo:</span>
                 <span className="text-white font-semibold col-span-2 truncate">{submittedData?.email}</span>
