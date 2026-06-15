@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-q
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Loader2, Send, ArrowRight, FileCheck } from 'lucide-react';
 import type { RegistrationInput } from '../../../types';
+import { nhost } from '../../../lib/nhost';
 
 const registrationSchema = z.object({
   fullName: z
@@ -21,6 +22,11 @@ const registrationSchema = z.object({
     .min(9, { message: 'El teléfono debe tener al menos 9 dígitos.' })
     .max(15, { message: 'El teléfono es demasiado largo.' })
     .regex(/^[+0-9\s]+$/, { message: 'El teléfono debe contener solo números, espacios o "+".' }),
+  documentNumber: z
+    .string()
+    .min(8, { message: 'El documento de identidad debe tener al menos 8 dígitos.' })
+    .max(12, { message: 'El documento de identidad es demasiado largo.' })
+    .regex(/^[a-zA-Z0-9]+$/, { message: 'El documento debe contener solo letras y números.' }),
   institution: z
     .string()
     .min(3, { message: 'Ingrese el nombre de su institución.' })
@@ -51,17 +57,124 @@ const RegistrationFormContent: React.FC = () => {
       fullName: '',
       email: '',
       phone: '',
+      documentNumber: '',
       institution: '',
       participantType: 'Pregrado',
       researchArea: '',
     },
   });
 
-  // Mock API post handler using TanStack Query Mutation
+  // API handler with Nhost integration and validation
   const registrationMutation = useMutation({
     mutationFn: async (data: RegistrationInput) => {
-      // Simulate API call lag
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const subdomain = import.meta.env.PUBLIC_NHOST_SUBDOMAIN;
+      const isConfigured = subdomain && subdomain !== 'xxxx-yyyy-zzzz';
+
+      if (!isConfigured) {
+        // Mock Mode Simulation: Check for mock duplicates
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        if (data.documentNumber === '12345678' || data.email === 'duplicate@test.com') {
+          throw new Error('El número de documento o correo electrónico ya se encuentra registrado para este evento.');
+        }
+        return data;
+      }
+
+      // Live Mode check if email or documentNumber is already registered
+      const checkResp = await nhost.graphql.request<any>({
+        query: `
+          query CheckRegistered($email: String!, $docPattern: String!) {
+            profiles(
+              where: {
+                _or: [
+                  { email: { _eq: $email } },
+                  { phone: { _like: $docPattern } }
+                ]
+              }
+            ) {
+              id
+              email
+              registrations {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          email: data.email,
+          docPattern: `%Doc: ${data.documentNumber}%`
+        }
+      });
+
+      if (checkResp.body.errors && checkResp.body.errors.length > 0) {
+        throw new Error(checkResp.body.errors.map((e: any) => e.message).join(', '));
+      }
+
+      const existingProfile = checkResp.body.data?.profiles?.[0];
+      if (existingProfile && existingProfile.registrations?.length > 0) {
+        throw new Error('El número de documento o correo electrónico ya se encuentra registrado para este evento.');
+      }
+
+      // Pre-registration mutation
+      const profileId = existingProfile?.id || (crypto.randomUUID ? crypto.randomUUID() : 'b51bb9e5-9fa5-45d2-a7f4-ee1fa42921f0');
+      const activeEditionId = 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d'; // fallback default active edition
+
+      const mutationResp = await nhost.graphql.request<any>({
+        query: `
+          mutation CreatePreRegistration(
+            $profileId: uuid!,
+            $email: String!,
+            $fullName: String!,
+            $phone: String,
+            $institution: String,
+            $editionId: uuid!,
+            $participationType: participation_type_enum!,
+            $researchArea: research_area_enum
+          ) {
+            insert_profiles_one(
+              object: {
+                id: $profileId,
+                email: $email,
+                full_name: $fullName,
+                phone: $phone,
+                institution: $institution,
+                role: participant
+              },
+              on_conflict: {
+                constraint: profiles_pkey,
+                update_columns: [full_name, phone, institution]
+              }
+            ) {
+              id
+            }
+            insert_registrations_one(
+              object: {
+                profile_id: $profileId,
+                edition_id: $editionId,
+                participation_type: $participationType,
+                research_area: $researchArea,
+                payment_status: pending
+              }
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          profileId,
+          email: data.email,
+          fullName: data.fullName,
+          phone: `${data.phone} | Doc: ${data.documentNumber}`,
+          institution: data.institution,
+          editionId: activeEditionId,
+          participationType: data.participantType === 'Pregrado' ? 'pregrado' : data.participantType === 'Postgrado' ? 'postgrado' : 'publico_general',
+          researchArea: data.researchArea === 'Ciencias de la Salud' ? 'ciencias_salud' : data.researchArea === 'Ciencias Naturales' ? 'ciencias_naturales' : data.researchArea === 'Ingenierías y Tecnología' ? 'ingenierias' : 'ciencias_sociales'
+        }
+      });
+
+      if (mutationResp.body.errors && mutationResp.body.errors.length > 0) {
+        throw new Error(mutationResp.body.errors.map((e: any) => e.message).join(', '));
+      }
+
       return data;
     },
     onSuccess: (data) => {
@@ -76,7 +189,7 @@ const RegistrationFormContent: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-dark/60 backdrop-blur-xl border border-accent/15 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+    <div className="w-full max-w-2xl mx-auto bg-dark/60 backdrop-blur-xl rounded-3xl p-6 sm:p-10 relative overflow-hidden">
       {/* Decorative leaf glows */}
       <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
       <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-secondary/5 rounded-full blur-2xl"></div>
@@ -121,6 +234,29 @@ const RegistrationFormContent: React.FC = () => {
                 {errors.fullName && (
                   <span id="fullName-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
                     {errors.fullName.message}
+                  </span>
+                )}
+              </div>
+
+              {/* Document Number */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="documentNumber" className="text-xs font-semibold text-accent uppercase tracking-wider">
+                  Número de Documento (DNI/Pasaporte)
+                </label>
+                <input
+                  type="text"
+                  id="documentNumber"
+                  placeholder="Ej: 71234567"
+                  {...register('documentNumber')}
+                  className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
+                    errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                  }`}
+                  aria-invalid={errors.documentNumber ? 'true' : 'false'}
+                  aria-describedby={errors.documentNumber ? 'documentNumber-error' : undefined}
+                />
+                {errors.documentNumber && (
+                  <span id="documentNumber-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
+                    {errors.documentNumber.message}
                   </span>
                 )}
               </div>
@@ -246,7 +382,9 @@ const RegistrationFormContent: React.FC = () => {
             {/* Error general state */}
             {registrationMutation.isError && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-xs sm:text-sm text-red-400">
-                Ocurrió un error al enviar el formulario. Por favor, inténtelo de nuevo.
+                {registrationMutation.error instanceof Error
+                  ? registrationMutation.error.message
+                  : 'Ocurrió un error al enviar el formulario. Por favor, inténtelo de nuevo.'}
               </div>
             )}
 
@@ -254,7 +392,7 @@ const RegistrationFormContent: React.FC = () => {
             <button
               type="submit"
               disabled={registrationMutation.isPending}
-              className="mt-4 w-full bg-secondary hover:bg-accent disabled:bg-primary/30 disabled:text-light/50 text-dark font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-secondary/15 hover:shadow-secondary/25 active:scale-98"
+              className="mt-4 w-full bg-secondary hover:bg-accent disabled:bg-primary/30 disabled:text-light/50 text-dark font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
             >
               {registrationMutation.isPending ? (
                 <>
