@@ -24,7 +24,7 @@ export const NavbarReact: React.FC = () => {
     setTheme(isDark ? 'dark' : 'light');
 
     const hasHero = document.getElementById('inicio') !== null;
-    
+
     const handleScroll = () => {
       if (!hasHero) {
         setIsScrolled(true);
@@ -64,8 +64,8 @@ export const NavbarReact: React.FC = () => {
 
   const headerClass = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 md:px-12 ${
     isScrolled || isMenuOpen
-      ? 'bg-dark border-b border-accent/10 py-3 shadow-lg shadow-dark/5'
-      : 'bg-transparent border-b border-transparent py-4 dark'
+      ? 'bg-[#0D1F17] border-b border-[#4CAF50]/15 py-3 shadow-lg shadow-black/25'
+      : 'bg-transparent border-b border-transparent py-4'
   }`;
 
   return (
@@ -81,7 +81,7 @@ export const NavbarReact: React.FC = () => {
             <img
               src="/images/postgrado_brandwhite.webp"
               alt="Escuela de Postgrado UNAP"
-              className="h-10 w-auto object-contain transition-transform hover:scale-[1.02] duration-300"
+              className="h-16 w-auto object-contain transition-transform hover:scale-[1.02] duration-300"
             />
           </a>
 
@@ -93,14 +93,10 @@ export const NavbarReact: React.FC = () => {
                 <a
                   key={link.href}
                   href={link.href}
-                  className={`font-display text-sm tracking-wide transition-all focus-visible:outline-none focus-visible:underline underline-offset-4 ${
+                  className={`font-display text-lg tracking-wide transition-all focus-visible:outline-none focus-visible:underline underline-offset-4 ${
                     isRegister
                       ? 'text-secondary hover:text-accent font-bold'
-                      : `nav-link-item ${
-                          isScrolled
-                            ? 'text-light/80 hover:text-light'
-                            : 'text-white/80 hover:text-white'
-                        }`
+                      : 'text-white/80 hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -114,11 +110,7 @@ export const NavbarReact: React.FC = () => {
             {/* Theme Toggle IconButton */}
             <button
               onClick={toggleTheme}
-              className={`p-2.5 rounded-xl border transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
-                isScrolled || isMenuOpen
-                  ? 'text-light/80 hover:text-light hover:bg-light/10 border-light/10'
-                  : 'text-white/80 hover:text-white hover:bg-white/10 border-white/10'
-              }`}
+              className="p-2.5 rounded-xl border border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
               aria-label="Cambiar tema de color"
             >
               <AnimatePresence mode="wait" initial={false}>
@@ -142,11 +134,7 @@ export const NavbarReact: React.FC = () => {
             {/* Mobile Navigation Toggle Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`lg:hidden p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg transition-all ${
-                isScrolled || isMenuOpen
-                  ? 'text-light/90 hover:text-light hover:bg-light/10'
-                  : 'text-white/90 hover:text-white hover:bg-white/10'
-              }`}
+              className="lg:hidden p-2 text-white/90 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg transition-all"
               aria-label={isMenuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
               aria-expanded={isMenuOpen}
             >
@@ -174,7 +162,7 @@ export const NavbarReact: React.FC = () => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="fixed inset-x-0 bottom-0 top-[65px] bg-dark/95 backdrop-blur-xl border-t border-accent/10 lg:hidden flex flex-col p-6 z-40"
+            className="fixed inset-x-0 bottom-0 top-[65px] bg-[#0D1F17]/95 backdrop-blur-xl border-t border-[#4CAF50]/15 lg:hidden flex flex-col p-6 z-40"
             role="dialog"
             aria-label="Menú móvil"
           >
@@ -187,7 +175,7 @@ export const NavbarReact: React.FC = () => {
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="mobile-nav-link font-display text-xl font-medium text-light/90 hover:text-light py-3 border-b border-accent/5 transition-colors"
+                    className="mobile-nav-link font-display text-xl font-medium text-white/90 hover:text-white py-3 border-b border-white/5 transition-colors"
                   >
                     {link.label}
                   </a>

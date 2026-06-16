@@ -22,15 +22,17 @@ const currentYear = new Date().getFullYear();
   >
   </div>
 
-  <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
+  <div
+    class="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10"
+  >
     <!-- Col 1: University Branding & Socials -->
     <div class="flex flex-col gap-6">
       <div class="flex items-center gap-3">
         <div
           class="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center border border-primary/30"
         >
-          <Leaf class="w-5 h-5 text-secondary absolute top-1.5 right-1.5" />
-          <GraduationCap class="w-6 h-6 text-accent absolute bottom-1.5 left-1.5" />
+          <Leaf />
+          <GraduationCap />
         </div>
         <div class="flex flex-col">
           <span class="font-display font-bold text-lg leading-tight text-light"
@@ -52,7 +54,7 @@ const currentYear = new Date().getFullYear();
           class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-light rounded-lg border border-accent/10 transition-colors"
           aria-label="Facebook Oficial de la Escuela de Postgrado"
         >
-          <Facebook class="w-5 h-5" />
+          <Facebook />
         </a>
         <a
           href="https://youtube.com"
@@ -61,7 +63,7 @@ const currentYear = new Date().getFullYear();
           class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-light rounded-lg border border-accent/10 transition-colors"
           aria-label="Canal de Youtube de la Escuela de Postgrado"
         >
-          <Youtube class="w-5 h-5" />
+          <Youtube />
         </a>
         <a
           href="https://linkedin.com"
@@ -70,7 +72,7 @@ const currentYear = new Date().getFullYear();
           class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-light rounded-lg border border-accent/10 transition-colors"
           aria-label="Página de LinkedIn de la Escuela de Postgrado"
         >
-          <Linkedin class="w-5 h-5" />
+          <Linkedin />
         </a>
       </div>
     </div>
@@ -89,9 +91,7 @@ const currentYear = new Date().getFullYear();
           rel="noopener"
           class="text-light/70 hover:text-light flex items-center gap-1 group transition-colors"
         >
-          Portal de Postgrado <ArrowUpRight
-            class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"
-          />
+          Portal de Postgrado <ArrowUpRight />
         </a>
         <a
           href="https://www.unapiquitos.edu.pe"
@@ -99,9 +99,7 @@ const currentYear = new Date().getFullYear();
           rel="noopener"
           class="text-light/70 hover:text-light flex items-center gap-1 group transition-colors"
         >
-          Portal Principal UNAP <ArrowUpRight
-            class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"
-          />
+          Portal Principal UNAP <ArrowUpRight />
         </a>
         <a
           href="https://alicia.concytec.gob.pe"
@@ -109,9 +107,7 @@ const currentYear = new Date().getFullYear();
           rel="noopener"
           class="text-light/70 hover:text-light flex items-center gap-1 group transition-colors"
         >
-          Repositorio Nacional ALICIA <ArrowUpRight
-            class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"
-          />
+          Repositorio Nacional ALICIA <ArrowUpRight />
         </a>
         <a href="#cronograma" class="text-light/70 hover:text-light transition-colors">
           Programa del Encuentro
@@ -158,15 +154,15 @@ const currentYear = new Date().getFullYear();
       </h3>
       <div class="flex flex-col gap-3.5 text-sm text-light/70">
         <div class="flex gap-2.5">
-          <MapPin class="w-5 h-5 text-accent shrink-0" />
+          <MapPin />
           <span>{CONTACT_INFO.address}</span>
         </div>
         <div class="flex items-center gap-2.5">
-          <Phone class="w-4 h-4 text-accent shrink-0" />
+          <Phone />
           <span>{CONTACT_INFO.phones[0]}</span>
         </div>
         <div class="flex items-center gap-2.5">
-          <Mail class="w-4 h-4 text-accent shrink-0" />
+          <Mail />
           <a href={`mailto:${CONTACT_INFO.emails[0]}`} class="hover:text-light transition-colors"
             >{CONTACT_INFO.emails[0]}</a
           >
