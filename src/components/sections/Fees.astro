@@ -14,7 +14,7 @@ import { ShieldAlert } from 'lucide-react';
       <span class="text-xs font-bold text-secondary uppercase tracking-widest">
         Derechos de Certificación
       </span>
-      <h2 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-white">
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-light">
         Inversión Académica y Certificación
       </h2>
       <p class="text-sm sm:text-base text-light/75 leading-relaxed">
@@ -43,7 +43,7 @@ import { ShieldAlert } from 'lucide-react';
             {/* Header info */}
             <div class="text-center mb-6 border-b border-accent/10 pb-6">
               <span class="text-xs font-bold text-accent uppercase tracking-widest block mb-2">{fee.category}</span>
-              <div class="flex items-baseline justify-center gap-1.5 text-white">
+              <div class="flex items-baseline justify-center gap-1.5 text-light">
                 <span class="text-2xl font-bold">S/.</span>
                 <span class="text-5xl font-display font-black leading-none">{fee.price.toFixed(2)}</span>
               </div>
@@ -70,7 +70,7 @@ import { ShieldAlert } from 'lucide-react';
               class={`w-full text-center inline-block font-display font-bold text-sm py-3 px-6 rounded-xl transition-all cursor-pointer ${
                 fee.popular 
                   ? 'bg-secondary text-dark hover:bg-accent shadow-md shadow-secondary/10' 
-                  : 'bg-primary/10 hover:bg-primary/20 text-white border border-accent/10 hover:border-accent/20'
+                  : 'bg-primary/10 hover:bg-primary/20 text-light border border-accent/10 hover:border-accent/20'
               }`}
             >
               Pre-inscribirme en esta categoría

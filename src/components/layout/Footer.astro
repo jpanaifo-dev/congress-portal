@@ -33,7 +33,7 @@ const currentYear = new Date().getFullYear();
           <GraduationCap class="w-6 h-6 text-accent absolute bottom-1.5 left-1.5" />
         </div>
         <div class="flex flex-col">
-          <span class="font-display font-bold text-lg leading-tight text-white"
+          <span class="font-display font-bold text-lg leading-tight text-light"
             >Escuela de Postgrado</span
           >
           <span class="text-xs text-accent font-medium uppercase tracking-widest">UNAP</span>
@@ -49,7 +49,7 @@ const currentYear = new Date().getFullYear();
           href="https://facebook.com"
           target="_blank"
           rel="noopener noreferrer"
-          class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-white rounded-lg border border-accent/10 transition-colors"
+          class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-light rounded-lg border border-accent/10 transition-colors"
           aria-label="Facebook Oficial de la Escuela de Postgrado"
         >
           <Facebook class="w-5 h-5" />
@@ -58,7 +58,7 @@ const currentYear = new Date().getFullYear();
           href="https://youtube.com"
           target="_blank"
           rel="noopener noreferrer"
-          class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-white rounded-lg border border-accent/10 transition-colors"
+          class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-light rounded-lg border border-accent/10 transition-colors"
           aria-label="Canal de Youtube de la Escuela de Postgrado"
         >
           <Youtube class="w-5 h-5" />
@@ -67,7 +67,7 @@ const currentYear = new Date().getFullYear();
           href="https://linkedin.com"
           target="_blank"
           rel="noopener noreferrer"
-          class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-white rounded-lg border border-accent/10 transition-colors"
+          class="p-2.5 bg-primary/10 hover:bg-primary/20 text-accent hover:text-light rounded-lg border border-accent/10 transition-colors"
           aria-label="Página de LinkedIn de la Escuela de Postgrado"
         >
           <Linkedin class="w-5 h-5" />
@@ -78,7 +78,7 @@ const currentYear = new Date().getFullYear();
     <!-- Col 2: Useful Links -->
     <div class="flex flex-col gap-4">
       <h3
-        class="font-display font-semibold text-white uppercase tracking-wider text-sm border-l-2 border-secondary pl-3"
+        class="font-display font-semibold text-light uppercase tracking-wider text-sm border-l-2 border-secondary pl-3"
       >
         Enlaces de Interés
       </h3>
@@ -87,7 +87,7 @@ const currentYear = new Date().getFullYear();
           href="https://postgrado.unapiquitos.edu.pe"
           target="_blank"
           rel="noopener"
-          class="text-light/70 hover:text-white flex items-center gap-1 group transition-colors"
+          class="text-light/70 hover:text-light flex items-center gap-1 group transition-colors"
         >
           Portal de Postgrado <ArrowUpRight
             class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -97,7 +97,7 @@ const currentYear = new Date().getFullYear();
           href="https://www.unapiquitos.edu.pe"
           target="_blank"
           rel="noopener"
-          class="text-light/70 hover:text-white flex items-center gap-1 group transition-colors"
+          class="text-light/70 hover:text-light flex items-center gap-1 group transition-colors"
         >
           Portal Principal UNAP <ArrowUpRight
             class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -107,16 +107,16 @@ const currentYear = new Date().getFullYear();
           href="https://alicia.concytec.gob.pe"
           target="_blank"
           rel="noopener"
-          class="text-light/70 hover:text-white flex items-center gap-1 group transition-colors"
+          class="text-light/70 hover:text-light flex items-center gap-1 group transition-colors"
         >
           Repositorio Nacional ALICIA <ArrowUpRight
             class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"
           />
         </a>
-        <a href="#cronograma" class="text-light/70 hover:text-white transition-colors">
+        <a href="#cronograma" class="text-light/70 hover:text-light transition-colors">
           Programa del Encuentro
         </a>
-        <a href="/registro" class="text-light/70 hover:text-white transition-colors">
+        <a href="/registro" class="text-light/70 hover:text-light transition-colors">
           Ficha de Inscripción
         </a>
       </nav>
@@ -125,7 +125,7 @@ const currentYear = new Date().getFullYear();
     <!-- Col 3: Research Focus -->
     <div class="flex flex-col gap-4">
       <h3
-        class="font-display font-semibold text-white uppercase tracking-wider text-sm border-l-2 border-secondary pl-3"
+        class="font-display font-semibold text-light uppercase tracking-wider text-sm border-l-2 border-secondary pl-3"
       >
         Líneas de Investigación
       </h3>
@@ -152,7 +152,7 @@ const currentYear = new Date().getFullYear();
     <!-- Col 4: Contact Details -->
     <div class="flex flex-col gap-4">
       <h3
-        class="font-display font-semibold text-white uppercase tracking-wider text-sm border-l-2 border-secondary pl-3"
+        class="font-display font-semibold text-light uppercase tracking-wider text-sm border-l-2 border-secondary pl-3"
       >
         Contacto Oficial
       </h3>
@@ -167,7 +167,7 @@ const currentYear = new Date().getFullYear();
         </div>
         <div class="flex items-center gap-2.5">
           <Mail class="w-4 h-4 text-accent shrink-0" />
-          <a href={`mailto:${CONTACT_INFO.emails[0]}`} class="hover:text-white transition-colors"
+          <a href={`mailto:${CONTACT_INFO.emails[0]}`} class="hover:text-light transition-colors"
             >{CONTACT_INFO.emails[0]}</a
           >
         </div>
@@ -189,9 +189,9 @@ const currentYear = new Date().getFullYear();
       reservados.
     </p>
     <div class="flex gap-6">
-      <a href="#faq" class="hover:text-white transition-colors">Términos & Condiciones</a>
-      <a href="#faq" class="hover:text-white transition-colors">Preguntas Frecuentes</a>
-      <a href="#contacto" class="hover:text-white transition-colors">Soporte Técnico</a>
+      <a href="#faq" class="hover:text-light transition-colors">Términos & Condiciones</a>
+      <a href="#faq" class="hover:text-light transition-colors">Preguntas Frecuentes</a>
+      <a href="#contacto" class="hover:text-light transition-colors">Soporte Técnico</a>
     </div>
   </div>
 </footer>

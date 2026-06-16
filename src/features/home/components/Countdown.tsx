@@ -45,9 +45,9 @@ export const Countdown: React.FC = () => {
     return (
       <div className="grid grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-lg mt-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-dark/40 border border-accent/10 rounded-2xl p-3 sm:p-4 md:p-6 flex flex-col items-center justify-center animate-pulse">
+          <div key={i} className="bg-black/40 border border-secondary/20 rounded-2xl p-3 sm:p-4 md:p-6 flex flex-col items-center justify-center animate-pulse">
             <span className="text-3xl md:text-5xl font-display font-extrabold text-white opacity-20">00</span>
-            <span className="text-xs text-accent/40 uppercase tracking-widest mt-1">...</span>
+            <span className="text-xs text-secondary/40 uppercase tracking-widest mt-1">...</span>
           </div>
         ))}
       </div>
@@ -69,7 +69,7 @@ export const Countdown: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
-          className="relative bg-dark/50 backdrop-blur-md border border-accent/15 rounded-2xl p-3 sm:p-4 md:p-6 flex flex-col items-center justify-center group hover:border-secondary/30 transition-colors"
+          className="relative bg-black/40 backdrop-blur-md border border-secondary/20 rounded-2xl p-3 sm:p-4 md:p-6 flex flex-col items-center justify-center group hover:border-secondary/30 transition-colors"
         >
           {/* Subtle Glow Overlay */}
           <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 rounded-2xl blur-md transition-opacity duration-300 pointer-events-none"></div>
@@ -88,7 +88,7 @@ export const Countdown: React.FC = () => {
               </motion.span>
             </AnimatePresence>
           </div>
-          <span className="text-[10px] sm:text-xs text-accent font-semibold uppercase tracking-wider mt-1.5">
+          <span className="text-[10px] sm:text-xs text-secondary font-semibold uppercase tracking-wider mt-1.5">
             {item.label}
           </span>
         </motion.div>

@@ -159,7 +159,7 @@ export const Timeline: React.FC = () => {
       case 'break':
         return <Coffee className="w-5 h-5 text-light/40" />;
       case 'ceremony':
-        return <Calendar className="w-5 h-5 text-white" />;
+        return <Calendar className="w-5 h-5 text-light" />;
       default:
         return <HelpCircle className="w-5 h-5 text-light/40" />;
     }
@@ -177,7 +177,7 @@ export const Timeline: React.FC = () => {
       case 'break':
         return 'bg-light/5 text-light/65 border-light/10';
       case 'ceremony':
-        return 'bg-white/10 text-white border-white/20';
+        return 'bg-light/10 text-light border-light/20';
       default:
         return 'bg-light/5 text-light/65 border-light/10';
     }
@@ -206,7 +206,7 @@ export const Timeline: React.FC = () => {
     return (
       <div className="w-full text-center py-16 bg-dark/40 backdrop-blur-md rounded-3xl border border-accent/10 p-8 flex flex-col items-center justify-center gap-4 relative z-10">
         <Calendar className="w-12 h-12 text-accent/40 mx-auto" />
-        <h3 className="font-display font-bold text-lg text-white">No hay actividades registradas</h3>
+        <h3 className="font-display font-bold text-lg text-light">No hay actividades registradas</h3>
         <p className="text-xs sm:text-sm text-light/65 max-w-md mx-auto text-center">
           Actualmente no se encuentran sesiones de cronograma registradas en la base de datos para la edición activa del evento.
         </p>
@@ -260,9 +260,9 @@ export const Timeline: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <span className="text-7xl font-display font-black text-white text-glow leading-none">{dateNum}</span>
+                <span className="text-7xl font-display font-black text-light text-glow leading-none">{dateNum}</span>
 
-                <h3 className="font-display font-bold text-lg leading-tight text-white uppercase group-hover:text-secondary transition-colors mt-2">
+                <h3 className="font-display font-bold text-lg leading-tight text-light uppercase group-hover:text-secondary transition-colors mt-2">
                   DÍA {dayNumber}
                 </h3>
 
@@ -335,7 +335,7 @@ export const Timeline: React.FC = () => {
                             {isKeynote && (
                               <>
                                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&q=80&w=400&h=300')] bg-cover bg-center -z-10 group-hover:scale-103 transition-transform duration-500"></div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-dark/95 via-dark/80 to-dark/50 -z-10"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#0D1F17]/95 via-[#0D1F17]/80 to-[#0D1F17]/50 -z-10"></div>
                               </>
                             )}
 
@@ -350,7 +350,7 @@ export const Timeline: React.FC = () => {
                                 </span>
                               </div>
 
-                              <h4 className={`font-display font-bold text-base leading-snug transition-colors mb-2 line-clamp-2 ${isKeynote ? 'text-[#fcd34d] text-glow group-hover:text-white' : 'text-white group-hover:text-secondary'
+                              <h4 className={`font-display font-bold text-base leading-snug transition-colors mb-2 line-clamp-2 ${isKeynote ? 'text-[#fcd34d] text-glow group-hover:text-white' : 'text-light group-hover:text-secondary'
                                 }`}>
                                 {act.title}
                               </h4>
@@ -368,7 +368,7 @@ export const Timeline: React.FC = () => {
                                   loading="lazy"
                                 />
                                 <div className="flex flex-col overflow-hidden">
-                                  <span className="text-xs font-semibold text-white truncate">{speaker.name}</span>
+                                  <span className="text-xs font-semibold text-light truncate">{speaker.name}</span>
                                   <span className="text-[10px] text-accent truncate">{speaker.specialty}</span>
                                 </div>
                               </div>
@@ -413,7 +413,7 @@ export const Timeline: React.FC = () => {
                           {isKeynote && (
                             <>
                               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&q=80&w=400&h=300')] bg-cover bg-center -z-10"></div>
-                              <div className="absolute inset-0 bg-gradient-to-t from-dark/95 via-dark/80 to-dark/50 -z-10"></div>
+                              <div className="absolute inset-0 bg-gradient-to-t from-[#0D1F17]/95 via-[#0D1F17]/80 to-[#0D1F17]/50 -z-10"></div>
                             </>
                           )}
 
@@ -427,7 +427,7 @@ export const Timeline: React.FC = () => {
                             </span>
                           </div>
 
-                          <h4 className={`font-display font-bold text-base mb-1.5 leading-snug ${isKeynote ? 'text-[#fcd34d] text-glow' : 'text-white group-hover:text-secondary transition-colors'
+                          <h4 className={`font-display font-bold text-base mb-1.5 leading-snug ${isKeynote ? 'text-[#fcd34d] text-glow' : 'text-light group-hover:text-secondary transition-colors'
                             }`}>
                             {act.title}
                           </h4>
@@ -444,7 +444,7 @@ export const Timeline: React.FC = () => {
                                 loading="lazy"
                               />
                               <div className="flex flex-col">
-                                <span className="text-xs font-bold text-white">{speaker.name}</span>
+                                <span className="text-xs font-bold text-light">{speaker.name}</span>
                                 <span className="text-[10px] text-accent">{speaker.specialty}</span>
                               </div>
                             </div>

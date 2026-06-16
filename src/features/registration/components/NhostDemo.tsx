@@ -203,9 +203,9 @@ export const NhostDemo: React.FC = () => {
     <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 text-light">
       
       {/* Header and status info bar */}
-      <div className="col-span-1 lg:col-span-12 glass-card rounded-2xl p-6 border border-accent/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="col-span-1 lg:col-span-12 glass-card rounded-2xl p-6 border border-accent/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="font-display font-bold text-2xl text-white flex items-center gap-2">
+          <h2 className="font-display font-bold text-2xl text-light flex items-center gap-2">
             <Database className="w-6 h-6 text-secondary" />
             Consola de Integración Nhost
           </h2>
@@ -224,7 +224,7 @@ export const NhostDemo: React.FC = () => {
           </span>
           <button 
             onClick={() => fetchSpeakers(false)}
-            className="p-2 bg-dark border border-accent/15 rounded-lg hover:border-secondary transition-all text-light/70 hover:text-white cursor-pointer"
+            className="p-2 bg-dark border border-accent/15 rounded-lg hover:border-secondary transition-all text-light/70 hover:text-light cursor-pointer"
             title="Recargar datos"
           >
             <RefreshCw className="w-4 h-4" />
@@ -264,7 +264,7 @@ export const NhostDemo: React.FC = () => {
         {/* Tab contents */}
         {activeTab === 'speakers' ? (
           <div className="glass-card rounded-2xl p-6 border border-accent/10 flex-grow">
-            <h3 className="text-lg font-display font-bold text-white mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-display font-bold text-light mb-4 flex items-center gap-2">
               <Users className="w-5 h-5 text-secondary" />
               Tabla: `speakers`
             </h3>
@@ -295,7 +295,7 @@ export const NhostDemo: React.FC = () => {
                     )}
                     <div className="flex-grow min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h4 className="font-display font-bold text-white text-base truncate">{spk.full_name}</h4>
+                        <h4 className="font-display font-bold text-light text-base truncate">{spk.full_name}</h4>
                         <span className="text-[10px] bg-primary/10 border border-accent/10 px-2 py-0.5 rounded text-accent font-semibold flex-shrink-0">
                           {spk.institution || 'N/A'}
                         </span>
@@ -312,7 +312,7 @@ export const NhostDemo: React.FC = () => {
         ) : (
           <div className="glass-card rounded-2xl p-6 border border-accent/10 flex-grow font-mono text-xs flex flex-col gap-4 overflow-x-auto">
             <div>
-              <div className="flex items-center gap-2 text-white font-sans font-semibold mb-2">
+              <div className="flex items-center gap-2 text-light font-sans font-semibold mb-2">
                 <Terminal className="w-4 h-4 text-secondary" />
                 Consulta: Obtener Ponentes (GET_SPEAKERS)
               </div>
@@ -322,7 +322,7 @@ export const NhostDemo: React.FC = () => {
             </div>
 
             <div>
-              <div className="flex items-center gap-2 text-white font-sans font-semibold mb-2">
+              <div className="flex items-center gap-2 text-light font-sans font-semibold mb-2">
                 <Terminal className="w-4 h-4 text-secondary" />
                 Mutación: Registro Transaccional (CREATE_PARTICIPANT_REGISTRATION)
               </div>
@@ -338,7 +338,7 @@ export const NhostDemo: React.FC = () => {
       <div className="col-span-1 lg:col-span-5">
         <div className="glass-card rounded-2xl p-6 border border-accent/10 h-full flex flex-col justify-between">
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
-            <h3 className="text-lg font-display font-bold text-white mb-2 flex items-center gap-2 border-b border-accent/10 pb-3">
+            <h3 className="text-lg font-display font-bold text-light mb-2 flex items-center gap-2 border-b border-accent/10 pb-3">
               <Send className="w-5 h-5 text-secondary" />
               Probar Mutación de Registro
             </h3>
@@ -346,7 +346,7 @@ export const NhostDemo: React.FC = () => {
             {/* Simulated environment variables details */}
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-[11px] text-light/80 leading-relaxed">
               <span className="font-semibold text-secondary block mb-1">Simulación Transaccional:</span>
-              Crea un perfil de usuario en <code className="bg-dark/50 px-1 text-white rounded">profiles</code> e inserta una pre-inscripción en <code className="bg-dark/50 px-1 text-white rounded">registrations</code> usando UUIDs asociados.
+              Crea un perfil de usuario en <code className="bg-dark/50 px-1 text-light rounded">profiles</code> e inserta una pre-inscripción en <code className="bg-dark/50 px-1 text-light rounded">registrations</code> usando UUIDs asociados.
             </div>
 
             {/* Profile ID config */}
@@ -365,7 +365,7 @@ export const NhostDemo: React.FC = () => {
                 type="text"
                 value={customProfileId}
                 onChange={(e) => setCustomProfileId(e.target.value)}
-                className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-secondary"
+                className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs font-mono text-light focus:outline-none focus:border-secondary"
                 required
               />
             </div>
@@ -377,7 +377,7 @@ export const NhostDemo: React.FC = () => {
                 type="text"
                 value={customEditionId}
                 onChange={(e) => setCustomEditionId(e.target.value)}
-                className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-secondary"
+                className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs font-mono text-light focus:outline-none focus:border-secondary"
                 required
               />
             </div>
@@ -391,7 +391,7 @@ export const NhostDemo: React.FC = () => {
                   placeholder="Juan Carlos"
                   value={firstNames}
                   onChange={(e) => setFirstNames(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                   required
                 />
               </div>
@@ -403,7 +403,7 @@ export const NhostDemo: React.FC = () => {
                   placeholder="Pérez"
                   value={lastNames}
                   onChange={(e) => setLastNames(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                   required
                 />
               </div>
@@ -413,7 +413,7 @@ export const NhostDemo: React.FC = () => {
                 <select
                   value={docType}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDocType(e.target.value as DbDocumentType)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                 >
                   <option value="DNI">DNI</option>
                   <option value="CARNET_EXTRANJERIA">Carnet de Extranjería</option>
@@ -428,7 +428,7 @@ export const NhostDemo: React.FC = () => {
                   placeholder="71234567"
                   value={docNumber}
                   onChange={(e) => setDocNumber(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                   required
                 />
               </div>
@@ -440,7 +440,7 @@ export const NhostDemo: React.FC = () => {
                   placeholder="juan@unap.edu.pe"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                   required
                 />
               </div>
@@ -452,7 +452,7 @@ export const NhostDemo: React.FC = () => {
                   placeholder="987654321"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                 />
               </div>
 
@@ -463,7 +463,7 @@ export const NhostDemo: React.FC = () => {
                   placeholder="UNAP"
                   value={institution}
                   onChange={(e) => setInstitution(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                 />
               </div>
             </div>
@@ -475,7 +475,7 @@ export const NhostDemo: React.FC = () => {
                 <select
                   value={participationType}
                   onChange={(e) => setParticipationType(e.target.value as DbParticipationType)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                 >
                   <option value="pregrado">Pregrado</option>
                   <option value="postgrado">Postgrado</option>
@@ -488,7 +488,7 @@ export const NhostDemo: React.FC = () => {
                 <select
                   value={researchArea}
                   onChange={(e) => setResearchArea(e.target.value as DbResearchArea)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
                 >
                   <option value="ciencias_salud">Ciencias de la Salud</option>
                   <option value="ciencias_naturales">Ciencias Naturales</option>

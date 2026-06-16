@@ -33,7 +33,7 @@ export const Accordion: React.FC<AccordionProps> = ({ items }) => {
             <button
               type="button"
               onClick={() => toggleItem(item.id)}
-              className="w-full flex items-center justify-between p-5 text-left font-display font-semibold text-white sm:text-lg hover:text-secondary focus-visible:outline-none focus-visible:bg-primary/10 transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between p-5 text-left font-display font-semibold text-light sm:text-lg hover:text-secondary focus-visible:outline-none focus-visible:bg-primary/10 transition-colors cursor-pointer"
               aria-expanded={isOpen}
               aria-controls={`faq-content-${item.id}`}
               id={`faq-btn-${item.id}`}
