@@ -160,7 +160,7 @@ export const CompleteProgram: React.FC = () => {
       case 'break':
         return <Coffee className="w-5 h-5 text-light/45" />;
       case 'ceremony':
-        return <Calendar className="w-5 h-5 text-white" />;
+        return <Calendar className="w-5 h-5 text-light" />;
       default:
         return <HelpCircle className="w-5 h-5 text-light/45" />;
     }
@@ -178,7 +178,7 @@ export const CompleteProgram: React.FC = () => {
       case 'break':
         return 'bg-light/5 text-light/60 border-light/10';
       case 'ceremony':
-        return 'bg-white/5 text-white border-white/15';
+        return 'bg-light/5 text-light border-light/15';
       default:
         return 'bg-light/5 text-light/60 border-light/10';
     }
@@ -215,7 +215,7 @@ export const CompleteProgram: React.FC = () => {
       <div className="w-full max-w-4xl mx-auto flex flex-col gap-12 relative z-10">
         <div className="w-full text-center py-16 bg-dark/40 backdrop-blur-md rounded-3xl border border-accent/10 p-8 flex flex-col items-center justify-center gap-4">
           <Calendar className="w-12 h-12 text-accent/40 mx-auto" />
-          <h3 className="font-display font-bold text-lg text-white">No hay actividades registradas</h3>
+          <h3 className="font-display font-bold text-lg text-light">No hay actividades registradas</h3>
           <p className="text-xs sm:text-sm text-light/65 max-w-md mx-auto text-center">
             Actualmente no se encuentran sesiones de cronograma registradas en la base de datos para la edición activa del evento.
           </p>
@@ -229,13 +229,13 @@ export const CompleteProgram: React.FC = () => {
       {displaySchedule.map((dayData, idx) => (
         <div key={dayData.dateString} className="flex flex-col gap-8">
           {/* Day Title */}
-          <div className="flex items-center gap-4 border-b border-white/[0.08] pb-4">
+          <div className="flex items-center gap-4 border-b border-light/10 pb-4">
             <div className="w-12 h-12 rounded-2xl bg-secondary/15 flex items-center justify-center border border-secondary/35 text-secondary font-display font-black text-lg">
               {idx + 1}
             </div>
             <div className="flex flex-col">
               <span className="text-[10px] text-accent uppercase font-bold tracking-widest">Día del Congreso</span>
-              <h2 className="text-lg sm:text-xl font-display font-black text-white">{dayData.dateString}</h2>
+              <h2 className="text-lg sm:text-xl font-display font-black text-light">{dayData.dateString}</h2>
             </div>
           </div>
 
@@ -278,7 +278,7 @@ export const CompleteProgram: React.FC = () => {
                       </span>
                     </div>
 
-                    <h3 className={`font-display font-extrabold text-base sm:text-lg mb-2 leading-snug text-white ${
+                    <h3 className={`font-display font-extrabold text-base sm:text-lg mb-2 leading-snug text-light ${
                       isKeynote ? 'text-glow-secondary' : 'group-hover:text-secondary transition-colors'
                     }`}>
                       {act.title}
@@ -299,7 +299,7 @@ export const CompleteProgram: React.FC = () => {
                             loading="lazy"
                           />
                           <div className="flex flex-col min-w-0">
-                            <span className="text-xs sm:text-sm font-extrabold text-white truncate">{speaker.name}</span>
+                            <span className="text-xs sm:text-sm font-extrabold text-light truncate">{speaker.name}</span>
                             <span className="text-[10px] sm:text-xs text-accent truncate">{speaker.specialty} • <span className="text-light/55">{speaker.institution}</span></span>
                           </div>
                         </div>

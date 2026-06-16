@@ -2,17 +2,47 @@
 
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary: #0B5D1E;
   --color-secondary: #4CAF50;
-  --color-accent: #A5D6A7;
-  --color-dark: #0D1F17;
-  --color-light: #F5F8F5;
-  --color-support: #FFFFFF;
+  --color-accent: var(--accent-color);
+  --color-dark: var(--bg-dark);
+  --color-light: var(--text-light);
+  --color-support: var(--color-support-var);
   --color-jsyellow: #F5A623;
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Outfit', sans-serif;
+}
+
+:root {
+  /* Light theme values */
+  --bg-dark: #F5F8F5;
+  --text-light: #0D1F17;
+  --color-support-var: #0D1F17;
+  --accent-color: #0B5D1E;
+  
+  --glass-card-bg: rgba(255, 255, 255, 0.85);
+  --glass-card-border: rgba(11, 93, 30, 0.12);
+  --border-base: rgba(13, 31, 23, 0.08);
+  --schedule-bg-filter: grayscale(100%) brightness(95%) contrast(90%);
+  --schedule-bg-opacity: 0.08;
+}
+
+.dark {
+  /* Dark theme values */
+  --bg-dark: #0D1F17;
+  --text-light: #F5F8F5;
+  --color-support-var: #FFFFFF;
+  --accent-color: #A5D6A7;
+  
+  --glass-card-bg: rgba(13, 31, 23, 0.7);
+  --glass-card-border: rgba(165, 214, 167, 0.1);
+  --border-base: rgba(255, 255, 255, 0.05);
+  --schedule-bg-filter: grayscale(100%) brightness(15%) contrast(110%);
+  --schedule-bg-opacity: 1;
 }
 
 @layer base {
@@ -44,9 +74,9 @@
 /* Custom premium design system utility classes */
 @layer utilities {
   .glass-card {
-    background: rgba(13, 31, 23, 0.7);
+    background: var(--glass-card-bg);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(165, 214, 167, 0.1);
+    border: 1px solid var(--glass-card-border);
   }
 
   .text-glow {
@@ -79,7 +109,8 @@
     background-image: url('https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=1600&h=900');
     background-size: cover;
     background-position: center;
-    filter: grayscale(100%) brightness(15%) contrast(110%);
+    filter: var(--schedule-bg-filter);
+    opacity: var(--schedule-bg-opacity);
     z-index: 0;
     pointer-events: none;
   }
