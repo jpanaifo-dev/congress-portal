@@ -1,5 +1,9 @@
 ---
 import { Timeline } from '../../features/home/components/Timeline';
+import { fetchConfig } from '../../lib/supabase';
+
+const config = await fetchConfig();
+const editionId = config.edition?.id || "";
 ---
 
 <section id="cronograma" class="relative py-24 bg-dark schedule-crowd-bg">
@@ -25,7 +29,7 @@ import { Timeline } from '../../features/home/components/Timeline';
     </div>
 
     {/* Timeline Component Embed (loaded when visible to user) */}
-    <Timeline client:visible />
+    <Timeline client:visible editionId={editionId} />
 
     {/* CTA to complete program page */}
     <div class="text-center mt-12">

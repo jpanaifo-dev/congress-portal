@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { nhost } from '../../../lib/nhost';
+import { fetchSpeakers, fetchConfig } from '../../../lib/supabase';
 
-export const SpeakersList: React.FC = () => {
+interface SpeakersListProps {
+  editionId?: string;
+}
+
+export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId }) => {
   const [speakers, setSpeakers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [dbError, setDbError] = useState<string | null>(null);
@@ -9,29 +13,14 @@ export const SpeakersList: React.FC = () => {
   useEffect(() => {
     const loadSpeakers = async () => {
       try {
-        const resp = await nhost.graphql.request<any>({
-          query: `
-            query GetSpeakers {
-              speakers(order_by: { full_name: asc }) {
-                id
-                full_name
-                specialty
-                bio
-                photo_url
-                institution
-              }
-            }
-          `
-        });
-
-        if (resp.body.errors && resp.body.errors.length > 0) {
-          console.warn("GraphQL errors loading speakers:", resp.body.errors);
-          setDbError(resp.body.errors[0].message);
-        } else {
-          const list = resp.body.data?.speakers;
-          if (list) {
-            setSpeakers(list);
-          }
+        let activeEditionId = editionId;
+        if (!activeEditionId) {
+          const config = await fetchConfig();
+          activeEditionId = config.edition?.id || "";
+        }
+        if (activeEditionId) {
+          const list = await fetchSpeakers(activeEditionId);
+          setSpeakers(list);
         }
       } catch (err: any) {
         console.warn("Failed to load speakers from database:", err);
@@ -42,7 +31,7 @@ export const SpeakersList: React.FC = () => {
     };
 
     loadSpeakers();
-  }, []);
+  }, [editionId]);
 
   if (loading) {
     return (

@@ -1,6 +1,7 @@
 ---
 import { SEO } from 'astro-seo';
 import '../styles/global.css';
+import { fetchConfig } from '../lib/supabase';
 
 interface Props {
   title?: string;
@@ -8,18 +9,29 @@ interface Props {
 }
 
 const {
-  title = "III Encuentro Científico - Escuela de Postgrado UNAP",
-  description = "III Encuentro Científico de la Escuela de Postgrado de la UNAP: 'Ciencia que transforma la Amazonía, conocimiento que construye futuro'. 02 y 03 de julio de 2026."
+  title: propTitle,
+  description: propDescription
 } = Astro.props;
+
+// Fetch active config from Supabase
+const config = await fetchConfig();
+
+const brandName = config.event?.name || config.globalSettings?.app_name || "III Encuentro Científico - Escuela de Postgrado UNAP";
+const brandDesc = config.event?.short_description || "III Encuentro Científico de la Escuela de Postgrado de la UNAP: 'Ciencia que transforma la Amazonía, conocimiento que construye futuro'. 02 y 03 de julio de 2026.";
+const startDateStr = config.edition?.start_date ? `${config.edition.start_date}T08:00:00-05:00` : "2026-07-02T08:00:00-05:00";
+const endDateStr = config.edition?.end_date ? `${config.edition.end_date}T18:00:00-05:00` : "2026-07-03T18:00:00-05:00";
+
+const title = propTitle || brandName;
+const description = propDescription || brandDesc;
 
 // JSON-LD Structured Data
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "EducationEvent",
-  "name": "III Encuentro Científico de la Escuela de Postgrado - UNAP",
-  "description": "Ciencia que transforma la Amazonía, conocimiento que construye futuro.",
-  "startDate": "2026-07-02T08:00:00-05:00",
-  "endDate": "2026-07-03T18:00:00-05:00",
+  "name": brandName,
+  "description": brandDesc,
+  "startDate": startDateStr,
+  "endDate": endDateStr,
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/MixedEventAttendanceMode",
   "location": [
@@ -66,11 +78,23 @@ const jsonLd = {
 };
 ---
 
+
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Brand colors injected from Supabase Database -->
+    <style define:vars={{
+      primaryColor: config.event?.brand_colors?.primary || '#0B5D1E',
+      secondaryColor: config.event?.brand_colors?.secondary || '#4CAF50',
+    }}>
+      :root {
+        --color-primary: var(--primaryColor) !important;
+        --color-secondary: var(--secondaryColor) !important;
+      }
+    </style>
     
     <!-- Theme Loader Script (Avoid FOUC) -->
     <script is:inline>

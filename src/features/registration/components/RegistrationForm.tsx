@@ -3,11 +3,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
-// Duplicate import removed
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Loader2, Send, ArrowRight, FileCheck } from 'lucide-react';
 import type { RegistrationInput } from '../../../types';
-import { nhost } from '../../../lib/nhost';
+import { checkProfileRegistration, createRegistration, fetchConfig } from '../../../lib/supabase';
 import confetti from 'canvas-confetti';
 
 const registrationSchema = z.object({
@@ -51,8 +50,13 @@ const registrationSchema = z.object({
 
 const queryClient = new QueryClient();
 
+interface RegistrationFormProps {
+  editionId?: string;
+  mainEventId?: string;
+}
+
 // Internal Form Content Component that uses useMutation
-const RegistrationFormContent: React.FC = () => {
+const RegistrationFormContent: React.FC<RegistrationFormProps> = ({ editionId, mainEventId }) => {
   const [docCheckStatus, setDocCheckStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState<RegistrationInput | null>(null);
@@ -78,164 +82,49 @@ const RegistrationFormContent: React.FC = () => {
     },
   });
 
-  // API handler with Nhost integration and validation
+  // API handler with Supabase REST integration and validation
   const registrationMutation = useMutation({
     mutationFn: async (data: RegistrationInput) => {
-      const subdomain = import.meta.env.PUBLIC_NHOST_SUBDOMAIN;
-      const isConfigured = subdomain && subdomain !== 'xxxx-yyyy-zzzz';
+      let activeEditionId = editionId;
+      let activeMainEventId = mainEventId;
 
-      if (!isConfigured) {
-        // Mock Mode Simulation: Check for mock duplicates
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        if (data.documentNumber === '12345678' || data.email === 'duplicate@test.com') {
-          throw new Error('El número de documento o correo electrónico ya se encuentra registrado para este evento.');
-        }
-        return data;
+      if (!activeEditionId || !activeMainEventId) {
+        const config = await fetchConfig();
+        activeEditionId = activeEditionId || config.edition?.id || undefined;
+        activeMainEventId = activeMainEventId || config.event?.id || undefined;
       }
 
-      // Live Mode check if email or (doc_type, doc_number) is already registered
-      const checkResp = await nhost.graphql.request<any>({
-        query: `
-          query CheckRegistered($email: String!, $docType: document_type!, $docNumber: String!) {
-            profiles(
-              where: {
-                _or: [
-                  { email: { _eq: $email } },
-                  {
-                    _and: [
-                      { doc_type: { _eq: $docType } },
-                      { doc_number: { _eq: $docNumber } }
-                    ]
-                  }
-                ]
-              }
-            ) {
-              id
-              email
-              registrations {
-                id
-              }
-            }
-          }
-        `,
-        variables: {
-          email: data.email,
-          docType: data.docType,
-          docNumber: data.documentNumber
-        }
-      });
-
-      if (checkResp.body.errors && checkResp.body.errors.length > 0) {
-        throw new Error(checkResp.body.errors.map((e: any) => e.message).join(', '));
+      if (!activeEditionId || !activeMainEventId) {
+        throw new Error('No se pudo determinar el evento o edición activos. Por favor, asegúrate de que existan registros configurados en la base de datos.');
       }
 
-      const existingProfile = checkResp.body.data?.profiles?.[0];
-      if (existingProfile && existingProfile.registrations?.length > 0) {
+      // Check if already registered
+      const check = await checkProfileRegistration(
+        data.email,
+        data.docType,
+        data.documentNumber,
+        activeEditionId
+      );
+
+      if (check.isRegisteredForEdition) {
         throw new Error('El número de documento o correo electrónico ya se encuentra registrado para este evento.');
       }
 
-      // Pre-registration mutation
-      const profileId = existingProfile?.id || (crypto.randomUUID ? crypto.randomUUID() : 'b51bb9e5-9fa5-45d2-a7f4-ee1fa42921f0');
-
-      let activeEditionId: string | null = null;
-      let graphqlErrorMsg: string | null = null;
-      try {
-        const editionResp = await nhost.graphql.request<any>({
-          query: `
-            query GetActiveEdition {
-              editions(order_by: { is_active: desc }, limit: 1) {
-                id
-              }
-            }
-          `
-        });
-
-        if (editionResp.body.errors && editionResp.body.errors.length > 0) {
-          graphqlErrorMsg = editionResp.body.errors.map((e: any) => e.message).join(', ');
-        } else {
-          const firstEdition = editionResp.body.data?.editions?.[0];
-          if (firstEdition?.id) {
-            activeEditionId = firstEdition.id;
-          }
-        }
-      } catch (err: any) {
-        console.error('Error fetching active edition:', err);
-        graphqlErrorMsg = err.message || String(err);
-      }
-
-      if (graphqlErrorMsg) {
-        throw new Error(`Error al consultar ediciones: ${graphqlErrorMsg}. Asegúrate de que la tabla "editions" esté registrada (tracked) y tenga permisos de lectura (SELECT) en el Nhost Console.`);
-      }
-
-      if (!activeEditionId) {
-        throw new Error('No se encontró ninguna edición del evento en la tabla "editions". Por favor, agrega al menos una edición en tu base de datos.');
-      }
-
-      const mutationResp = await nhost.graphql.request<any>({
-        query: `
-          mutation CreatePreRegistration(
-            $profileId: uuid!,
-            $email: String!,
-            $firstNames: String!,
-            $lastNames: String!,
-            $docType: document_type!,
-            $docNumber: String!,
-            $phone: String,
-            $institution: String,
-            $editionId: uuid!,
-            $participationType: participation_type!,
-            $researchArea: research_area
-          ) {
-            insert_profiles_one(
-              object: {
-                id: $profileId,
-                email: $email,
-                first_names: $firstNames,
-                last_names: $lastNames,
-                doc_type: $docType,
-                doc_number: $docNumber,
-                phone: $phone,
-                institution: $institution,
-                role: participant
-              },
-              on_conflict: {
-                constraint: profiles_pkey,
-                update_columns: [first_names, last_names, doc_type, doc_number, phone, institution]
-              }
-            ) {
-              id
-            }
-            insert_registrations_one(
-              object: {
-                profile_id: $profileId,
-                edition_id: $editionId,
-                participation_type: $participationType,
-                research_area: $researchArea,
-                payment_status: pending
-              }
-            ) {
-              id
-            }
-          }
-        `,
-        variables: {
-          profileId,
-          email: data.email,
-          firstNames: data.firstNames,
-          lastNames: data.lastNames,
-          docType: data.docType,
-          docNumber: data.documentNumber,
-          phone: data.phone,
-          institution: data.institution,
-          editionId: activeEditionId,
-          participationType: data.participantType === 'Pregrado' ? 'pregrado' : data.participantType === 'Postgrado' ? 'postgrado' : 'publico_general',
-          researchArea: data.researchArea === 'Ciencias de la Salud' ? 'ciencias_salud' : data.researchArea === 'Ciencias Naturales' ? 'ciencias_naturales' : data.researchArea === 'Ingenierías y Tecnología' ? 'ingenierias' : 'ciencias_sociales'
-        }
+      // Create/update profile and insert into event_participants
+      await createRegistration({
+        profileId: check.profileId,
+        email: data.email,
+        firstNames: data.firstNames,
+        lastNames: data.lastNames,
+        docType: data.docType,
+        docNumber: data.documentNumber,
+        phone: data.phone,
+        institution: data.institution,
+        researchArea: data.researchArea,
+        participantType: data.participantType,
+        editionId: activeEditionId,
+        mainEventId: activeMainEventId
       });
-
-      if (mutationResp.body.errors && mutationResp.body.errors.length > 0) {
-        throw new Error(mutationResp.body.errors.map((e: any) => e.message).join(', '));
-      }
 
       return data;
     },
@@ -388,18 +277,13 @@ const RegistrationFormContent: React.FC = () => {
                     if (!value || !docType) { setDocCheckStatus('idle'); return; }
                     setDocCheckStatus('checking');
                     try {
-                      const resp = await nhost.graphql.request<any>({
-                        query: `
-                            query CheckDoc($docType: document_type!, $docNumber: String!) {
-                              profiles(where: { _and: [{ doc_type: { _eq: $docType } }, { doc_number: { _eq: $docNumber } }] }) {
-                                id
-                              }
-                            }
-                          `,
-                        variables: { docType, docNumber: value },
-                      });
-                      const exists = resp.body.data?.profiles?.length > 0;
-                      setDocCheckStatus(exists ? 'taken' : 'available');
+                      let activeEditionId = editionId;
+                      if (!activeEditionId) {
+                        const config = await fetchConfig();
+                        activeEditionId = config.edition?.id || "";
+                      }
+                      const check = await checkProfileRegistration('', docType, value, activeEditionId);
+                      setDocCheckStatus(check.isRegisteredForEdition ? 'taken' : 'available');
                     } catch (e) {
                       console.error(e);
                       setDocCheckStatus('idle');
@@ -638,10 +522,10 @@ const RegistrationFormContent: React.FC = () => {
 };
 
 // Exported component with QueryClientProvider wrapper
-export const RegistrationForm: React.FC = () => {
+export const RegistrationForm: React.FC<RegistrationFormProps> = ({ editionId, mainEventId }) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <RegistrationFormContent />
+      <RegistrationFormContent editionId={editionId} mainEventId={mainEventId} />
     </QueryClientProvider>
   );
 };

@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, Award, BookOpen, Coffee, HelpCircle } from 'lucide-react';
 import type { ScheduleActivity } from '../../../types';
-import { nhost } from '../../../lib/nhost';
+import { fetchSessions, fetchConfig } from '../../../lib/supabase';
 
-export const Timeline: React.FC = () => {
+interface TimelineProps {
+  editionId?: string;
+}
+
+export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [dbError, setDbError] = useState<string | null>(null);
@@ -13,43 +17,14 @@ export const Timeline: React.FC = () => {
   useEffect(() => {
     const loadSessions = async () => {
       try {
-        const resp = await nhost.graphql.request<any>({
-          query: `
-            query GetActiveEditionDetails {
-              editions(where: { is_active: { _eq: true } }) {
-                id
-                start_date
-                end_date
-                sessions(order_by: { start_time: asc }) {
-                  id
-                  title
-                  description
-                  type
-                  start_time
-                  end_time
-                  location
-                  session_speakers {
-                    speaker {
-                      id
-                      full_name
-                      specialty
-                      photo_url
-                    }
-                  }
-                }
-              }
-            }
-          `
-        });
-
-        if (resp.body.errors && resp.body.errors.length > 0) {
-          console.warn("GraphQL errors loading sessions:", resp.body.errors);
-          setDbError(resp.body.errors[0].message);
-        } else {
-          const activeEd = resp.body.data?.editions?.[0];
-          if (activeEd?.sessions && activeEd.sessions.length > 0) {
-            setSessions(activeEd.sessions);
-          }
+        let activeEditionId = editionId;
+        if (!activeEditionId) {
+          const config = await fetchConfig();
+          activeEditionId = config.edition?.id || "";
+        }
+        if (activeEditionId) {
+          const list = await fetchSessions(activeEditionId);
+          setSessions(list);
         }
       } catch (err: any) {
         console.warn("Failed to load sessions from database:", err);
@@ -60,7 +35,7 @@ export const Timeline: React.FC = () => {
     };
 
     loadSessions();
-  }, []);
+  }, [editionId]);
 
   // Group database sessions by date string
   let displaySchedule: any[] = [];
@@ -69,10 +44,24 @@ export const Timeline: React.FC = () => {
     const grouped: { [date: string]: any[] } = {};
     sessions.forEach(sess => {
       let dateKey = 'Fecha desconocida';
+      
+      let start_time_date = new Date();
+      let end_time_date = new Date();
       try {
-        const d = new Date(sess.start_time);
+        if (sess.start_time && sess.start_time.includes('T')) {
+          start_time_date = new Date(sess.start_time);
+          end_time_date = new Date(sess.end_time);
+        } else if (sess.session_date && sess.start_time) {
+          start_time_date = new Date(`${sess.session_date}T${sess.start_time}`);
+          end_time_date = new Date(`${sess.session_date}T${sess.end_time}`);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      try {
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-        const formatted = d.toLocaleDateString('es-ES', options);
+        const formatted = start_time_date.toLocaleDateString('es-ES', options);
         dateKey = formatted.charAt(0).toUpperCase() + formatted.slice(1);
       } catch (e) {
         console.error(e);
@@ -84,51 +73,79 @@ export const Timeline: React.FC = () => {
       
       let timeStr = '00:00';
       try {
-        const start = new Date(sess.start_time);
-        const end = new Date(sess.end_time);
         const formatTime = (date: Date) => {
           const hours = String(date.getHours()).padStart(2, '0');
           const minutes = String(date.getMinutes()).padStart(2, '0');
           return `${hours}:${minutes}`;
         };
-        timeStr = `${formatTime(start)} - ${formatTime(end)}`;
+        timeStr = `${formatTime(start_time_date)} - ${formatTime(end_time_date)}`;
       } catch (e) {
         console.error(e);
       }
       
-      const speakerData = sess.session_speakers?.[0]?.speaker;
+      const speakerData = sess.session_speakers?.[0]?.event_participants?.profile;
+      const locationName = sess.facility?.name || sess.location || 'Auditorio Principal';
       
       grouped[dateKey].push({
         id: sess.id,
         time: timeStr,
         title: sess.title,
         description: sess.description || '',
-        type: sess.type,
+        type: sess.type || sess.session_type || 'presentation',
+        location: locationName,
         speaker: speakerData ? {
-          name: speakerData.full_name,
-          specialty: speakerData.specialty,
-          photoUrl: speakerData.photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=400'
+          name: `${speakerData.first_name} ${speakerData.last_name}`.trim(),
+          specialty: speakerData.dedication || (speakerData.expertise_areas?.[0] || 'Investigador'),
+          photoUrl: speakerData.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=400'
         } : null
       });
     });
     
     const sortedDates = Object.keys(grouped).sort((a, b) => {
       const sessA = sessions.find(s => {
-        const d = new Date(s.start_time);
+        let st_date = new Date();
+        try {
+          if (s.start_time && s.start_time.includes('T')) {
+            st_date = new Date(s.start_time);
+          } else if (s.session_date && s.start_time) {
+            st_date = new Date(`${s.session_date}T${s.start_time}`);
+          }
+        } catch {}
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-        const formatted = d.toLocaleDateString('es-ES', options);
+        const formatted = st_date.toLocaleDateString('es-ES', options);
         const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
         return key === a;
       });
       const sessB = sessions.find(s => {
-        const d = new Date(s.start_time);
+        let st_date = new Date();
+        try {
+          if (s.start_time && s.start_time.includes('T')) {
+            st_date = new Date(s.start_time);
+          } else if (s.session_date && s.start_time) {
+            st_date = new Date(`${s.session_date}T${s.start_time}`);
+          }
+        } catch {}
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-        const formatted = d.toLocaleDateString('es-ES', options);
+        const formatted = st_date.toLocaleDateString('es-ES', options);
         const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
         return key === b;
       });
       if (sessA && sessB) {
-        return new Date(sessA.start_time).getTime() - new Date(sessB.start_time).getTime();
+        let timeA = new Date();
+        let timeB = new Date();
+        try {
+          if (sessA.start_time && sessA.start_time.includes('T')) {
+            timeA = new Date(sessA.start_time);
+          } else if (sessA.session_date && sessA.start_time) {
+            timeA = new Date(`${sessA.session_date}T${sessA.start_time}`);
+          }
+          if (sessB.start_time && sessB.start_time.includes('T')) {
+            timeB = new Date(sessB.start_time);
+          } else if (sessB.session_date && sessB.start_time) {
+            timeB = new Date(`${sessB.session_date}T${sessB.start_time}`);
+          }
+        } catch {}
+        return timeA.getTime() - timeB.getTime();
       }
       return 0;
     });

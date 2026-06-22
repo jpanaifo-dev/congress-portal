@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { nhost } from '../../../lib/nhost';
-import { GET_SPEAKERS, CREATE_PARTICIPANT_REGISTRATION } from '../../../lib/queries';
-import type { DbSpeaker, DbParticipationType, DbResearchArea, DbDocumentType } from '../../../types';
+import { fetchConfig, fetchSpeakers, createRegistration, checkProfileRegistration, type EventConfig } from '../../../lib/supabase';
 import { 
   Users, 
   Database, 
@@ -9,126 +7,61 @@ import {
   RefreshCw, 
   CheckCircle, 
   AlertTriangle, 
-  Code, 
   Sparkles,
-  Terminal
+  Settings
 } from 'lucide-react';
 
 export const NhostDemo: React.FC = () => {
-  // Query States
-  const [speakers, setSpeakers] = useState<DbSpeaker[]>([]);
+  const [config, setConfig] = useState<EventConfig | null>(null);
+  const [speakers, setSpeakers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMockMode, setIsMockMode] = useState<boolean>(false);
 
   // Mutation Form States
   const [firstNames, setFirstNames] = useState<string>('');
   const [lastNames, setLastNames] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
-  const [docType, setDocType] = useState<DbDocumentType>('DNI');
+  const [docType, setDocType] = useState<'DNI' | 'CARNET_EXTRANJERIA' | 'PASAPORTE'>('DNI');
   const [docNumber, setDocNumber] = useState<string>('');
   const [institution, setInstitution] = useState<string>('');
-  const [participationType, setParticipationType] = useState<DbParticipationType>('pregrado');
-  const [researchArea, setResearchArea] = useState<DbResearchArea>('ciencias_salud');
+  const [participationType, setParticipationType] = useState<string>('Pregrado');
+  const [researchArea, setResearchArea] = useState<string>('Ciencias Naturales');
   
-  // Custom UUIDs for test demonstration
-  const [customProfileId, setCustomProfileId] = useState<string>(
-    crypto.randomUUID ? crypto.randomUUID() : 'b51bb9e5-9fa5-45d2-a7f4-ee1fa42921f0'
-  );
-  const [customEditionId, setCustomEditionId] = useState<string>('a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d');
+  // Custom IDs for test
+  const [customEditionId, setCustomEditionId] = useState<string>('');
+  const [customMainEventId, setCustomMainEventId] = useState<string>('');
 
   // Mutation Status States
   const [mutationLoading, setMutationLoading] = useState<boolean>(false);
   const [mutationResult, setMutationResult] = useState<any | null>(null);
   const [mutationError, setMutationError] = useState<string | null>(null);
 
-  // Tab State
-  const [activeTab, setActiveTab] = useState<'speakers' | 'queries'>('speakers');
-
-  const fetchSpeakers = async (forceMock = false) => {
+  const loadData = async () => {
     setLoading(true);
     setError(null);
-    
-    // Check if subdomain is default or missing
-    const subdomain = import.meta.env.PUBLIC_NHOST_SUBDOMAIN;
-    if (!subdomain || subdomain === 'xxxx-yyyy-zzzz' || forceMock) {
-      // Load fallback mock data
-      setTimeout(() => {
-        setSpeakers([
-          {
-            id: 'spk-1',
-            full_name: 'Dr. Alberto Ruiz (Mock)',
-            specialty: 'Ecología Tropical y Biodiversidad',
-            bio: 'Investigador principal de bosques inundables en el llano amazónico.',
-            photo_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-            institution: 'UNAP',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 'spk-2',
-            full_name: 'Dra. Elena Rostova (Mock)',
-            specialty: 'Ciencia de Datos y Monitoreo Ambiental',
-            bio: 'Especialista en inteligencia artificial aplicada a la teledetección forestal.',
-            photo_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
-            institution: 'UNAP',
-            created_at: new Date().toISOString()
-          }
-        ]);
-        setIsMockMode(true);
-        setLoading(false);
-      }, 800);
-      return;
-    }
-
     try {
-      const resp = await nhost.graphql.request<{ speakers: DbSpeaker[] }>({
-        query: GET_SPEAKERS,
-      });
-
-      if (resp.body.errors && resp.body.errors.length > 0) {
-        throw new Error(
-          resp.body.errors.map(e => e.message).join(', ')
-        );
+      const activeConfig = await fetchConfig();
+      setConfig(activeConfig);
+      
+      if (activeConfig.edition?.id) {
+        setCustomEditionId(activeConfig.edition.id);
+        const list = await fetchSpeakers(activeConfig.edition.id);
+        setSpeakers(list);
       }
-
-      setSpeakers(resp.body.data?.speakers || []);
-      setIsMockMode(false);
-
-      // Try to fetch a valid edition ID to pre-populate customEditionId
-      try {
-        const editionResp = await nhost.graphql.request<any>({
-          query: `
-            query GetActiveEdition {
-              editions(order_by: { is_active: desc }, limit: 1) {
-                id
-              }
-            }
-          `
-        });
-        if (editionResp.body.errors && editionResp.body.errors.length > 0) {
-          console.warn("GraphQL errors fetching active edition ID:", editionResp.body.errors);
-        } else {
-          const firstEdition = editionResp.body.data?.editions?.[0];
-          if (firstEdition?.id) {
-            setCustomEditionId(firstEdition.id);
-          }
-        }
-      } catch (err) {
-        console.warn("Failed to fetch active edition ID, keeping default:", err);
+      if (activeConfig.event?.id) {
+        setCustomMainEventId(activeConfig.event.id);
       }
     } catch (err: any) {
-      console.warn("Nhost GraphQL failed, falling back to mock mode:", err.message);
-      setError(err.message || 'Error al conectar con Nhost GraphQL');
-      // Auto-fallback to mock mode
-      fetchSpeakers(true);
+      console.error(err);
+      setError(err.message || 'Error al conectar con Supabase REST');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSpeakers();
+    loadData();
   }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -137,93 +70,62 @@ export const NhostDemo: React.FC = () => {
     setMutationResult(null);
     setMutationError(null);
 
-    if (isMockMode) {
-      // Mock successful mutation response
-      setTimeout(() => {
-        setMutationResult({
-          profile: {
-            id: customProfileId,
-            email,
-            first_names: firstNames,
-            last_names: lastNames,
-            doc_type: docType,
-            doc_number: docNumber,
-            role: 'participant'
-          },
-          registration: {
-            id: crypto.randomUUID ? crypto.randomUUID() : 'reg-12345',
-            participation_type: participationType,
-            research_area: researchArea,
-            payment_status: 'pending',
-            created_at: new Date().toISOString()
-          }
-        });
-        setMutationLoading(false);
-      }, 1500);
-      return;
-    }
-
     try {
-      const resp = await nhost.graphql.request<any>({
-        query: CREATE_PARTICIPANT_REGISTRATION,
-        variables: {
-          profileId: customProfileId,
-          email,
-          firstNames,
-          lastNames,
-          docType,
-          docNumber,
-          phone: phone || null,
-          institution: institution || null,
-          editionId: customEditionId,
-          participationType,
-          researchArea
-        }
-      });
-
-      if (resp.body.errors && resp.body.errors.length > 0) {
-        throw new Error(
-          resp.body.errors.map(e => e.message).join(', ')
-        );
+      const check = await checkProfileRegistration(email, docType, docNumber, customEditionId);
+      
+      if (check.isRegisteredForEdition) {
+        throw new Error('El usuario ya se encuentra registrado para esta edición del congreso.');
       }
 
-      setMutationResult(resp.body.data);
+      const result = await createRegistration({
+        profileId: check.profileId,
+        email,
+        firstNames,
+        lastNames,
+        docType,
+        docNumber,
+        phone,
+        institution,
+        researchArea,
+        participantType: participationType,
+        editionId: customEditionId,
+        mainEventId: customMainEventId
+      });
+
+      setMutationResult({
+        success: true,
+        message: '¡Registro guardado con éxito!',
+        data: result
+      });
     } catch (err: any) {
-      setMutationError(err.message || 'Error al procesar la mutación en Nhost');
+      setMutationError(err.message || 'Error al guardar el registro en Supabase');
     } finally {
       setMutationLoading(false);
     }
-  };
-
-  const regenerateProfileId = () => {
-    setCustomProfileId(crypto.randomUUID ? crypto.randomUUID() : 'b51bb9e5-9fa5-45d2-a7f4-ee1fa42921f0');
   };
 
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 text-light">
       
       {/* Header and status info bar */}
-      <div class="col-span-1 lg:col-span-12 glass-card rounded-2xl p-6 border border-accent/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="col-span-1 lg:col-span-12 glass-card rounded-2xl p-6 border border-accent/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="font-display font-bold text-2xl text-light flex items-center gap-2">
             <Database className="w-6 h-6 text-secondary" />
-            Consola de Integración Nhost
+            Consola de Integración Supabase
           </h2>
           <p className="text-xs text-light/70 mt-1">
-            Esta pantalla demuestra la conexión GraphQL contra las tablas enlazadas de tu base de datos.
+            Esta pantalla demuestra la conexión REST y PostgREST contra las tablas enlazadas de tu base de datos Supabase.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
-            isMockMode 
-              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' 
-              : 'bg-secondary/15 text-secondary border border-secondary/30'
-          }`}>
+          <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-secondary/15 text-secondary border border-secondary/30">
             <Sparkles className="w-3.5 h-3.5" />
-            {isMockMode ? 'Modo Simulado (Mock)' : 'Conectado a Nhost'}
+            Conectado a Supabase
           </span>
           <button 
-            onClick={() => fetchSpeakers(false)}
+            onClick={loadData}
+            type="button"
             className="p-2 bg-dark border border-accent/15 rounded-lg hover:border-secondary transition-all text-light/70 hover:text-light cursor-pointer"
             title="Recargar datos"
           >
@@ -232,158 +134,117 @@ export const NhostDemo: React.FC = () => {
         </div>
       </div>
 
-      {/* LEFT PANEL: Database View / Query view */}
+      {error && (
+        <div className="col-span-1 lg:col-span-12 bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-sm text-red-400">
+          Error general: {error}
+        </div>
+      )}
+
+      {/* LEFT PANEL: Database View / Active Config */}
       <div className="col-span-1 lg:col-span-7 flex flex-col gap-6">
         
-        {/* Tabs switcher */}
-        <div className="flex border-b border-accent/10">
-          <button
-            onClick={() => setActiveTab('speakers')}
-            className={`px-5 py-2.5 font-display text-sm font-semibold transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
-              activeTab === 'speakers' 
-                ? 'border-secondary text-secondary font-bold' 
-                : 'border-transparent text-light/60 hover:text-light'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            Ponentes de Base de Datos
-          </button>
-          <button
-            onClick={() => setActiveTab('queries')}
-            className={`px-5 py-2.5 font-display text-sm font-semibold transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
-              activeTab === 'queries' 
-                ? 'border-secondary text-secondary font-bold' 
-                : 'border-transparent text-light/60 hover:text-light'
-            }`}
-          >
-            <Code className="w-4 h-4" />
-            Estructuras GraphQL
-          </button>
+        {/* Dynamic Config details */}
+        <div className="glass-card rounded-2xl p-6 border border-accent/10">
+          <h3 className="text-lg font-display font-bold text-light mb-4 flex items-center gap-2 border-b border-accent/10 pb-2">
+            <Settings className="w-5 h-5 text-secondary" />
+            Configuración Activa (Astro / Supabase)
+          </h3>
+          {loading ? (
+            <div className="flex justify-center py-6 text-xs text-light/50">Cargando variables...</div>
+          ) : !config ? (
+            <div className="text-xs text-light/50">No hay configuraciones.</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="flex flex-col gap-1 p-3 bg-dark/40 rounded-xl">
+                <span className="text-[10px] text-accent font-bold uppercase">Event Name (main_events.name)</span>
+                <span className="font-semibold text-light">{config.event?.name || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1 p-3 bg-dark/40 rounded-xl">
+                <span className="text-[10px] text-accent font-bold uppercase">Active Slug (APP_NAME_SLUG)</span>
+                <span className="font-mono text-light font-bold">{config.event?.slug || 'N/A'}</span>
+              </div>
+              <div className="flex flex-col gap-1 p-3 bg-dark/40 rounded-xl">
+                <span className="text-[10px] text-accent font-bold uppercase">Active Edition (editions.slug)</span>
+                <span className="font-semibold text-light">{config.edition?.slug || 'N/A'} (Año {config.edition?.year})</span>
+              </div>
+              <div className="flex flex-col gap-1 p-3 bg-dark/40 rounded-xl">
+                <span className="text-[10px] text-accent font-bold uppercase">Dates (editions.start_date)</span>
+                <span className="font-semibold text-light">{config.edition?.start_date} al {config.edition?.end_date}</span>
+              </div>
+              <div className="flex flex-col gap-1 p-3 bg-dark/40 rounded-xl sm:col-span-2">
+                <span className="text-[10px] text-accent font-bold uppercase">Brand Colors (main_events.brand_colors)</span>
+                <span className="font-mono text-light flex gap-4">
+                  <span>Primary: <span style={{ color: config.event?.brand_colors?.primary || '#0B5D1E' }} className="font-bold">{config.event?.brand_colors?.primary || '#0B5D1E'}</span></span>
+                  <span>Secondary: <span style={{ color: config.event?.brand_colors?.secondary || '#4CAF50' }} className="font-bold">{config.event?.brand_colors?.secondary || '#4CAF50'}</span></span>
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Tab contents */}
-        {activeTab === 'speakers' ? (
-          <div className="glass-card rounded-2xl p-6 border border-accent/10 flex-grow">
-            <h3 className="text-lg font-display font-bold text-light mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5 text-secondary" />
-              Tabla: `speakers`
-            </h3>
+        {/* Speakers List */}
+        <div className="glass-card rounded-2xl p-6 border border-accent/10 flex-grow">
+          <h3 className="text-lg font-display font-bold text-light mb-4 flex items-center gap-2 border-b border-accent/10 pb-2">
+            <Users className="w-5 h-5 text-secondary" />
+            Ponentes de la Edición
+          </h3>
 
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-12 text-light/60 gap-3">
-                <RefreshCw className="w-8 h-8 animate-spin text-secondary" />
-                <span>Cargando ponentes desde la base de datos...</span>
-              </div>
-            ) : speakers.length === 0 ? (
-              <div className="text-center py-12 text-light/50 border border-dashed border-accent/10 rounded-xl">
-                No se encontraron registros en la tabla `speakers`.
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {speakers.map((spk) => (
-                  <div key={spk.id} className="bg-dark/40 border border-accent/5 rounded-xl p-4 flex gap-4 hover:border-secondary/30 transition-all">
-                    {spk.photo_url ? (
-                      <img 
-                        src={spk.photo_url} 
-                        alt={spk.full_name} 
-                        className="w-14 h-14 rounded-full object-cover border border-accent/20 flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-14 h-14 rounded-full bg-primary/20 border border-accent/20 flex items-center justify-center text-secondary font-bold flex-shrink-0">
-                        {spk.full_name.charAt(0)}
-                      </div>
-                    )}
-                    <div className="flex-grow min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <h4 className="font-display font-bold text-light text-base truncate">{spk.full_name}</h4>
-                        <span className="text-[10px] bg-primary/10 border border-accent/10 px-2 py-0.5 rounded text-accent font-semibold flex-shrink-0">
-                          {spk.institution || 'N/A'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-secondary font-medium mt-0.5">{spk.specialty}</p>
-                      <p className="text-xs text-light/65 mt-2 line-clamp-2">{spk.bio}</p>
-                      <div className="text-[9px] text-light/40 mt-3 font-mono">ID: {spk.id}</div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12 text-light/60 gap-3">
+              <RefreshCw className="w-8 h-8 animate-spin text-secondary" />
+              <span>Cargando ponentes desde Supabase...</span>
+            </div>
+          ) : speakers.length === 0 ? (
+            <div className="text-center py-12 text-light/50 border border-dashed border-accent/10 rounded-xl">
+              No se encontraron registros de ponentes asignados a sesiones en esta edición.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {speakers.map((spk) => (
+                <div key={spk.id} className="bg-dark/40 border border-accent/5 rounded-xl p-4 flex gap-4 hover:border-secondary/30 transition-all">
+                  {spk.photo_url ? (
+                    <img 
+                      src={spk.photo_url} 
+                      alt={spk.full_name} 
+                      className="w-12 h-12 rounded-full object-cover border border-accent/20 flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-primary/20 border border-accent/20 flex items-center justify-center text-secondary font-bold flex-shrink-0">
+                      {spk.full_name.charAt(0)}
                     </div>
+                  )}
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="font-display font-bold text-light text-sm truncate">{spk.full_name}</h4>
+                      <span className="text-[9px] bg-primary/10 border border-accent/10 px-2 py-0.5 rounded text-accent font-semibold flex-shrink-0">
+                        {spk.institution || 'N/A'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-secondary font-medium mt-0.5">{spk.specialty}</p>
+                    <p className="text-xs text-light/65 mt-1.5 line-clamp-2">{spk.bio}</p>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="glass-card rounded-2xl p-6 border border-accent/10 flex-grow font-mono text-xs flex flex-col gap-4 overflow-x-auto">
-            <div>
-              <div className="flex items-center gap-2 text-light font-sans font-semibold mb-2">
-                <Terminal className="w-4 h-4 text-secondary" />
-                Consulta: Obtener Ponentes (GET_SPEAKERS)
-              </div>
-              <pre className="bg-dark/60 border border-accent/10 rounded-lg p-3 text-emerald-400 overflow-x-auto">
-                {GET_SPEAKERS.trim()}
-              </pre>
+                </div>
+              ))}
             </div>
-
-            <div>
-              <div className="flex items-center gap-2 text-light font-sans font-semibold mb-2">
-                <Terminal className="w-4 h-4 text-secondary" />
-                Mutación: Registro Transaccional (CREATE_PARTICIPANT_REGISTRATION)
-              </div>
-              <pre className="bg-dark/60 border border-accent/10 rounded-lg p-3 text-cyan-400 overflow-x-auto">
-                {CREATE_PARTICIPANT_REGISTRATION.trim()}
-              </pre>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* RIGHT PANEL: Mutation Playground Form */}
+      {/* RIGHT PANEL: Test Mutation */}
       <div className="col-span-1 lg:col-span-5">
         <div className="glass-card rounded-2xl p-6 border border-accent/10 h-full flex flex-col justify-between">
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
             <h3 className="text-lg font-display font-bold text-light mb-2 flex items-center gap-2 border-b border-accent/10 pb-3">
               <Send className="w-5 h-5 text-secondary" />
-              Probar Mutación de Registro
+              Probar Registro REST
             </h3>
 
-            {/* Simulated environment variables details */}
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 text-[11px] text-light/80 leading-relaxed">
-              <span className="font-semibold text-secondary block mb-1">Simulación Transaccional:</span>
-              Crea un perfil de usuario en <code className="bg-dark/50 px-1 text-light rounded">profiles</code> e inserta una pre-inscripción en <code className="bg-dark/50 px-1 text-light rounded">registrations</code> usando UUIDs asociados.
+              <span className="font-semibold text-secondary block mb-1">Simulación Supabase:</span>
+              Crea un perfil de usuario en <code className="bg-dark/50 px-1 text-light rounded">profiles</code> e inserta una pre-inscripción en <code className="bg-dark/50 px-1 text-light rounded">event_participants</code> utilizando PostgREST.
             </div>
 
-            {/* Profile ID config */}
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between items-center">
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">UUID del Perfil (Simular Auth)</label>
-                <button 
-                  type="button" 
-                  onClick={regenerateProfileId}
-                  className="text-[10px] text-secondary hover:underline cursor-pointer"
-                >
-                  Regenerar UUID
-                </button>
-              </div>
-              <input
-                type="text"
-                value={customProfileId}
-                onChange={(e) => setCustomProfileId(e.target.value)}
-                className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs font-mono text-light focus:outline-none focus:border-secondary"
-                required
-              />
-            </div>
-
-            {/* Edition ID config */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">UUID del Evento/Edición</label>
-              <input
-                type="text"
-                value={customEditionId}
-                onChange={(e) => setCustomEditionId(e.target.value)}
-                className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs font-mono text-light focus:outline-none focus:border-secondary"
-                required
-              />
-            </div>
-
-            {/* User details */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Nombres</label>
                 <input
@@ -391,7 +252,7 @@ export const NhostDemo: React.FC = () => {
                   placeholder="Juan Carlos"
                   value={firstNames}
                   onChange={(e) => setFirstNames(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-light focus:outline-none focus:border-secondary"
                   required
                 />
               </div>
@@ -403,44 +264,44 @@ export const NhostDemo: React.FC = () => {
                   placeholder="Pérez"
                   value={lastNames}
                   onChange={(e) => setLastNames(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-light focus:outline-none focus:border-secondary"
                   required
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Tipo Documento</label>
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Tipo Doc</label>
                 <select
                   value={docType}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDocType(e.target.value as DbDocumentType)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
+                  onChange={(e: any) => setDocType(e.target.value)}
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-light focus:outline-none focus:border-secondary"
                 >
                   <option value="DNI">DNI</option>
-                  <option value="CARNET_EXTRANJERIA">Carnet de Extranjería</option>
+                  <option value="CARNET_EXTRANJERIA">C.E.</option>
                   <option value="PASAPORTE">Pasaporte</option>
                 </select>
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Nro Documento</label>
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Número Doc</label>
                 <input
                   type="text"
                   placeholder="71234567"
                   value={docNumber}
                   onChange={(e) => setDocNumber(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-light focus:outline-none focus:border-secondary"
                   required
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 col-span-2">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Correo</label>
                 <input
                   type="email"
                   placeholder="juan@unap.edu.pe"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-light focus:outline-none focus:border-secondary"
                   required
                 />
               </div>
@@ -452,53 +313,46 @@ export const NhostDemo: React.FC = () => {
                   placeholder="987654321"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-light focus:outline-none focus:border-secondary"
                 />
               </div>
 
-              <div className="flex flex-col gap-1 col-span-2">
+              <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Institución</label>
                 <input
                   type="text"
                   placeholder="UNAP"
                   value={institution}
                   onChange={(e) => setInstitution(e.target.value)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-light focus:outline-none focus:border-secondary"
                 />
               </div>
             </div>
 
-            {/* Enums dropdown selectors */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* IDs configs */}
+            <div className="border-t border-accent/10 pt-3 mt-1 flex flex-col gap-3 text-xs">
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Participación</label>
-                <select
-                  value={participationType}
-                  onChange={(e) => setParticipationType(e.target.value as DbParticipationType)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
-                >
-                  <option value="pregrado">Pregrado</option>
-                  <option value="postgrado">Postgrado</option>
-                  <option value="publico_general">Público General</option>
-                </select>
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">UUID Edición</label>
+                <input
+                  type="text"
+                  value={customEditionId}
+                  onChange={(e) => setCustomEditionId(e.target.value)}
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 font-mono text-light focus:outline-none focus:border-secondary"
+                  required
+                />
               </div>
-
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">Área Investigación</label>
-                <select
-                  value={researchArea}
-                  onChange={(e) => setResearchArea(e.target.value as DbResearchArea)}
-                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 text-xs text-light focus:outline-none focus:border-secondary"
-                >
-                  <option value="ciencias_salud">Ciencias de la Salud</option>
-                  <option value="ciencias_naturales">Ciencias Naturales</option>
-                  <option value="ingenierias">Ingenierías y Tecnología</option>
-                  <option value="ciencias_sociales">Ciencias Sociales</option>
-                </select>
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-accent">UUID Evento Principal</label>
+                <input
+                  type="text"
+                  value={customMainEventId}
+                  onChange={(e) => setCustomMainEventId(e.target.value)}
+                  className="bg-dark/50 border border-accent/15 rounded-lg px-3 py-2 font-mono text-light focus:outline-none focus:border-secondary"
+                  required
+                />
               </div>
             </div>
 
-            {/* Submit Action */}
             <button
               type="submit"
               disabled={mutationLoading}
@@ -507,12 +361,12 @@ export const NhostDemo: React.FC = () => {
               {mutationLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  Ejecutando mutación...
+                  Registrando...
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  Ejecutar Mutación GraphQL
+                  Ejecutar Registro REST
                 </>
               )}
             </button>
@@ -524,10 +378,10 @@ export const NhostDemo: React.FC = () => {
               <div className="bg-secondary/10 border border-secondary/30 rounded-xl p-4 text-xs">
                 <div className="flex items-center gap-1.5 text-secondary font-bold mb-2">
                   <CheckCircle className="w-4 h-4" />
-                  ¡Registro guardado con éxito!
+                  {mutationResult.message}
                 </div>
                 <pre className="bg-dark/40 p-2 rounded text-[10px] font-mono text-light overflow-x-auto max-h-40">
-                  {JSON.stringify(mutationResult, null, 2)}
+                  {JSON.stringify(mutationResult.data, null, 2)}
                 </pre>
               </div>
             )}
@@ -536,14 +390,11 @@ export const NhostDemo: React.FC = () => {
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-xs">
                 <div className="flex items-center gap-1.5 text-red-400 font-bold mb-2">
                   <AlertTriangle className="w-4 h-4" />
-                  Error en la Base de Datos Nhost
+                  Error en Supabase
                 </div>
                 <p className="text-light/80 leading-relaxed font-mono text-[10px]">
                   {mutationError}
                 </p>
-                <div className="mt-2 text-[9px] text-light/50">
-                  Tip: Asegúrate de que el UUID de la Edición exista en tu tabla `editions`.
-                </div>
               </div>
             )}
           </div>

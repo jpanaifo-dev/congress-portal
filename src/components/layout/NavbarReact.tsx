@@ -13,7 +13,15 @@ const navLinks = [
   { href: '/registro', label: 'Registro' },
 ];
 
-export const NavbarReact: React.FC = () => {
+interface NavbarProps {
+  logoUrl?: string;
+  eventName?: string;
+}
+
+export const NavbarReact: React.FC<NavbarProps> = ({
+  logoUrl = "/images/postgrado_brandwhite.webp",
+  eventName = "Escuela de Postgrado UNAP"
+}) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -79,8 +87,8 @@ export const NavbarReact: React.FC = () => {
             aria-label="Volver al inicio"
           >
             <img
-              src="/images/postgrado_brandwhite.webp"
-              alt="Escuela de Postgrado UNAP"
+              src={logoUrl}
+              alt={eventName}
               className="h-16 w-auto object-contain transition-transform hover:scale-[1.02] duration-300"
             />
           </a>
