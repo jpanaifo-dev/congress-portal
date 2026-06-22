@@ -4,9 +4,14 @@ import Navbar from '../components/layout/Navbar.astro';
 import { CompleteProgram } from '../features/home/components/CompleteProgram';
 import Footer from '../components/layout/Footer.astro';
 import { Calendar, Award, BookOpen, Clock } from 'lucide-react';
+import { fetchConfig } from '../lib/supabase';
+
+const config = await fetchConfig();
+const editionId = config.edition?.id || "";
+const eventName = config.event?.name || "III Encuentro Científico";
 ---
 
-<Layout title="Programa Científico Completo - III Encuentro Científico EPG UNAP">
+<Layout title={`Programa Científico Completo - ${eventName}`}>
   <!-- Navigation Header -->
   <Navbar />
 
@@ -53,7 +58,7 @@ import { Calendar, Award, BookOpen, Clock } from 'lucide-react';
       </div>
 
       <!-- Dynamic Complete Program Component -->
-      <CompleteProgram client:load />
+      <CompleteProgram client:load editionId={editionId} />
 
     </div>
   </main>

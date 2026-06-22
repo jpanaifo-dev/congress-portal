@@ -1,6 +1,39 @@
 ---
 import { Calendar, MapPin, ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
 import { Countdown } from '../../features/home/components/Countdown';
+import { fetchConfig } from '../../lib/supabase';
+
+const config = await fetchConfig();
+const eventName = config.event?.name || "III Encuentro Científico de la Escuela de Postgrado";
+const shortDescription = config.event?.short_description || "Ciencia que transforma la Amazonía, conocimiento que construye futuro";
+
+let formattedDates = "02 y 03 de Julio, 2026";
+if (config.edition?.start_date && config.edition?.end_date) {
+  try {
+    const start = new Date(config.edition.start_date + 'T00:00:00');
+    const end = new Date(config.edition.end_date + 'T00:00:00');
+    const startDay = String(start.getDate()).padStart(2, '0');
+    const endDay = String(end.getDate()).padStart(2, '0');
+    const startMonth = start.toLocaleDateString('es-ES', { month: 'long' });
+    const endMonth = end.toLocaleDateString('es-ES', { month: 'long' });
+    const startYear = start.getFullYear();
+    const endYear = end.getFullYear();
+
+    if (startYear !== endYear) {
+      formattedDates = `${startDay} de ${startMonth}, ${startYear} al ${endDay} de ${endMonth}, ${endYear}`;
+    } else if (startMonth !== endMonth) {
+      formattedDates = `${startDay} de ${startMonth} al ${endDay} de ${endMonth}, ${startYear}`;
+    } else if (startDay !== endDay) {
+      const capMonth = startMonth.charAt(0).toUpperCase() + startMonth.slice(1);
+      formattedDates = `${startDay} y ${endDay} de ${capMonth}, ${startYear}`;
+    } else {
+      const capMonth = startMonth.charAt(0).toUpperCase() + startMonth.slice(1);
+      formattedDates = `${startDay} de ${capMonth}, ${startYear}`;
+    }
+  } catch (e) {
+    console.error('Error formatting dates:', e);
+  }
+}
 ---
 
 <section
@@ -14,7 +47,7 @@ import { Countdown } from '../../features/home/components/Countdown';
       loop
       muted
       playsinline
-      poster="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600&h=900"
+      poster={config.event?.cover_url || "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600&h=900"}
       class="absolute inset-0 w-full h-full object-cover filter grayscale contrast-110 brightness-[0.35] saturate-[0.60]"
     >
       <source src="/videos/banner_video.mp4" type="video/mp4" />
@@ -30,16 +63,14 @@ import { Countdown } from '../../features/home/components/Countdown';
     <!-- Left Aligned Content Wrapper (No Right Column) -->
     <div class="max-w-3xl flex flex-col gap-6 text-left my-auto">
       <h1
-        class="font-display font-medium text-4xl sm:text-5xl lg:text-7xl leading-tight tracking-tight text-white uppercase"
+        class="font-display font-black text-4xl sm:text-5xl lg:text-6xl leading-tight tracking-tight text-white uppercase"
       >
-        III Encuentro <br />
-        Científico de la <br />
-        <span class="text-jsyellow font-bold"> Escuela de Postgrado </span>
+        {eventName}
       </h1>
 
       <div class="flex flex-col gap-2 border-l-2 border-secondary pl-4 py-1">
-        <p class="text-sm sm:text-lg italic max-w-sm text-white/80">
-          "Ciencia que transforma la Amazonía, conocimiento que construye futuro"
+        <p class="text-sm sm:text-lg italic max-w-2xl text-white/80">
+          "{shortDescription}"
         </p>
       </div>
 
@@ -69,7 +100,7 @@ import { Countdown } from '../../features/home/components/Countdown';
           <span
             class="text-xs sm:text-sm text-white font-display font-bold px-5 py-2.5 whitespace-nowrap underline decoration-secondary decoration-2 underline-offset-4"
           >
-            02 y 03 de Julio, 2026
+            {formattedDates}
           </span>
         </div>
       </div>

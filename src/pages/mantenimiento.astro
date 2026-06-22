@@ -1,0 +1,75 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Hammer, HardHat, Compass, Mail, PhoneCall } from 'lucide-react';
+import { fetchConfig } from '../lib/supabase';
+
+const config = await fetchConfig();
+const eventName = config.event?.name || "Plataforma de Eventos";
+const email = config.event?.contact_email || "postgrado@unapiquitos.edu.pe";
+---
+
+<Layout title="Plataforma en Mantenimiento" isMaintenancePage={true}>
+  <div class="min-h-screen flex flex-col justify-between amazon-gradient-bg relative overflow-hidden">
+    <!-- Ambient Rainforest backdrops -->
+    <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/15 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute inset-0 leaf-overlay pointer-events-none z-[1] opacity-5"></div>
+
+    <!-- Main Container -->
+    <main class="flex-grow flex items-center justify-center py-16 px-6 relative z-10">
+      <div class="w-full max-w-xl text-center flex flex-col items-center gap-6">
+        
+        {/* Animated Construction Icon Wrapper */}
+        <div class="relative mb-4">
+          <div class="w-24 h-24 bg-secondary/10 rounded-3xl border border-secondary/30 flex items-center justify-center text-secondary relative z-10 shadow-[0_0_30px_rgba(76,175,80,0.15)] animate-pulse">
+            <Hammer className="w-12 h-12" />
+          </div>
+          <div class="absolute -top-2 -right-2 w-8 h-8 bg-jsyellow/20 rounded-full border border-jsyellow/40 flex items-center justify-center text-jsyellow rotate-12">
+            <HardHat className="w-4 h-4" />
+          </div>
+        </div>
+
+        <span class="text-xs font-bold text-secondary uppercase tracking-widest bg-secondary/10 px-4 py-1.5 rounded-full border border-secondary/25">
+          Modo Mantenimiento
+        </span>
+
+        <h1 class="font-display font-black text-4xl sm:text-5xl text-white tracking-tight leading-tight uppercase">
+          Plataforma <br /> Temporalmente <br />
+          <span class="text-jsyellow font-black text-glow-yellow">Fuera de Línea</span>
+        </h1>
+
+        <div class="glass-card rounded-2xl p-6 border border-accent/15 w-full flex flex-col gap-4">
+          <p class="text-xs sm:text-sm text-light/80 leading-relaxed font-sans font-medium">
+            Estamos realizando mejoras y actualizaciones en el portal oficial de <strong>{eventName}</strong> para brindarte una mejor experiencia académica y tecnológica.
+          </p>
+          <div class="h-[1px] bg-accent/10 my-1"></div>
+          <p class="text-[11px] text-light/60 flex items-center justify-center gap-1.5">
+            <Compass className="w-4 h-4 text-secondary shrink-0 animate-spin" style={{ animationDuration: '6s' }} />
+            Estaremos de vuelta muy pronto. Gracias por tu comprensión.
+          </p>
+        </div>
+
+        {/* Contact details */}
+        <div class="flex flex-col sm:flex-row items-center gap-4 mt-2 text-xs text-light/50">
+          <a href={`mailto:${email}`} class="flex items-center gap-1.5 hover:text-secondary transition-colors">
+            <Mail className="w-4 h-4 text-accent" />
+            {email}
+          </a>
+          <span class="hidden sm:inline text-light/20">•</span>
+          <span class="flex items-center gap-1.5">
+            <PhoneCall className="w-4 h-4 text-accent" />
+            Soporte Escuela de Postgrado
+          </span>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Minimalist Footer -->
+    <footer class="w-full py-8 border-t border-accent/10 text-center relative z-10 bg-dark/30 backdrop-blur-sm">
+      <p class="text-[10px] text-light/40">
+        © 2026 Universidad Nacional de la Amazonía Peruana. Escuela de Postgrado. Todos los derechos reservados.
+      </p>
+    </footer>
+  </div>
+</Layout>

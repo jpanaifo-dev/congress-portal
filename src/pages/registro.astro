@@ -1,9 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { RegistrationForm } from '../features/registration/components/RegistrationForm';
+import { fetchConfig } from '../lib/supabase';
+
+const config = await fetchConfig();
+const editionId = config.edition?.id || "";
+const mainEventId = config.event?.id || "";
+const eventName = config.event?.name || "III Encuentro Científico";
 ---
 
-<Layout title="Registro de Participantes - III Encuentro Científico">
+<Layout title={`Registro de Participantes - ${eventName}`}>
   <!-- Dynamic Rainforest background wrapper -->
   <div class="min-h-screen flex flex-col justify-between amazon-gradient-bg relative overflow-hidden selection:bg-primary selection:text-white">
     <!-- Forest glow overlays -->
@@ -25,7 +31,7 @@ import { RegistrationForm } from '../features/registration/components/Registrati
           </p>
         </div>
 
-        <RegistrationForm client:load />
+        <RegistrationForm client:load editionId={editionId} mainEventId={mainEventId} />
       </div>
     </main>
 

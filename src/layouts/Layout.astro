@@ -1,25 +1,41 @@
 ---
 import { SEO } from 'astro-seo';
 import '../styles/global.css';
+import { fetchConfig } from '../lib/supabase';
 
 interface Props {
   title?: string;
   description?: string;
+  isMaintenancePage?: boolean;
 }
 
 const {
-  title = "III Encuentro Científico - Escuela de Postgrado UNAP",
-  description = "III Encuentro Científico de la Escuela de Postgrado de la UNAP: 'Ciencia que transforma la Amazonía, conocimiento que construye futuro'. 02 y 03 de julio de 2026."
+  title: propTitle,
+  description: propDescription,
+  isMaintenancePage = false
 } = Astro.props;
+
+// Fetch active config from Supabase
+const config = await fetchConfig();
+
+// Perform client-side check for is_online; server-side Astro.redirect is not used here to avoid ResponseSentError during component rendering
+
+const brandName = config.event?.name || config.globalSettings?.app_name || "III Encuentro Científico - Escuela de Postgrado UNAP";
+const brandDesc = config.event?.short_description || "III Encuentro Científico de la Escuela de Postgrado de la UNAP: 'Ciencia que transforma la Amazonía, conocimiento que construye futuro'. 02 y 03 de julio de 2026.";
+const startDateStr = config.edition?.start_date ? `${config.edition.start_date}T08:00:00-05:00` : "2026-07-02T08:00:00-05:00";
+const endDateStr = config.edition?.end_date ? `${config.edition.end_date}T18:00:00-05:00` : "2026-07-03T18:00:00-05:00";
+
+const title = propTitle || brandName;
+const description = propDescription || brandDesc;
 
 // JSON-LD Structured Data
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "EducationEvent",
-  "name": "III Encuentro Científico de la Escuela de Postgrado - UNAP",
-  "description": "Ciencia que transforma la Amazonía, conocimiento que construye futuro.",
-  "startDate": "2026-07-02T08:00:00-05:00",
-  "endDate": "2026-07-03T18:00:00-05:00",
+  "name": brandName,
+  "description": brandDesc,
+  "startDate": startDateStr,
+  "endDate": endDateStr,
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/MixedEventAttendanceMode",
   "location": [
@@ -66,20 +82,81 @@ const jsonLd = {
 };
 ---
 
+
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- Brand colors injected from Supabase Database -->
+    <style define:vars={{
+      primaryColor: config.event?.brand_colors?.primary || '#0B5D1E',
+      secondaryColor: config.event?.brand_colors?.secondary || '#4CAF50',
+    }}>
+      :root {
+        --color-primary: var(--primaryColor) !important;
+        --color-secondary: var(--secondaryColor) !important;
+      }
+    </style>
+    
     <!-- Theme Loader Script (Avoid FOUC) -->
-    <script is:inline>
+    <script is:inline define:vars={{ isMaintenancePage }}>
       (function() {
+        if (isMaintenancePage) {
+          document.documentElement.classList.add('dark');
+          return;
+        }
         const storedTheme = localStorage.getItem('theme');
         if (storedTheme === 'light') {
           document.documentElement.classList.remove('dark');
         } else {
           document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+
+    <!-- Real-time client-side is_online check to support static deployments -->
+    <script is:inline define:vars={{
+      supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+      supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      isMaintenancePage
+    }}>
+      (async function() {
+        // Fast path: immediate redirect if cached offline state is known to avoid content flash
+        const cachedIsOnline = localStorage.getItem('is_online');
+        if (cachedIsOnline === 'false' && !isMaintenancePage) {
+          window.location.replace('/mantenimiento');
+          return;
+        } else if (cachedIsOnline === 'true' && isMaintenancePage) {
+          window.location.replace('/');
+          return;
+        }
+
+        // Live check: query Supabase API
+        if (!supabaseUrl || !supabaseAnonKey) return;
+        try {
+          const response = await fetch(`${supabaseUrl}/rest/v1/global_settings?select=is_online&order=updated_at.desc&limit=1`, {
+            headers: {
+              'apikey': supabaseAnonKey,
+              'Authorization': 'Bearer ' + supabaseAnonKey
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+              const isOnline = data[0].is_online;
+              localStorage.setItem('is_online', isOnline ? 'true' : 'false');
+              
+              if (!isMaintenancePage && isOnline === false) {
+                window.location.replace('/mantenimiento');
+              } else if (isMaintenancePage && isOnline === true) {
+                window.location.replace('/');
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error checking online status:', e);
         }
       })();
     </script>

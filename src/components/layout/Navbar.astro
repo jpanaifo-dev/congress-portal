@@ -1,5 +1,10 @@
 ---
 import { NavbarReact } from './NavbarReact';
+import { fetchConfig } from '../../lib/supabase';
+
+const config = await fetchConfig();
+const logoUrl = config.event?.logo_url || "/images/postgrado_brandwhite.webp";
+const eventName = config.event?.name || "Escuela de Postgrado UNAP";
 ---
 
-<NavbarReact client:load />
+<NavbarReact logoUrl={logoUrl} eventName={eventName} client:load />

@@ -1,5 +1,35 @@
 ---
 import { HeartPulse, Leaf, Cpu, Scale } from 'lucide-react';
+import { fetchConfig } from '../../lib/supabase';
+
+const config = await fetchConfig();
+const eventName = config.event?.name || "III Encuentro Científico";
+
+let formattedDates = "02 y 03 de julio de 2026";
+if (config.edition?.start_date && config.edition?.end_date) {
+  try {
+    const start = new Date(config.edition.start_date + 'T00:00:00');
+    const end = new Date(config.edition.end_date + 'T00:00:00');
+    const startDay = String(start.getDate()).padStart(2, '0');
+    const endDay = String(end.getDate()).padStart(2, '0');
+    const startMonth = start.toLocaleDateString('es-ES', { month: 'long' });
+    const endMonth = end.toLocaleDateString('es-ES', { month: 'long' });
+    const startYear = start.getFullYear();
+    const endYear = end.getFullYear();
+
+    if (startYear !== endYear) {
+      formattedDates = `${startDay} de ${startMonth}, ${startYear} al ${endDay} de ${endMonth}, ${endYear}`;
+    } else if (startMonth !== endMonth) {
+      formattedDates = `${startDay} de ${startMonth} al ${endDay} de ${endMonth}, ${startYear}`;
+    } else if (startDay !== endDay) {
+      formattedDates = `${startDay} y ${endDay} de ${startMonth}, ${startYear}`;
+    } else {
+      formattedDates = `${startDay} de ${startMonth}, ${startYear}`;
+    }
+  } catch (e) {
+    console.error('Error formatting dates:', e);
+  }
+}
 ---
 
 <section
@@ -26,11 +56,9 @@ import { HeartPulse, Leaf, Cpu, Scale } from 'lucide-react';
       <!-- Description Paragraph -->
       <div class="max-w-3xl mb-16">
         <p class="text-base sm:text-lg text-light/70 leading-relaxed font-sans">
-          El III Encuentro Científico es un evento de dos días (<strong
-            class="text-light font-semibold">02 y 03 de julio de 2026</strong
-          >) que se llevará a cabo de forma presencial y virtual en la <strong
-            class="text-light font-semibold">Escuela de Postgrado</strong
-          >. Está especialmente dirigido a investigadores, docentes, estudiantes de pregrado y
+          El {eventName} es un evento que se llevará a cabo de forma presencial y virtual en la <strong
+            class="text-light font-semibold">Escuela de Postgrado</strong> el <strong
+            class="text-light font-semibold">{formattedDates}</strong>. Está especialmente dirigido a investigadores, docentes, estudiantes de pregrado y
           postgrado, y profesionales dedicados a la construcción de conocimiento para la región.
         </p>
       </div>

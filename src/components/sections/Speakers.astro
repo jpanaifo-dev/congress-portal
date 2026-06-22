@@ -1,5 +1,9 @@
 ---
 import { SpeakersList } from '../../features/home/components/SpeakersList';
+import { fetchConfig } from '../../lib/supabase';
+
+const config = await fetchConfig();
+const editionId = config.edition?.id || "";
 ---
 
 <section id="ponentes" class="relative py-24 bg-dark/30 overflow-hidden">
@@ -29,6 +33,6 @@ import { SpeakersList } from '../../features/home/components/SpeakersList';
     </div>
 
     <!-- Speakers Grid (Dynamically loaded from Database) -->
-    <SpeakersList client:visible />
+    <SpeakersList client:visible editionId={editionId} />
   </div>
 </section>
