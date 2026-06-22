@@ -6,15 +6,26 @@ import { fetchConfig } from '../lib/supabase';
 interface Props {
   title?: string;
   description?: string;
+  isMaintenancePage?: boolean;
 }
 
 const {
   title: propTitle,
-  description: propDescription
+  description: propDescription,
+  isMaintenancePage = false
 } = Astro.props;
 
 // Fetch active config from Supabase
 const config = await fetchConfig();
+
+// Perform redirect check based on is_online status
+if (!isMaintenancePage && config.globalSettings && !config.globalSettings.is_online) {
+  return Astro.redirect('/mantenimiento');
+}
+
+if (isMaintenancePage && config.globalSettings?.is_online) {
+  return Astro.redirect('/');
+}
 
 const brandName = config.event?.name || config.globalSettings?.app_name || "III Encuentro Científico - Escuela de Postgrado UNAP";
 const brandDesc = config.event?.short_description || "III Encuentro Científico de la Escuela de Postgrado de la UNAP: 'Ciencia que transforma la Amazonía, conocimiento que construye futuro'. 02 y 03 de julio de 2026.";
@@ -104,6 +115,38 @@ const jsonLd = {
           document.documentElement.classList.remove('dark');
         } else {
           document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+
+    <!-- Real-time client-side is_online check to support static deployments -->
+    <script define:vars={{
+      supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+      supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      isMaintenancePage
+    }}>
+      (async function() {
+        if (!supabaseUrl || !supabaseAnonKey) return;
+        try {
+          const response = await fetch(`${supabaseUrl}/rest/v1/global_settings?select=is_online&order=updated_at.desc&limit=1`, {
+            headers: {
+              'apikey': supabaseAnonKey,
+              'Authorization': 'Bearer ' + supabaseAnonKey
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+              const isOnline = data[0].is_online;
+              if (!isMaintenancePage && isOnline === false) {
+                window.location.href = '/mantenimiento';
+              } else if (isMaintenancePage && isOnline === true) {
+                window.location.href = '/';
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error checking online status:', e);
         }
       })();
     </script>
