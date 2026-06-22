@@ -9,8 +9,14 @@ async function supabaseRequest(path: string, options: RequestInit = {}) {
     'apikey': anonKey,
     'Authorization': `Bearer ${anonKey}`,
     'Content-Type': 'application/json',
-    ...options.headers,
   };
+  
+  if (options.headers) {
+    const incomingHeaders = new Headers(options.headers);
+    incomingHeaders.forEach((value, key) => {
+      headers[key] = value;
+    });
+  }
   
   if (options.method && options.method !== 'GET') {
     headers['Prefer'] = 'return=representation';
