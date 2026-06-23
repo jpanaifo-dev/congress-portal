@@ -72,8 +72,8 @@ export const NavbarReact: React.FC<NavbarProps> = ({
 
   const headerClass = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 md:px-12 ${
     isScrolled || isMenuOpen
-      ? 'bg-[#0D1F17] border-b border-[#4CAF50]/15 py-3 shadow-lg shadow-black/25'
-      : 'bg-transparent border-b border-transparent py-4'
+      ? 'bg-[#07140F]/80 backdrop-blur-lg border-b border-white/5 py-3 shadow-md shadow-black/10'
+      : 'bg-transparent border-b border-transparent py-5'
   }`;
 
   return (
@@ -89,22 +89,22 @@ export const NavbarReact: React.FC<NavbarProps> = ({
             <img
               src={logoUrl}
               alt={eventName}
-              className="h-16 w-auto object-contain transition-transform hover:scale-[1.02] duration-300"
+              className="h-12 md:h-14 w-auto object-contain transition-transform hover:scale-[1.02] duration-300"
             />
           </a>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => {
               const isRegister = link.href === '#registro' || link.href === '/registro';
               return (
                 <a
                   key={link.href}
                   href={link.href}
-                  className={`font-display text-lg tracking-wide transition-all focus-visible:outline-none focus-visible:underline underline-offset-4 ${
+                  className={`font-display text-[11px] tracking-widest uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-secondary ${
                     isRegister
-                      ? 'text-secondary hover:text-accent font-bold'
-                      : 'text-white/80 hover:text-white'
+                      ? 'border border-secondary/40 text-secondary hover:bg-secondary hover:text-[#0D1F17] px-4 py-1.5 rounded-full font-bold shadow-sm shadow-secondary/5'
+                      : 'text-white/70 hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -118,7 +118,7 @@ export const NavbarReact: React.FC<NavbarProps> = ({
             {/* Theme Toggle IconButton */}
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl border border-white/10 text-white/80 hover:text-white hover:bg-white/10 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+              className="p-2 rounded-full border border-white/10 text-white/70 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
               aria-label="Cambiar tema de color"
             >
               <AnimatePresence mode="wait" initial={false}>
@@ -131,9 +131,9 @@ export const NavbarReact: React.FC<NavbarProps> = ({
                   className="flex items-center justify-center"
                 >
                   {theme === 'dark' ? (
-                    <Sun className="w-5 h-5" />
+                    <Sun className="w-4 h-4" />
                   ) : (
-                    <Moon className="w-5 h-5" />
+                    <Moon className="w-4 h-4" />
                   )}
                 </motion.div>
               </AnimatePresence>
@@ -142,7 +142,7 @@ export const NavbarReact: React.FC<NavbarProps> = ({
             {/* Mobile Navigation Toggle Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 text-white/90 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg transition-all"
+              className="lg:hidden p-2 text-white/80 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-full transition-all"
               aria-label={isMenuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
               aria-expanded={isMenuOpen}
             >
@@ -154,7 +154,7 @@ export const NavbarReact: React.FC<NavbarProps> = ({
                   exit={{ rotate: 90, opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.15 }}
                 >
-                  {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                  {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </motion.div>
               </AnimatePresence>
             </button>
@@ -170,11 +170,11 @@ export const NavbarReact: React.FC<NavbarProps> = ({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="fixed inset-x-0 bottom-0 top-[65px] bg-[#0D1F17]/95 backdrop-blur-xl border-t border-[#4CAF50]/15 lg:hidden flex flex-col p-6 z-40"
+            className="fixed inset-x-0 bottom-0 top-[65px] bg-[#07140F]/95 backdrop-blur-xl border-t border-white/5 lg:hidden flex flex-col p-6 z-40"
             role="dialog"
             aria-label="Menú móvil"
           >
-            <nav className="flex flex-col gap-3">
+            <nav className="flex flex-col gap-2 mt-4">
               {navLinks.map((link) => {
                 const isRegister = link.href === '#registro' || link.href === '/registro';
                 if (isRegister) return null;
@@ -183,18 +183,18 @@ export const NavbarReact: React.FC<NavbarProps> = ({
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="mobile-nav-link font-display text-xl font-medium text-white/90 hover:text-white py-3 border-b border-white/5 transition-colors"
+                    className="mobile-nav-link font-display text-[13px] font-bold tracking-widest uppercase text-white/70 hover:text-white py-3.5 border-b border-white/5 transition-colors"
                   >
                     {link.label}
                   </a>
                 );
               })}
             </nav>
-            <div className="mt-8">
+            <div className="mt-auto mb-8">
               <a
                 href="/registro"
                 onClick={() => setIsMenuOpen(false)}
-                className="w-full text-center inline-block font-display font-semibold text-[#0D1F17] bg-secondary hover:bg-accent py-4 rounded-xl transition-colors shadow-lg shadow-secondary/10"
+                className="w-full text-center inline-block font-display font-bold text-xs uppercase tracking-widest text-[#0D1F17] bg-secondary hover:bg-accent py-4 rounded-full transition-colors shadow-lg shadow-secondary/15"
               >
                 Registrarse ahora
               </a>

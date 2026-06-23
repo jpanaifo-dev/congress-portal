@@ -64,6 +64,8 @@ export interface EventConfig {
     contact_email: string | null;
     social_links: any;
     settings: any;
+    location?: string | null;
+    modality?: string | null;
   } | null;
   edition: {
     id: string;
@@ -76,6 +78,8 @@ export interface EventConfig {
     start_date: string;
     end_date: string;
     is_current: boolean;
+    location?: string | null;
+    modality?: string | null;
   } | null;
 }
 

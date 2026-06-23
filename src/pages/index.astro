@@ -10,6 +10,13 @@ import GallerySection from '../components/sections/GallerySection.astro';
 import Faq from '../components/sections/Faq.astro';
 import Contact from '../components/sections/Contact.astro';
 import Footer from '../components/layout/Footer.astro';
+import { StickyBottomBanner } from '../components/layout/StickyBottomBanner';
+import { fetchConfig } from '../lib/supabase';
+
+const config = await fetchConfig();
+const startDateStr = config.edition?.start_date 
+  ? `${config.edition.start_date}T08:00:00-05:00` 
+  : "2026-07-02T08:00:00-05:00";
 ---
 
 <Layout>
@@ -47,4 +54,10 @@ import Footer from '../components/layout/Footer.astro';
 
   <!-- University Branded Footer -->
   <Footer />
+
+  <!-- Sticky Countdown and Registration Quick-Bar -->
+  <StickyBottomBanner client:load targetDateStr={startDateStr} />
+  
+  <!-- Spacer to allow scrolling past the sticky footer banner -->
+  <div class="h-24 sm:h-20"></div>
 </Layout>

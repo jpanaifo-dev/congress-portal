@@ -90,6 +90,8 @@ export interface DbEvent {
   name: string;
   description: string | null;
   created_at?: string;
+  location?: string | null;
+  modality?: string | null;
 }
 
 export interface DbEdition {
@@ -101,6 +103,8 @@ export interface DbEdition {
   end_date: string;
   is_active: boolean;
   created_at?: string;
+  location?: string | null;
+  modality?: string | null;
 }
 
 export interface DbSpeaker {
