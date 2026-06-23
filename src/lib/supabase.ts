@@ -85,9 +85,13 @@ export interface EventConfig {
 
 // 1. Fetch unified config
 let cachedConfigPromise: Promise<EventConfig> | null = null;
+let lastFetchTime = 0;
+const CACHE_TTL = 3000; // 3 seconds
 
 export function fetchConfig(): Promise<EventConfig> {
-  if (!cachedConfigPromise) {
+  const now = Date.now();
+  if (!cachedConfigPromise || (now - lastFetchTime > CACHE_TTL)) {
+    lastFetchTime = now;
     cachedConfigPromise = (async () => {
       let globalSettings = null;
       let event = null;

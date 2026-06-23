@@ -35,6 +35,21 @@ export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
+    if (isClient) {
+      if (isVisible) {
+        document.documentElement.classList.add('sticky-banner-active');
+      } else {
+        document.documentElement.classList.remove('sticky-banner-active');
+      }
+    }
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.documentElement.classList.remove('sticky-banner-active');
+      }
+    };
+  }, [isVisible, isClient]);
+
+  useEffect(() => {
     setIsClient(true);
 
     const targetDate = new Date(targetDateStr).getTime();
