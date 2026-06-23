@@ -8,14 +8,27 @@ interface TimeLeft {
   seconds: number;
 }
 
+import { X } from 'lucide-react';
+
+interface TimeLeft {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
 interface StickyBottomBannerProps {
   targetDateStr?: string;
   registrationUrl?: string;
+  eventName?: string;
+  editionName?: string;
 }
 
 export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
   targetDateStr = '2026-07-02T08:00:00-05:00',
-  registrationUrl = '/registro'
+  registrationUrl = '/registro',
+  eventName = 'III Encuentro Científico',
+  editionName = ''
 }) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
   const [isClient, setIsClient] = useState(false);
@@ -59,6 +72,15 @@ export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
     { label: 'Min', value: timeLeft?.minutes ?? 0 },
     { label: 'Seg', value: timeLeft?.seconds ?? 0 },
   ];
+
+  // Dynamic alert messages containing the active event/edition name
+  const fullAlertText = editionName 
+    ? `¡REGÍSTRATE AHORA AL ${eventName.toUpperCase()} (${editionName.toUpperCase()})! ASEGURA TU PARTICIPACIÓN Y CERTIFICACIÓN.`
+    : `¡REGÍSTRATE AHORA AL ${eventName.toUpperCase()}! ASEGURA TU PARTICIPACIÓN Y CERTIFICACIÓN OFICIAL.`;
+
+  const mdAlertText = editionName
+    ? `${eventName.toUpperCase()} (${editionName.toUpperCase()}): ¡REGÍSTRATE YA!`
+    : `${eventName.toUpperCase()}: ¡REGÍSTRATE YA!`;
 
   return (
     <AnimatePresence>
@@ -110,7 +132,7 @@ export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
                 </span>
                 <p className="text-[11px] xl:text-xs font-display font-bold uppercase tracking-wider text-white/90">
-                  ¡REGÍSTRATE AHORA! ASEGURA TU PARTICIPACIÓN Y CERTIFICADO DEL III ENCUENTRO CIENTÍFICO
+                  {fullAlertText}
                 </p>
               </div>
               
@@ -121,18 +143,26 @@ export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-secondary"></span>
                 </span>
                 <p className="text-[10px] font-display font-bold uppercase tracking-wider text-white/85">
-                  III ENCUENTRO CIENTÍFICO: REGÍSTRATE YA
+                  {mdAlertText}
                 </p>
               </div>
 
-              {/* Registration CTA Button */}
-              <div className="shrink-0 w-full sm:w-auto flex justify-center md:justify-end">
+              {/* Registration CTA Button + Close Button */}
+              <div className="shrink-0 w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3">
                 <a
                   href={registrationUrl}
-                  className="w-full sm:w-auto text-center inline-flex items-center justify-center font-display font-black text-[11px] uppercase tracking-widest text-[#0D1F17] bg-secondary hover:bg-accent px-8 py-3.5 rounded-full transition-all cursor-pointer shadow-md shadow-secondary/15 hover:shadow-secondary/25 active:scale-95 duration-200"
+                  className="flex-grow sm:flex-grow-0 w-full sm:w-auto text-center inline-flex items-center justify-center font-display font-black text-[11px] uppercase tracking-widest text-[#0D1F17] bg-secondary hover:bg-accent px-8 py-3.5 rounded-full transition-all cursor-pointer shadow-md shadow-secondary/15 hover:shadow-secondary/25 active:scale-95 duration-200"
                 >
                   Inscribirse ahora
                 </a>
+                
+                <button
+                  onClick={() => setIsVisible(false)}
+                  className="p-2 text-white/55 hover:text-white rounded-full hover:bg-white/10 transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-secondary"
+                  aria-label="Cerrar banner"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
 
             </div>
