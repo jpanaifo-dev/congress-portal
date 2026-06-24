@@ -9,100 +9,106 @@ interface Props {
   isMaintenancePage?: boolean;
 }
 
-const {
-  title: propTitle,
-  description: propDescription,
-  isMaintenancePage = false
-} = Astro.props;
+const { title: propTitle, description: propDescription, isMaintenancePage = false } = Astro.props;
 
 // Fetch active config from Supabase
 const config = await fetchConfig();
 
 // Perform client-side check for is_online; server-side Astro.redirect is not used here to avoid ResponseSentError during component rendering
 
-const brandName = config.event?.name || config.globalSettings?.app_name || "III Encuentro Científico - Escuela de Postgrado UNAP";
-const brandDesc = config.event?.short_description || "III Encuentro Científico de la Escuela de Postgrado de la UNAP: 'Ciencia que transforma la Amazonía, conocimiento que construye futuro'. 02 y 03 de julio de 2026.";
-const startDateStr = config.edition?.start_date ? `${config.edition.start_date}T08:00:00-05:00` : "2026-07-02T08:00:00-05:00";
-const endDateStr = config.edition?.end_date ? `${config.edition.end_date}T18:00:00-05:00` : "2026-07-03T18:00:00-05:00";
+const brandName =
+  config.event?.name ||
+  config.globalSettings?.app_name ||
+  'III Encuentro Científico - Escuela de Postgrado UNAP';
+const brandDesc =
+  config.event?.short_description ||
+  "III Encuentro Científico de la Escuela de Postgrado de la UNAP: 'Ciencia que transforma la Amazonía, conocimiento que construye futuro'. 02 y 03 de julio de 2026.";
+const startDateStr = config.edition?.start_date
+  ? `${config.edition.start_date}T08:00:00-05:00`
+  : '2026-07-02T08:00:00-05:00';
+const endDateStr = config.edition?.end_date
+  ? `${config.edition.end_date}T18:00:00-05:00`
+  : '2026-07-03T18:00:00-05:00';
 
 const title = propTitle || brandName;
 const description = propDescription || brandDesc;
 
 // JSON-LD Structured Data
 const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "EducationEvent",
-  "name": brandName,
-  "description": brandDesc,
-  "startDate": startDateStr,
-  "endDate": endDateStr,
-  "eventStatus": "https://schema.org/EventScheduled",
-  "eventAttendanceMode": "https://schema.org/MixedEventAttendanceMode",
-  "location": [
+  '@context': 'https://schema.org',
+  '@type': 'EducationEvent',
+  name: brandName,
+  description: brandDesc,
+  startDate: startDateStr,
+  endDate: endDateStr,
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/MixedEventAttendanceMode',
+  location: [
     {
-      "@type": "Place",
-      "name": "Escuela de Postgrado - UNAP",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Los Rosales s/n, San Juan Bautista",
-        "addressLocality": "Maynas",
-        "addressRegion": "Loreto",
-        "addressCountry": "PE"
-      }
-    }
+      '@type': 'Place',
+      name: 'Escuela de Postgrado - UNAP',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Los Rosales s/n, San Juan Bautista',
+        addressLocality: 'Maynas',
+        addressRegion: 'Loreto',
+        addressCountry: 'PE',
+      },
+    },
   ],
-  "organizer": {
-    "@type": "EducationalOrganization",
-    "name": "Universidad Nacional de la Amazonía Peruana - Escuela de Postgrado",
-    "url": "https://www.unapiquitos.edu.pe"
+  organizer: {
+    '@type': 'EducationalOrganization',
+    name: 'Universidad Nacional de la Amazonía Peruana - Escuela de Postgrado',
+    url: 'https://www.unapiquitos.edu.pe',
   },
-  "offers": [
+  offers: [
     {
-      "@type": "Offer",
-      "name": "Certificación Estudiantes Pregrado",
-      "price": "25.00",
-      "priceCurrency": "PEN",
-      "category": "Pregrado"
+      '@type': 'Offer',
+      name: 'Certificación Estudiantes Pregrado',
+      price: '25.00',
+      priceCurrency: 'PEN',
+      category: 'Pregrado',
     },
     {
-      "@type": "Offer",
-      "name": "Certificación Estudiantes Postgrado",
-      "price": "50.00",
-      "priceCurrency": "PEN",
-      "category": "Postgrado"
+      '@type': 'Offer',
+      name: 'Certificación Estudiantes Postgrado',
+      price: '50.00',
+      priceCurrency: 'PEN',
+      category: 'Postgrado',
     },
     {
-      "@type": "Offer",
-      "name": "Certificación Público General",
-      "price": "60.00",
-      "priceCurrency": "PEN",
-      "category": "Público General"
-    }
-  ]
+      '@type': 'Offer',
+      name: 'Certificación Público General',
+      price: '60.00',
+      priceCurrency: 'PEN',
+      category: 'Público General',
+    },
+  ],
 };
 ---
-
 
 <!doctype html>
 <html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
     <!-- Brand colors injected from Supabase Database -->
-    <style define:vars={{
-      primaryColor: config.event?.brand_colors?.primary || '#0B5D1E',
-      secondaryColor: config.event?.brand_colors?.secondary || '#4CAF50',
-    }}>
+    <style
+      define:vars={{
+        primaryColor: config.event?.brand_colors?.primary || '#0B5D1E',
+        secondaryColor: config.event?.brand_colors?.secondary || '#4CAF50',
+      }}
+    >
       :root {
         --color-primary: var(--primaryColor) !important;
         --color-secondary: var(--secondaryColor) !important;
       }
     </style>
-    
+
     <!-- Theme Loader Script (Avoid FOUC) -->
     <script is:inline define:vars={{ isMaintenancePage }}>
-      (function() {
+      (function () {
         if (isMaintenancePage) {
           document.documentElement.classList.add('dark');
           return;
@@ -117,12 +123,15 @@ const jsonLd = {
     </script>
 
     <!-- Real-time client-side is_online check to support static deployments -->
-    <script is:inline define:vars={{
-      supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-      supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-      isMaintenancePage
-    }}>
-      (async function() {
+    <script
+      is:inline
+      define:vars={{
+        supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+        supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+        isMaintenancePage,
+      }}
+    >
+      (async function () {
         window.__SUPABASE_URL__ = supabaseUrl;
         window.__SUPABASE_ANON_KEY__ = supabaseAnonKey;
 
@@ -139,18 +148,21 @@ const jsonLd = {
         // Live check: query Supabase API
         if (!supabaseUrl || !supabaseAnonKey) return;
         try {
-          const response = await fetch(`${supabaseUrl}/rest/v1/global_settings?select=is_online&order=updated_at.desc&limit=1`, {
-            headers: {
-              'apikey': supabaseAnonKey,
-              'Authorization': 'Bearer ' + supabaseAnonKey
+          const response = await fetch(
+            `${supabaseUrl}/rest/v1/global_settings?select=is_online&order=updated_at.desc&limit=1`,
+            {
+              headers: {
+                apikey: supabaseAnonKey,
+                Authorization: 'Bearer ' + supabaseAnonKey,
+              },
             }
-          });
+          );
           if (response.ok) {
             const data = await response.json();
             if (data && data.length > 0) {
               const isOnline = data[0].is_online;
               localStorage.setItem('is_online', isOnline ? 'true' : 'false');
-              
+
               if (!isMaintenancePage && isOnline === false) {
                 window.location.replace('/mantenimiento');
               } else if (isMaintenancePage && isOnline === true) {
@@ -170,34 +182,38 @@ const jsonLd = {
       openGraph={{
         basic: {
           title: title,
-          type: "website",
-          image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200&h=630",
+          type: 'website',
+          image:
+            'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200&h=630',
         },
         optional: {
-          locale: "es_PE",
-          siteName: "UNAP Escuela de Postgrado",
-        }
+          locale: 'es_PE',
+          siteName: 'UNAP Escuela de Postgrado',
+        },
       }}
       twitter={{
-        card: "summary_large_image",
+        card: 'summary_large_image',
         title: title,
         description: description,
-        image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200&h=630",
+        image:
+          'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200&h=630',
       }}
       extend={{
         link: [
-          { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-          { rel: "icon", href: "/favicon.ico" },
-          { rel: "preconnect", href: "https://fonts.googleapis.com" },
-          { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "true" }
-        ]
+          { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+          { rel: 'icon', href: '/favicon.ico' },
+          { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+          { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'true' },
+        ],
       }}
     />
 
     <!-- JSON-LD Structured Data Injection -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
-  <body class="bg-dark text-light font-sans antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col">
+  <body
+    class="bg-dark text-light font-sans antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col"
+  >
     <slot />
   </body>
 </html>
