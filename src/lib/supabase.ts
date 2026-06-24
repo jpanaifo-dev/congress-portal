@@ -2,8 +2,11 @@
 
 // Helper for generic REST requests
 async function supabaseRequest(path: string, options: RequestInit = {}) {
-  const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/${path}`;
-  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+  const isClient = typeof window !== 'undefined';
+  const urlBase = isClient ? (window as any).__SUPABASE_URL__ : import.meta.env.VITE_SUPABASE_URL;
+  const anonKey = isClient ? (window as any).__SUPABASE_ANON_KEY__ : (import.meta.env.VITE_SUPABASE_ANON_KEY || "");
+
+  const url = `${urlBase}/rest/v1/${path}`;
   
   const headers: Record<string, string> = {
     'apikey': anonKey,
@@ -192,7 +195,7 @@ export async function fetchSpeakers(editionId: string) {
 
     // 2. Fetch event participants for this edition
     const participants = await supabaseRequest(
-      `event_participants?edition_id=eq.${editionId}&select=id,role_id,profiles(id,first_name,last_name,avatar_url,bio,dedication,institution,social_links)`
+      `event_participants?edition_id=eq.${editionId}&select=id,role_id,profile:profile_id(id,first_name,last_name,avatar_url,bio,dedication,institution,social_links)`
     );
 
     const speakersList: any[] = [];
@@ -202,7 +205,7 @@ export async function fetchSpeakers(editionId: string) {
       participants.forEach((part: any) => {
         // Filter by the speaker role IDs we identified
         if (speakerRoleIds.has(part.role_id) || part.role_id === 'cd7f72c1-51a1-41b3-a36c-fdea56707d30') {
-          const profile = part.profiles;
+          const profile = part.profile;
           if (profile && !seenProfileIds.has(profile.id)) {
             seenProfileIds.add(profile.id);
             speakersList.push({
@@ -222,7 +225,7 @@ export async function fetchSpeakers(editionId: string) {
     return speakersList;
   } catch (err) {
     console.error('Error loading speakers from event_participants:', err);
-    return [];
+    throw err;
   }
 }
 

@@ -55,6 +55,11 @@ export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId }) => {
         <p className="text-xs text-light/65 max-w-md mx-auto text-center">
           Actualmente no se encuentran investigadores o líderes académicos registrados en la base de datos.
         </p>
+        {dbError && (
+          <p className="text-red-400 text-xs font-semibold mt-2 bg-red-400/10 p-3 rounded-lg border border-red-400/20 max-w-lg mx-auto">
+            Error de conexión: {dbError}
+          </p>
+        )}
       </div>
     );
   }
