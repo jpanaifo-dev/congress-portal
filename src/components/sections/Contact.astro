@@ -6,7 +6,7 @@ const mapUrl =
   'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1990.5876471555948!2d-73.29493157116421!3d-3.77200632046194!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91ea0fc8b03af903%3A0xa30ac2bf7c0720a3!2sGraduate%20School%20-%20UNAP!5e0!3m2!1spt-BR!2spe!4v1781546159808!5m2!1spt-BR!2spe';
 ---
 
-<section id="contacto" class="relative py-24 bg-dark/30 overflow-hidden">
+<section id="contacto" class="relative py-24 bg-black/[0.01] dark:bg-[#07140F]/30 overflow-hidden border-t border-black/5 dark:border-white/5">
   <!-- Decorative leaf blur lights -->
   <div
     class="absolute top-1/2 left-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2"
@@ -23,40 +23,40 @@ const mapUrl =
       <div class="lg:col-span-5 flex flex-col justify-between gap-8">
         <div class="flex flex-col gap-5">
           <span
-            class="text-xs font-bold text-secondary uppercase tracking-widest border-l-2 border-secondary pl-3"
+            class="text-xs font-bold text-secondary dark:text-primary uppercase tracking-widest border-l-2 border-secondary dark:border-primary pl-3"
           >
             Atención Directa
           </span>
-          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl text-light">
-            Póngase en <span class="text-glow text-accent">Contacto con Nosotros</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl text-foreground dark:text-white">
+            Póngase en <span class="text-glow text-secondary dark:text-primary">Contacto con Nosotros</span>
           </h2>
-          <p class="text-sm sm:text-base text-light/75 leading-relaxed">
+          <p class="text-sm sm:text-base text-foreground/80 dark:text-white/85 leading-relaxed">
             ¿Tiene dudas sobre el proceso de postulación, pagos, o acreditación horaria? Comuníquese
             con la comisión organizadora por cualquiera de estos canales:
           </p>
 
           <div class="flex flex-col gap-4 mt-4">
             {/* Address */}
-            <div class="flex gap-4 p-4 rounded-xl border border-accent/10 bg-primary/5">
-              <MapPin className="w-6 h-6 text-secondary shrink-0 mt-0.5" />
+            <div class="flex gap-4 p-4 rounded-xl border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.03]">
+              <MapPin className="w-6 h-6 text-secondary dark:text-primary shrink-0 mt-0.5" />
               <div class="flex flex-col">
-                <span class="text-xs font-bold text-accent uppercase tracking-wider"
+                <span class="text-xs font-bold text-secondary dark:text-primary uppercase tracking-wider"
                   >Dirección Física</span
                 >
-                <span class="text-xs sm:text-sm text-light/85 mt-0.5">{CONTACT_INFO.address}</span>
+                <span class="text-xs sm:text-sm text-foreground/85 dark:text-white/85 mt-0.5">{CONTACT_INFO.address}</span>
               </div>
             </div>
 
             {/* Email */}
-            <div class="flex gap-4 p-4 rounded-xl border border-accent/10 bg-primary/5">
-              <Mail className="w-6 h-6 text-secondary shrink-0 mt-0.5" />
+            <div class="flex gap-4 p-4 rounded-xl border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.03]">
+              <Mail className="w-6 h-6 text-secondary dark:text-primary shrink-0 mt-0.5" />
               <div class="flex flex-col">
-                <span class="text-xs font-bold text-accent uppercase tracking-wider"
+                <span class="text-xs font-bold text-secondary dark:text-primary uppercase tracking-wider"
                   >Correo Institucional</span
                 >
                 <a
                   href={`mailto:${CONTACT_INFO.emails[0]}`}
-                  class="text-xs sm:text-sm text-light/95 hover:text-light underline transition-colors mt-0.5"
+                  class="text-xs sm:text-sm text-foreground/85 dark:text-white/85 hover:text-secondary dark:hover:text-primary underline transition-colors mt-0.5"
                 >
                   {CONTACT_INFO.emails[0]}
                 </a>
@@ -67,7 +67,7 @@ const mapUrl =
 
         {/* WhatsApp Call to Actions Grid */}
         <div class="flex flex-col gap-4">
-          <h3 class="font-display font-bold text-sm text-light uppercase tracking-wider">
+          <h3 class="font-display font-bold text-sm text-foreground dark:text-white uppercase tracking-wider">
             Coordinadores Científicos (WhatsApp)
           </h3>
 
@@ -78,7 +78,7 @@ const mapUrl =
                   href={`https://wa.me/${CONTACT_INFO.whatsappNumbers[i]}?text=Hola,%20solicito%20información%20sobre%20el%20III%20Encuentro%20Científico%20EPG%20UNAP`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="flex items-center justify-center gap-2 p-3 text-xs font-bold text-dark bg-primary hover:bg-accent rounded-xl transition-all hover:scale-102 cursor-pointer shadow-md text-center"
+                  class="flex items-center justify-center gap-2 p-3 text-xs font-bold text-[#0D1F17] bg-primary hover:bg-accent rounded-xl transition-all hover:scale-102 cursor-pointer shadow-md text-center"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
