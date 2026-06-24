@@ -89,7 +89,7 @@ export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
   ];
 
   // Dynamic alert messages containing the active event/edition name
-  const fullAlertText = editionName 
+  const fullAlertText = editionName
     ? `¡REGÍSTRATE AHORA AL ${eventName.toUpperCase()} (${editionName.toUpperCase()})! ASEGURA TU PARTICIPACIÓN Y CERTIFICACIÓN.`
     : `¡REGÍSTRATE AHORA AL ${eventName.toUpperCase()}! ASEGURA TU PARTICIPACIÓN Y CERTIFICACIÓN OFICIAL.`;
 
@@ -109,7 +109,7 @@ export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-3">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
-              
+
               {/* Countdown Timer with Vertical Dividers */}
               <div className="flex items-center gap-3 sm:gap-4 select-none shrink-0 w-full sm:w-auto justify-center md:justify-start">
                 {timeItems.map((item, index) => (
@@ -143,19 +143,19 @@ export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
               {/* Alert Message/Announcement */}
               <div className="hidden lg:flex items-center gap-2 text-center my-auto">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
                 <p className="text-[11px] xl:text-xs font-display font-bold uppercase tracking-wider text-white/90">
                   {fullAlertText}
                 </p>
               </div>
-              
+
               {/* Fallback layout for medium screens (between md and lg) to keep text but smaller */}
               <div className="hidden md:flex lg:hidden items-center gap-1.5 text-center my-auto">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-secondary"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
                 </span>
                 <p className="text-[10px] font-display font-bold uppercase tracking-wider text-white/85">
                   {mdAlertText}
@@ -166,11 +166,11 @@ export const StickyBottomBanner: React.FC<StickyBottomBannerProps> = ({
               <div className="shrink-0 w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3">
                 <a
                   href={registrationUrl}
-                  className="flex-grow sm:flex-grow-0 w-full sm:w-auto text-center inline-flex items-center justify-center font-display font-black text-[11px] uppercase tracking-widest text-[#0D1F17] bg-secondary hover:bg-accent px-8 py-3.5 rounded-full transition-all cursor-pointer shadow-md shadow-secondary/15 hover:shadow-secondary/25 active:scale-95 duration-200"
+                  className="flex-grow sm:flex-grow-0 w-full sm:w-auto text-center inline-flex items-center justify-center font-display font-black text-[11px] uppercase tracking-widest text-[#0D1F17] bg-primary hover:bg-accent px-8 py-3.5 rounded-full transition-all cursor-pointer shadow-md shadow-secondary/15 hover:shadow-secondary/25 active:scale-95 duration-200"
                 >
                   Inscribirse ahora
                 </a>
-                
+
                 <button
                   onClick={() => setIsVisible(false)}
                   className="p-2 text-white/55 hover:text-white rounded-full hover:bg-white/10 transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-secondary"

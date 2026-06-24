@@ -202,7 +202,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
     <div className="w-full max-w-2xl mx-auto bg-dark/60 backdrop-blur-xl rounded-3xl p-6 lg:p-8 border relative overflow-hidden">
       {/* Decorative leaf glows */}
       <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
-      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-secondary/5 rounded-full blur-2xl"></div>
+      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-primary/5 rounded-full blur-2xl"></div>
 
       {!isSubmitted ? (
         <motion.form
@@ -465,7 +465,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
           <button
             type="submit"
             disabled={registrationMutation.isPending || docCheckStatus === 'checking' || docCheckStatus === 'taken'}
-            className="mt-4 w-full bg-secondary hover:bg-accent disabled:bg-primary/30 disabled:text-light/50 text-dark font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            className="mt-4 w-full bg-primary hover:bg-accent disabled:bg-primary/30 disabled:text-light/50 text-dark font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
           >
             {registrationMutation.isPending ? (
               <>
@@ -494,7 +494,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
           transition={{ type: 'spring', stiffness: 200, damping: 25 }}
           className="flex flex-col items-center text-center p-2 relative z-10"
         >
-          <div className="w-16 h-16 bg-secondary/20 rounded-full border border-secondary/40 flex items-center justify-center text-secondary mb-6 shadow-[0_0_20px_rgba(76,175,80,0.25)]">
+          <div className="w-16 h-16 bg-primary/20 rounded-full border border-secondary/40 flex items-center justify-center text-secondary mb-6 shadow-[0_0_20px_rgba(76,175,80,0.25)]">
             <CheckCircle2 className="w-10 h-10" />
           </div>
 

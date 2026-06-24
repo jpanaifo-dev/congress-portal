@@ -127,7 +127,7 @@ export const Gallery: React.FC = () => {
             {/* Close Button */}
             <button
               onClick={() => setSelectedImg(null)}
-              className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 bg-primary/20 text-light hover:bg-secondary hover:text-dark border border-light/10 hover:border-transparent rounded-full transition-all cursor-pointer z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 bg-primary/20 text-light hover:bg-primary hover:text-dark border border-light/10 hover:border-transparent rounded-full transition-all cursor-pointer z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
               aria-label="Cerrar vista de imagen"
             >
               <X className="w-6 h-6" />

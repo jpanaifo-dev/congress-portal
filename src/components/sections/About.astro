@@ -3,8 +3,8 @@ import * as Icons from 'lucide-react';
 import { fetchConfig, fetchThematicLines, fetchEventTickets } from '../../lib/supabase';
 
 const config = await fetchConfig();
-const editionId = config.edition?.id || "";
-const eventName = config.event?.name || "III Encuentro Científico";
+const editionId = config.edition?.id || '';
+const eventName = config.event?.name || 'III Encuentro Científico';
 
 // Fetch thematic lines and tickets
 const thematicLines = editionId ? await fetchThematicLines(editionId) : [];
@@ -21,11 +21,13 @@ function formatCategory(name: string): string {
 
 // Section texts from database settings
 const sectionSettings = config.event?.settings?.landing_sections?.about;
-const tagline = sectionSettings?.tagline || "— Escuela de Postgrado";
-const heading = sectionSettings?.heading || "Encuentro — espacio de convergencia para difundir e impulsar la investigación científica en la Amazonía.";
+const tagline = sectionSettings?.tagline || '— Escuela de Postgrado';
+const heading =
+  sectionSettings?.heading ||
+  'Encuentro — espacio de convergencia para difundir e impulsar la investigación científica en la Amazonía.';
 
 // Date Formatter
-let formattedDates = "02 y 03 de julio de 2026";
+let formattedDates = '02 y 03 de julio de 2026';
 if (config.edition?.start_date && config.edition?.end_date) {
   try {
     const start = new Date(config.edition.start_date + 'T00:00:00');
@@ -52,30 +54,31 @@ if (config.edition?.start_date && config.edition?.end_date) {
 }
 
 // Split heading into bold & regular parts for aesthetics
-let boldTitle = "Encuentro —";
-let regularTitle = "espacio de convergencia para difundir e impulsar la investigación científica en la Amazonía.";
+let boldTitle = 'Encuentro —';
+let regularTitle =
+  'espacio de convergencia para difundir e impulsar la investigación científica en la Amazonía.';
 
-if (heading.includes(" — ")) {
-  const parts = heading.split(" — ");
-  boldTitle = parts[0] + " —";
-  regularTitle = parts.slice(1).join(" — ");
-} else if (heading.includes(" - ")) {
-  const parts = heading.split(" - ");
-  boldTitle = parts[0] + " -";
-  regularTitle = parts.slice(1).join(" - ");
+if (heading.includes(' — ')) {
+  const parts = heading.split(' — ');
+  boldTitle = parts[0] + ' —';
+  regularTitle = parts.slice(1).join(' — ');
+} else if (heading.includes(' - ')) {
+  const parts = heading.split(' - ');
+  boldTitle = parts[0] + ' -';
+  regularTitle = parts.slice(1).join(' - ');
 } else {
-  boldTitle = "";
+  boldTitle = '';
   regularTitle = heading;
 }
 
 // Modality and location mapping
 const modalityText = config.edition?.modality
   ? config.edition.modality.toLowerCase().replace('modalidad ', '')
-  : "presencial y virtual";
-const locationText = config.edition?.location || "Escuela de Postgrado";
+  : 'presencial y virtual';
+const locationText = config.edition?.location || 'Escuela de Postgrado';
 
 // Final paragraph
-const paragraph = sectionSettings?.paragraph 
+const paragraph = sectionSettings?.paragraph
   ? `El ${eventName} es un evento que se llevará a cabo de forma ${modalityText} en la ${locationText} el ${formattedDates}. ${sectionSettings.paragraph}`
   : `El ${eventName} es un evento que se llevará a cabo de forma ${modalityText} en la ${locationText} el ${formattedDates}. Está especialmente dirigido a investigadores, docentes, estudiantes de pregrado y postgrado, y profesionales dedicados a la construcción de conocimiento para la región.`;
 ---
@@ -94,7 +97,7 @@ const paragraph = sectionSettings?.paragraph
         <h2
           class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl uppercase text-light leading-tight"
         >
-          {boldTitle ? boldTitle + " " : ""}<span class="text-light/60">{regularTitle}</span>
+          {boldTitle ? boldTitle + ' ' : ''}<span class="text-light/60">{regularTitle}</span>
         </h2>
       </div>
 
@@ -106,60 +109,70 @@ const paragraph = sectionSettings?.paragraph
       </div>
 
       <!-- Topics / Insights Section -->
-      {thematicLines.length > 0 && (
-        <div class="mb-16">
-          <p class="text-sm sm:text-base text-light/80 font-medium mb-6 leading-relaxed">
-            Estas son las líneas temáticas:
-          </p>
+      {
+        thematicLines.length > 0 && (
+          <div class="mb-16">
+            <p class="text-sm sm:text-base text-light/80 font-medium mb-6 leading-relaxed">
+              Estas son las líneas temáticas:
+            </p>
 
-          <div class="flex flex-col gap-4 max-w-xl">
-            {thematicLines.map((line) => (
-              <div class="flex items-center gap-3.5 group cursor-default">
-                <div class="w-6 h-6 rounded-full border border-jsyellow flex items-center justify-center text-secondary shrink-0 transition-transform duration-300 group-hover:scale-110">
-                  <Icons.Check className="w-4 h-4" strokeWidth={3} />
+            <div class="flex flex-col gap-4 max-w-xl">
+              {thematicLines.map((line) => (
+                <div class="flex items-center gap-3.5 group cursor-default">
+                  <div class="w-6 h-6 rounded-full border border-jsyellow flex items-center justify-center text-secondary shrink-0 transition-transform duration-300 group-hover:scale-110">
+                    <Icons.Check className="w-4 h-4" strokeWidth={3} />
+                  </div>
+                  <span class="text-sm sm:text-base font-bold text-light/80 group-hover:text-light transition-colors duration-300">
+                    {line.name}
+                  </span>
                 </div>
-                <span class="text-sm sm:text-base font-bold text-light/80 group-hover:text-light transition-colors duration-300">
-                  {line.name}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <!-- Certifications Pricing Block (Dynamic from Database event_tickets) -->
-      {dbTickets.length > 0 && (
-        <div class="mb-16">
-          <p class="text-sm sm:text-base text-light/80 font-semibold mb-6 leading-relaxed">
-            Derechos de Certificación:
-          </p>
+      {
+        dbTickets.length > 0 && (
+          <div class="mb-16">
+            <p class="text-sm sm:text-base text-light/80 font-semibold mb-6 leading-relaxed">
+              Derechos de Certificación:
+            </p>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
-            {dbTickets.map((ticket: any) => {
-              const category = formatCategory(ticket.name);
-              const isPopular = ticket.name.toUpperCase().includes('POSTGRADO');
-              return (
-                <div 
-                  class={`relative glass-card rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 hover:scale-[1.01] ${
-                    isPopular 
-                      ? 'border-secondary bg-secondary/5 shadow-[0_0_20px_rgba(76,175,80,0.06)]' 
-                      : 'border-accent/15 hover:border-accent/30'
-                  }`}
-                >
-                  <div>
-                    <span class="text-xs font-bold text-accent uppercase tracking-widest block mb-1.5">{category}</span>
-                    <div class="flex items-baseline gap-1 text-light">
-                      <span class="text-sm font-extrabold">S/.</span>
-                      <span class="text-2xl font-display font-black leading-none">{Number(ticket.price).toFixed(2)}</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
+              {dbTickets.map((ticket: any) => {
+                const category = formatCategory(ticket.name);
+                const isPopular = ticket.name.toUpperCase().includes('POSTGRADO');
+                return (
+                  <div
+                    class={`relative glass-card rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 hover:scale-[1.01] ${
+                      isPopular
+                        ? 'border-secondary bg-primary/5 shadow-[0_0_20px_rgba(76,175,80,0.06)]'
+                        : 'border-accent/15 hover:border-accent/30'
+                    }`}
+                  >
+                    <div>
+                      <span class="text-xs font-bold text-accent uppercase tracking-widest block mb-1.5">
+                        {category}
+                      </span>
+                      <div class="flex items-baseline gap-1 text-light">
+                        <span class="text-sm font-extrabold">S/.</span>
+                        <span class="text-2xl font-display font-black leading-none">
+                          {Number(ticket.price).toFixed(2)}
+                        </span>
+                      </div>
+                      <span class="text-[9px] text-light/50 font-medium mt-2 block">
+                        Pago único por derecho de certificado firmado
+                      </span>
                     </div>
-                    <span class="text-[9px] text-light/50 font-medium mt-2 block">Pago único por derecho de certificado firmado</span>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <!-- Action Footer -->
       <div class="flex flex-wrap items-center gap-4 text-sm text-light/60">
@@ -174,4 +187,3 @@ const paragraph = sectionSettings?.paragraph
     </div>
   </div>
 </section>
-

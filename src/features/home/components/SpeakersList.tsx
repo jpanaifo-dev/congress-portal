@@ -106,7 +106,7 @@ export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId }) => {
                 alt={spk.full_name}
               />
             ))}
-            <div className="flex items-center justify-center h-10 w-10 rounded-full ring-2 ring-dark bg-secondary/15 border border-secondary/40 text-secondary text-xs font-black font-display select-none">
+            <div className="flex items-center justify-center h-10 w-10 rounded-full ring-2 ring-dark bg-primary/15 border border-secondary/40 text-secondary text-xs font-black font-display select-none">
               +{speakers.length}
             </div>
           </div>

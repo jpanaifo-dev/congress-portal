@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { fetchConfig, fetchSpeakers, createRegistration, checkProfileRegistration, type EventConfig } from '../../../lib/supabase';
-import { 
-  Users, 
-  Database, 
-  Send, 
-  RefreshCw, 
-  CheckCircle, 
-  AlertTriangle, 
+import {
+  Users,
+  Database,
+  Send,
+  RefreshCw,
+  CheckCircle,
+  AlertTriangle,
   Sparkles,
   Settings
 } from 'lucide-react';
@@ -27,7 +27,7 @@ export const NhostDemo: React.FC = () => {
   const [institution, setInstitution] = useState<string>('');
   const [participationType, setParticipationType] = useState<string>('Pregrado');
   const [researchArea, setResearchArea] = useState<string>('Ciencias Naturales');
-  
+
   // Custom IDs for test
   const [customEditionId, setCustomEditionId] = useState<string>('');
   const [customMainEventId, setCustomMainEventId] = useState<string>('');
@@ -43,7 +43,7 @@ export const NhostDemo: React.FC = () => {
     try {
       const activeConfig = await fetchConfig();
       setConfig(activeConfig);
-      
+
       if (activeConfig.edition?.id) {
         setCustomEditionId(activeConfig.edition.id);
         const list = await fetchSpeakers(activeConfig.edition.id);
@@ -72,7 +72,7 @@ export const NhostDemo: React.FC = () => {
 
     try {
       const check = await checkProfileRegistration(email, docType, docNumber, customEditionId);
-      
+
       if (check.isRegisteredForEdition) {
         throw new Error('El usuario ya se encuentra registrado para esta edición del congreso.');
       }
@@ -106,7 +106,7 @@ export const NhostDemo: React.FC = () => {
 
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 text-light">
-      
+
       {/* Header and status info bar */}
       <div className="col-span-1 lg:col-span-12 glass-card rounded-2xl p-6 border border-accent/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -119,11 +119,11 @@ export const NhostDemo: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-secondary/15 text-secondary border border-secondary/30">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-primary/15 text-secondary border border-secondary/30">
             <Sparkles className="w-3.5 h-3.5" />
             Conectado a Supabase
           </span>
-          <button 
+          <button
             onClick={loadData}
             type="button"
             className="p-2 bg-dark border border-accent/15 rounded-lg hover:border-secondary transition-all text-light/70 hover:text-light cursor-pointer"
@@ -142,7 +142,7 @@ export const NhostDemo: React.FC = () => {
 
       {/* LEFT PANEL: Database View / Active Config */}
       <div className="col-span-1 lg:col-span-7 flex flex-col gap-6">
-        
+
         {/* Dynamic Config details */}
         <div className="glass-card rounded-2xl p-6 border border-accent/10">
           <h3 className="text-lg font-display font-bold text-light mb-4 flex items-center gap-2 border-b border-accent/10 pb-2">
@@ -203,9 +203,9 @@ export const NhostDemo: React.FC = () => {
               {speakers.map((spk) => (
                 <div key={spk.id} className="bg-dark/40 border border-accent/5 rounded-xl p-4 flex gap-4 hover:border-secondary/30 transition-all">
                   {spk.photo_url ? (
-                    <img 
-                      src={spk.photo_url} 
-                      alt={spk.full_name} 
+                    <img
+                      src={spk.photo_url}
+                      alt={spk.full_name}
                       className="w-12 h-12 rounded-full object-cover border border-accent/20 flex-shrink-0"
                     />
                   ) : (
@@ -356,7 +356,7 @@ export const NhostDemo: React.FC = () => {
             <button
               type="submit"
               disabled={mutationLoading}
-              className="mt-4 bg-secondary hover:bg-accent disabled:bg-primary/20 text-dark font-display font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-secondary/15 hover:shadow-secondary/25"
+              className="mt-4 bg-primary hover:bg-accent disabled:bg-primary/20 text-dark font-display font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-secondary/15 hover:shadow-secondary/25"
             >
               {mutationLoading ? (
                 <>
@@ -375,7 +375,7 @@ export const NhostDemo: React.FC = () => {
           {/* Results box */}
           <div className="mt-6 border-t border-accent/10 pt-4 flex-grow flex flex-col justify-end">
             {mutationResult && (
-              <div className="bg-secondary/10 border border-secondary/30 rounded-xl p-4 text-xs">
+              <div className="bg-primary/10 border border-secondary/30 rounded-xl p-4 text-xs">
                 <div className="flex items-center gap-1.5 text-secondary font-bold mb-2">
                   <CheckCircle className="w-4 h-4" />
                   {mutationResult.message}
@@ -400,7 +400,7 @@ export const NhostDemo: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
     </div>
   );
 };

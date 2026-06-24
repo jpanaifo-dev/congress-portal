@@ -42,12 +42,12 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
 
   // Group database sessions by date
   let displaySchedule: any[] = [];
-  
+
   if (sessions.length > 0) {
     const grouped: { [date: string]: any[] } = {};
     sessions.forEach(sess => {
       let dateKey = 'Fecha del Evento';
-      
+
       let start_time_date = new Date();
       let end_time_date = new Date();
       try {
@@ -69,11 +69,11 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
       } catch (e) {
         console.error(e);
       }
-      
+
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
-      
+
       let timeStr = '00:00';
       try {
         const formatTime = (date: Date) => {
@@ -85,10 +85,10 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
       } catch (e) {
         console.error(e);
       }
-      
+
       const speakerData = sess.session_speakers?.[0]?.event_participants?.profile;
       const locationName = sess.facility?.name || sess.location || 'Auditorio Principal';
-      
+
       grouped[dateKey].push({
         id: sess.id,
         time: timeStr,
@@ -105,7 +105,7 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
         } : null
       });
     });
-    
+
     const sortedDates = Object.keys(grouped).sort((a, b) => {
       const sessA = sessions.find(s => {
         let st_date = new Date();
@@ -115,7 +115,7 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
           } else if (s.session_date && s.start_time) {
             st_date = new Date(`${s.session_date}T${s.start_time}`);
           }
-        } catch {}
+        } catch { }
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
         const formatted = st_date.toLocaleDateString('es-ES', options);
         const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
@@ -129,7 +129,7 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
           } else if (s.session_date && s.start_time) {
             st_date = new Date(`${s.session_date}T${s.start_time}`);
           }
-        } catch {}
+        } catch { }
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
         const formatted = st_date.toLocaleDateString('es-ES', options);
         const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
@@ -149,12 +149,12 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
           } else if (sessB.session_date && sessB.start_time) {
             timeB = new Date(`${sessB.session_date}T${sessB.start_time}`);
           }
-        } catch {}
+        } catch { }
         return timeA.getTime() - timeB.getTime();
       }
       return 0;
     });
-    
+
     displaySchedule = sortedDates.map((dateStr, idx) => ({
       day: idx + 1,
       dateString: dateStr,
@@ -182,7 +182,7 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
   const getBadgeStyle = (type: string) => {
     switch (type) {
       case 'keynote':
-        return 'bg-secondary/10 text-secondary border-secondary/20';
+        return 'bg-primary/10 text-secondary border-secondary/20';
       case 'panel':
       case 'workshop':
         return 'bg-accent/10 text-accent border-accent/20';
@@ -243,7 +243,7 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
         <div key={dayData.dateString} className="flex flex-col gap-8">
           {/* Day Title */}
           <div className="flex items-center gap-4 border-b border-light/10 pb-4">
-            <div className="w-12 h-12 rounded-2xl bg-secondary/15 flex items-center justify-center border border-secondary/35 text-secondary font-display font-black text-lg">
+            <div className="w-12 h-12 rounded-2xl bg-primary/15 flex items-center justify-center border border-secondary/35 text-secondary font-display font-black text-lg">
               {idx + 1}
             </div>
             <div className="flex flex-col">
@@ -263,17 +263,15 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
                 <div key={act.id} className="relative group">
                   {/* Timeline bullet dot */}
                   <div className="absolute -left-[37px] top-1.5 flex items-center justify-center">
-                    <div className={`w-6 h-6 rounded-full border flex items-center justify-center bg-dark z-10 transition-colors duration-300 ${
-                      isKeynote ? 'border-secondary text-secondary shadow-[0_0_8px_rgba(76,175,80,0.15)]' : 'border-accent/15 text-light/50 group-hover:border-accent/40'
-                    }`}>
+                    <div className={`w-6 h-6 rounded-full border flex items-center justify-center bg-dark z-10 transition-colors duration-300 ${isKeynote ? 'border-secondary text-secondary shadow-[0_0_8px_rgba(76,175,80,0.15)]' : 'border-accent/15 text-light/50 group-hover:border-accent/40'
+                      }`}>
                       {React.cloneElement(getActivityIcon(act.type), { className: 'w-3.5 h-3.5' })}
                     </div>
                   </div>
 
                   {/* Card Container */}
-                  <div className={`rounded-2xl p-5 sm:p-6 transition-all duration-300 relative overflow-hidden border ${
-                    isKeynote ? 'border-secondary/25 shadow-lg shadow-secondary/5 bg-[#0D1F17]' : 'glass-card border-accent/10 hover:border-accent/20 shadow-md'
-                  }`}>
+                  <div className={`rounded-2xl p-5 sm:p-6 transition-all duration-300 relative overflow-hidden border ${isKeynote ? 'border-secondary/25 shadow-lg shadow-secondary/5 bg-[#0D1F17]' : 'glass-card border-accent/10 hover:border-accent/20 shadow-md'
+                    }`}>
                     {isKeynote && (
                       <>
                         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&q=80&w=400&h=300')] bg-cover bg-center -z-10 opacity-30"></div>
@@ -293,22 +291,19 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
                           {act.location}
                         </span>
                       </div>
-                      <span className={`text-[9px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md border ${
-                        isKeynote ? 'bg-[#fcd34d]/10 text-[#fcd34d] border-[#fcd34d]/25' : getBadgeStyle(act.type)
-                      }`}>
+                      <span className={`text-[9px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md border ${isKeynote ? 'bg-[#fcd34d]/10 text-[#fcd34d] border-[#fcd34d]/25' : getBadgeStyle(act.type)
+                        }`}>
                         {translateType(act.type)}
                       </span>
                     </div>
 
-                    <h3 className={`font-display font-extrabold text-base sm:text-lg mb-2 leading-snug ${
-                      isKeynote ? 'text-glow-secondary text-[#fcd34d]' : 'text-light group-hover:text-secondary transition-colors'
-                    }`}>
+                    <h3 className={`font-display font-extrabold text-base sm:text-lg mb-2 leading-snug ${isKeynote ? 'text-glow-secondary text-[#fcd34d]' : 'text-light group-hover:text-secondary transition-colors'
+                      }`}>
                       {act.title}
                     </h3>
-                    
-                    <p className={`text-xs sm:text-sm leading-relaxed mb-4 ${
-                      isKeynote ? 'text-white/80' : 'text-light/75'
-                    }`}>
+
+                    <p className={`text-xs sm:text-sm leading-relaxed mb-4 ${isKeynote ? 'text-white/80' : 'text-light/75'
+                      }`}>
                       {act.description}
                     </p>
 
@@ -327,7 +322,7 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
                             <span className={`text-[10px] sm:text-xs truncate ${isKeynote ? 'text-[#fcd34d]' : 'text-accent'}`}>{speaker.specialty} • <span className={isKeynote ? 'text-white/60' : 'text-light/55'}>{speaker.institution}</span></span>
                           </div>
                         </div>
-                        
+
                         {speaker.bio && (
                           <div className="pl-13">
                             <button

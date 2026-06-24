@@ -39,12 +39,12 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
 
   // Group database sessions by date string
   let displaySchedule: any[] = [];
-  
+
   if (sessions.length > 0) {
     const grouped: { [date: string]: any[] } = {};
     sessions.forEach(sess => {
       let dateKey = 'Fecha desconocida';
-      
+
       let start_time_date = new Date();
       let end_time_date = new Date();
       try {
@@ -66,11 +66,11 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
       } catch (e) {
         console.error(e);
       }
-      
+
       if (!grouped[dateKey]) {
         grouped[dateKey] = [];
       }
-      
+
       let timeStr = '00:00';
       try {
         const formatTime = (date: Date) => {
@@ -82,10 +82,10 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
       } catch (e) {
         console.error(e);
       }
-      
+
       const speakerData = sess.session_speakers?.[0]?.event_participants?.profile;
       const locationName = sess.facility?.name || sess.location || 'Auditorio Principal';
-      
+
       grouped[dateKey].push({
         id: sess.id,
         time: timeStr,
@@ -100,7 +100,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
         } : null
       });
     });
-    
+
     const sortedDates = Object.keys(grouped).sort((a, b) => {
       const sessA = sessions.find(s => {
         let st_date = new Date();
@@ -110,7 +110,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
           } else if (s.session_date && s.start_time) {
             st_date = new Date(`${s.session_date}T${s.start_time}`);
           }
-        } catch {}
+        } catch { }
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
         const formatted = st_date.toLocaleDateString('es-ES', options);
         const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
@@ -124,7 +124,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
           } else if (s.session_date && s.start_time) {
             st_date = new Date(`${s.session_date}T${s.start_time}`);
           }
-        } catch {}
+        } catch { }
         const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
         const formatted = st_date.toLocaleDateString('es-ES', options);
         const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
@@ -144,12 +144,12 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
           } else if (sessB.session_date && sessB.start_time) {
             timeB = new Date(`${sessB.session_date}T${sessB.start_time}`);
           }
-        } catch {}
+        } catch { }
         return timeA.getTime() - timeB.getTime();
       }
       return 0;
     });
-    
+
     displaySchedule = sortedDates.map((dateStr, idx) => ({
       day: idx + 1,
       dateString: dateStr,
@@ -158,7 +158,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
   }
 
   // Adjust activeDayIndex to remain within bounds
-  const activeDayIndex = selectedBlock.startsWith('day-') 
+  const activeDayIndex = selectedBlock.startsWith('day-')
     ? Math.min(Math.max(0, parseInt(selectedBlock.split('-')[1], 10) - 1), displaySchedule.length - 1)
     : 0;
   const currentDayData = displaySchedule[activeDayIndex] || displaySchedule[0];
@@ -185,7 +185,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
   const getTypeStyle = (type: ScheduleActivity['type']) => {
     switch (type) {
       case 'keynote':
-        return 'bg-secondary/15 text-secondary border-secondary/25';
+        return 'bg-primary/15 text-secondary border-secondary/25';
       case 'panel':
       case 'workshop':
         return 'bg-accent/15 text-accent border-accent/25';
@@ -243,7 +243,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
           const dayNumber = idx + 1;
           const blockKey = `day-${dayNumber}`;
           const isSelected = selectedBlock === blockKey;
-          
+
           let dateNum = String(dayNumber).padStart(2, '0');
           let weekdayShort = 'Día';
           let monthName = 'Julio';
@@ -253,11 +253,11 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
             const dateParts = parts[1]?.trim().split(' de ');
             dateNum = dateParts[0] || dateNum;
             monthName = dateParts[1] || monthName;
-            
+
             // Capitalize
             weekdayShort = weekdayShort.charAt(0).toUpperCase() + weekdayShort.slice(1);
             monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-          } catch (e) {}
+          } catch (e) { }
 
           return (
             <button
@@ -267,8 +267,8 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
               aria-controls="program-detail-panel"
               onClick={() => setSelectedBlock(blockKey)}
               className={`snap-start shrink-0 w-[290px] sm:w-auto relative min-h-[380px] rounded-3xl overflow-hidden glass-card flex flex-col justify-between p-6 text-left group transition-all duration-300 hover:scale-[1.02] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${isSelected
-                  ? 'border-secondary shadow-[0_0_25px_rgba(76,175,80,0.25)] ring-2 ring-secondary/35 scale-[1.01]'
-                  : 'hover:border-secondary/40'
+                ? 'border-secondary shadow-[0_0_25px_rgba(76,175,80,0.25)] ring-2 ring-secondary/35 scale-[1.01]'
+                : 'hover:border-secondary/40'
                 }`}
             >
               <div className="flex items-center justify-between w-full text-accent/60 font-bold text-[10px] uppercase tracking-widest">
@@ -334,8 +334,8 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
                         >
                           <div className="h-20 flex items-center justify-center relative mb-4">
                             <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center bg-dark transition-all duration-300 z-10 ${isKeynote || act.type === 'research'
-                                ? 'border-secondary shadow-[0_0_15px_rgba(76,175,80,0.3)] group-hover:scale-110'
-                                : 'border-accent/20 group-hover:border-accent/50'
+                              ? 'border-secondary shadow-[0_0_15px_rgba(76,175,80,0.3)] group-hover:scale-110'
+                              : 'border-accent/20 group-hover:border-accent/50'
                               }`}>
                               {getActivityIcon(act.type)}
                             </div>
@@ -344,8 +344,8 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
                           {/* Individual Event Card */}
                           <div
                             className={`rounded-2xl p-5 relative w-full overflow-hidden transition-all duration-300 flex flex-col justify-between min-h-[240px] border ${isKeynote
-                                ? 'border-[#fcd34d]/30 hover:border-secondary/40 shadow-lg bg-[#0D1F17]'
-                                : 'glass-card border-accent/10 hover:border-secondary/35 shadow-md'
+                              ? 'border-[#fcd34d]/30 hover:border-secondary/40 shadow-lg bg-[#0D1F17]'
+                              : 'glass-card border-accent/10 hover:border-secondary/35 shadow-md'
                               }`}
                           >
                             {/* If Keynote, load a background image with dark overlay */}
@@ -362,9 +362,8 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
                                   <Clock className="w-3.5 h-3.5" />
                                   {act.time}
                                 </span>
-                                <span className={`text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md border ${
-                                   isKeynote ? 'bg-[#fcd34d]/10 text-[#fcd34d] border-[#fcd34d]/25' : getTypeStyle(act.type)
-                                 }`}>
+                                <span className={`text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md border ${isKeynote ? 'bg-[#fcd34d]/10 text-[#fcd34d] border-[#fcd34d]/25' : getTypeStyle(act.type)
+                                  }`}>
                                   {act.type}
                                 </span>
                               </div>
@@ -415,8 +414,8 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
                       >
                         <div className="absolute -left-[45px] top-1.5 flex items-center justify-center">
                           <div className={`w-8 h-8 rounded-full border flex items-center justify-center bg-dark z-10 ${isKeynote || act.type === 'research'
-                              ? 'border-secondary text-secondary shadow-[0_0_10px_rgba(76,175,80,0.25)]'
-                              : 'border-accent/20 text-light/50'
+                            ? 'border-secondary text-secondary shadow-[0_0_10px_rgba(76,175,80,0.25)]'
+                            : 'border-accent/20 text-light/50'
                             }`}>
                             {React.cloneElement(getActivityIcon(act.type), { className: 'w-4 h-4' })}
                           </div>
@@ -425,8 +424,8 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
                         {/* Individual Card Content Mobile */}
                         <div
                           className={`rounded-xl p-5 relative overflow-hidden transition-all duration-300 border ${isKeynote
-                              ? 'border-[#fcd34d]/30 shadow-lg bg-[#0D1F17]'
-                              : 'glass-card border-accent/10 hover:border-secondary/20 shadow-md'
+                            ? 'border-[#fcd34d]/30 shadow-lg bg-[#0D1F17]'
+                            : 'glass-card border-accent/10 hover:border-secondary/20 shadow-md'
                             }`}
                         >
                           {isKeynote && (
@@ -441,9 +440,8 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
                               <Clock className="w-4 h-4" />
                               {act.time}
                             </span>
-                            <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md border ${
-                               isKeynote ? 'bg-[#fcd34d]/10 text-[#fcd34d] border-[#fcd34d]/25' : getTypeStyle(act.type)
-                             }`}>
+                            <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md border ${isKeynote ? 'bg-[#fcd34d]/10 text-[#fcd34d] border-[#fcd34d]/25' : getTypeStyle(act.type)
+                              }`}>
                               {act.type}
                             </span>
                           </div>

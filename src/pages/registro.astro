@@ -4,9 +4,9 @@ import { RegistrationForm } from '../features/registration/components/Registrati
 import { fetchConfig, fetchThematicLines, fetchEventTickets } from '../lib/supabase';
 
 const config = await fetchConfig();
-const editionId = config.edition?.id || "";
-const mainEventId = config.event?.id || "";
-const eventName = config.event?.name || "III Encuentro Científico";
+const editionId = config.edition?.id || '';
+const mainEventId = config.event?.id || '';
+const eventName = config.event?.name || 'III Encuentro Científico';
 
 // Fetch thematic lines & ticket categories for registration form
 const thematicLines = editionId ? await fetchThematicLines(editionId) : [];
@@ -20,15 +20,23 @@ function formatCategory(name: string): string {
   if (norm === 'PUBLICO GENERAL') return 'Público General';
   return name;
 }
-const registrationCategories = dbTickets.map(t => formatCategory(t.name));
+const registrationCategories = dbTickets.map((t) => formatCategory(t.name));
 ---
 
 <Layout title={`Registro de Participantes - ${eventName}`}>
   <!-- Dynamic Rainforest background wrapper -->
-  <div class="min-h-screen flex flex-col justify-between amazon-gradient-bg relative overflow-hidden selection:bg-primary selection:text-white">
+  <div
+    class="min-h-screen flex flex-col justify-between amazon-gradient-bg relative overflow-hidden selection:bg-primary selection:text-white"
+  >
     <!-- Forest glow overlays -->
-    <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <div
+      class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"
+    >
+    </div>
+    <div
+      class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"
+    >
+    </div>
 
     <!-- Main Registration Section -->
     <main class="flex-grow flex items-center justify-center py-8 px-4 sm:px-6 relative z-10">
@@ -41,25 +49,32 @@ const registrationCategories = dbTickets.map(t => formatCategory(t.name));
             Ficha de Inscripción Digital
           </h1>
           <p class="text-xs sm:text-sm text-light/75 leading-relaxed">
-            Completa tus datos personales y académicos para reservar tu certificación oficial emitida por la Escuela de Postgrado de la UNAP.
+            Completa tus datos personales y académicos para reservar tu certificación oficial
+            emitida por la Escuela de Postgrado de la UNAP.
           </p>
         </div>
 
-        <RegistrationForm 
-          client:load 
-          editionId={editionId} 
-          mainEventId={mainEventId} 
+        <RegistrationForm
+          client:load
+          editionId={editionId}
+          mainEventId={mainEventId}
           thematicLines={thematicLines}
           registrationCategories={registrationCategories}
         />
       </div>
     </main>
 
-
     <!-- Minimalist Footer -->
-    <footer class="w-full py-8 px-6 border-t border-accent/10 text-center relative z-10 bg-dark/35 backdrop-blur-sm">
-      <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-light/50">
-        <p>© 2026 Universidad Nacional de la Amazonía Peruana. Escuela de Postgrado. Todos los derechos reservados.</p>
+    <footer
+      class="w-full py-8 px-6 border-t border-accent/10 text-center relative z-10 bg-dark/35 backdrop-blur-sm"
+    >
+      <div
+        class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-light/50"
+      >
+        <p>
+          © 2026 Universidad Nacional de la Amazonía Peruana. Escuela de Postgrado. Todos los
+          derechos reservados.
+        </p>
         <div class="flex gap-6">
           <a href="/#faq" class="hover:text-light transition-colors">Preguntas Frecuentes</a>
           <a href="/#contacto" class="hover:text-light transition-colors">Contacto & Soporte</a>

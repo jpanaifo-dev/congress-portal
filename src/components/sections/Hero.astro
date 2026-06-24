@@ -4,13 +4,13 @@ import { Countdown } from '../../features/home/components/Countdown';
 import { fetchConfig } from '../../lib/supabase';
 
 const config = await fetchConfig();
-const eventName = config.event?.name || "III Encuentro Científico de la Escuela de Postgrado";
-const shortDescription = config.event?.short_description || "Sin descripcion";
+const eventName = config.event?.name || 'III Encuentro Científico de la Escuela de Postgrado';
+const shortDescription = config.event?.short_description || 'Sin descripcion';
 
 // Dynamic splitting for heading styling (first words are bold, rest are regular/medium weight)
 const titleWords = eventName.split(' ');
 let boldPart = eventName;
-let regularPart = "";
+let regularPart = '';
 if (titleWords.length > 2) {
   const splitIndex = Math.min(3, Math.ceil(titleWords.length / 2));
   boldPart = titleWords.slice(0, splitIndex).join(' ');
@@ -18,11 +18,11 @@ if (titleWords.length > 2) {
 }
 
 // Fetch location, modality and edition title dynamically from database, fallback if not set yet
-const eventLocation = config.edition?.location || config.event?.location || "Iquitos, Perú";
-const eventModality = config.edition?.modality || config.event?.modality || "Modalidad Híbrida";
-const editionTitle = config.edition?.name?.es || "Tercera Edición";
+const eventLocation = config.edition?.location || config.event?.location || 'Iquitos, Perú';
+const eventModality = config.edition?.modality || config.event?.modality || 'Modalidad Híbrida';
+const editionTitle = config.edition?.name?.es || 'Tercera Edición';
 
-let formattedDates = "02 y 03 de Julio, 2026";
+let formattedDates = '02 y 03 de Julio, 2026';
 if (config.edition?.start_date && config.edition?.end_date) {
   try {
     const start = new Date(config.edition.start_date + 'T00:00:00');
@@ -62,7 +62,8 @@ if (config.edition?.start_date && config.edition?.end_date) {
       loop
       muted
       playsinline
-      poster={config.event?.cover_url || "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600&h=900"}
+      poster={config.event?.cover_url ||
+        'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600&h=900'}
       class="absolute inset-0 w-full h-full object-cover filter grayscale contrast-110 brightness-[0.35] saturate-[0.60]"
     >
       <source src="/videos/banner_video.mp4" type="video/mp4" />
@@ -77,16 +78,17 @@ if (config.edition?.start_date && config.edition?.end_date) {
   >
     <!-- Left Aligned Content Wrapper (No Right Column) -->
     <div class="max-w-5xl flex flex-col gap-6 text-left my-auto">
-      
       <!-- Edition Header Eyebrow Tag -->
-      <div class="w-fit flex items-center gap-2 text-amber-500 text-sm md:text-base font-bold uppercase tracking-widest">
+      <div
+        class="w-fit flex items-center gap-2 text-amber-500 text-sm md:text-base font-bold uppercase tracking-widest"
+      >
         {editionTitle}
       </div>
 
       <h1
         class="font-display text-4xl sm:text-5xl md:text-6xl leading-[0.9] tracking-tight text-white uppercase max-w-4xl"
       >
-        <span class="font-black">{boldPart}</span>{" "}
+        <span class="font-black">{boldPart}</span>{' '}
         <span class="font-medium text-white/80">{regularPart}</span>
       </h1>
 
@@ -97,14 +99,20 @@ if (config.edition?.start_date && config.edition?.end_date) {
       </div>
 
       <!-- Joined Location/Date Capsule badges - Modern minimal conference style -->
-      <div class="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-bold uppercase tracking-widest text-white/90 mt-4">
+      <div
+        class="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-bold uppercase tracking-widest text-white/90 mt-4"
+      >
         <!-- Date Badge -->
-        <div class="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-full">
-          <span class="inline-block w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+        <div
+          class="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-full"
+        >
+          <span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
           <span>Fecha: {formattedDates}</span>
         </div>
         <!-- Location Badge -->
-        <div class="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-full">
+        <div
+          class="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-full"
+        >
           <svg class="w-4 h-2.5 rounded-sm border border-white/10 shrink-0" viewBox="0 0 3 2">
             <rect width="1" height="2" fill="#d91414"></rect>
             <rect width="1" height="2" x="1" fill="#fff"></rect>
@@ -113,16 +121,21 @@ if (config.edition?.start_date && config.edition?.end_date) {
           <span>Lugar: {eventLocation}</span>
         </div>
         <!-- Modality Badge -->
-        <div class="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-full">
+        <div
+          class="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-full"
+        >
           <span>Modalidad: {eventModality}</span>
         </div>
       </div>
 
       <!-- Action CTAs (Toggled via CSS depending on Sticky Bottom Banner status) -->
-      <div id="hero-actions" class="flex flex-col sm:flex-row items-center gap-4 mt-8 w-full sm:w-auto transition-all duration-300 ease-in-out">
+      <div
+        id="hero-actions"
+        class="flex flex-col sm:flex-row items-center gap-4 mt-8 w-full sm:w-auto transition-all duration-300 ease-in-out"
+      >
         <a
           href="/registro"
-          class="w-full sm:w-auto text-center inline-flex items-center justify-center font-display font-bold text-xs uppercase tracking-widest text-[#0D1F17] bg-secondary hover:bg-accent px-10 py-4.5 rounded-full transition-all cursor-pointer shadow-lg shadow-secondary/15 hover:shadow-secondary/25 active:scale-98"
+          class="w-full sm:w-auto text-center inline-flex items-center justify-center font-display font-bold text-xs uppercase tracking-widest text-[#0D1F17] bg-primary hover:bg-accent px-10 py-4.5 rounded-full transition-all cursor-pointer shadow-lg shadow-secondary/15 hover:shadow-secondary/25 active:scale-98"
         >
           Inscribirse
         </a>

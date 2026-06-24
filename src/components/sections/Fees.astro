@@ -94,7 +94,7 @@ const paymentNote = sectionSettings?.payment_note || "Los depósitos se realizan
           >
             {/* Popular Tag Badge */}
             {fee.popular && (
-              <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-secondary text-dark font-display font-black text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-full shadow-md">
+              <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-dark font-display font-black text-[10px] uppercase tracking-widest px-4 py-1.5 rounded-full shadow-md">
                 Recomendado
               </div>
             )}
@@ -129,7 +129,7 @@ const paymentNote = sectionSettings?.payment_note || "Los depósitos se realizan
                 href="/registro" 
                 class={`w-full text-center inline-block font-display font-bold text-sm py-3 px-6 rounded-xl transition-all cursor-pointer ${
                   fee.popular 
-                    ? 'bg-secondary text-dark hover:bg-accent shadow-md shadow-secondary/10' 
+                    ? 'bg-primary text-dark hover:bg-accent shadow-md shadow-secondary/10' 
                     : 'bg-primary/10 hover:bg-primary/20 text-light border border-accent/10 hover:border-accent/20'
                 }`}
               >
