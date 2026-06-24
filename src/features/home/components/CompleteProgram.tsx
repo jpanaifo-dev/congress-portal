@@ -211,14 +211,44 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
 
   if (loading) {
     return (
-      <div className="w-full max-w-4xl mx-auto flex flex-col gap-12 relative z-10">
-        <div className="flex flex-col items-center justify-center py-20 gap-3 glass-card rounded-3xl p-8">
-          <svg className="w-8 h-8 text-secondary animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-          <span className="text-xs text-light/60">Cargando cronograma científico...</span>
-        </div>
+      <div className="w-full max-w-4xl mx-auto flex flex-col gap-12 relative z-10 animate-pulse">
+        {[1, 2].map((dayIdx) => (
+          <div key={dayIdx} className="flex flex-col gap-8">
+            {/* Day Title Skeleton */}
+            <div className="flex items-center gap-4 border-b border-light/10 pb-4">
+              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 font-display font-black text-lg"></div>
+              <div className="flex flex-col gap-2">
+                <span className="h-3 w-24 bg-white/5 rounded"></span>
+                <span className="h-6 w-48 bg-white/10 rounded"></span>
+              </div>
+            </div>
+
+            {/* Vertical Timeline list Skeleton */}
+            <div className="flex flex-col relative pl-6 border-l border-primary/20 gap-8">
+              {[1, 2].map((i) => (
+                <div key={i} className="relative">
+                  {/* Timeline bullet dot */}
+                  <div className="absolute -left-[37px] top-1.5 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full border border-white/10 bg-white/5"></div>
+                  </div>
+
+                  {/* Card Container */}
+                  <div className="rounded-2xl p-5 sm:p-6 border border-white/5 bg-white/5 flex flex-col gap-4">
+                    <div className="flex justify-between items-center">
+                      <div className="flex gap-4">
+                        <div className="h-4 w-20 bg-white/10 rounded"></div>
+                        <div className="h-4 w-24 bg-white/5 rounded"></div>
+                      </div>
+                      <div className="h-4 w-16 bg-white/10 rounded"></div>
+                    </div>
+                    <div className="h-6 w-3/4 bg-white/10 rounded"></div>
+                    <div className="h-4 w-full bg-white/5 rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

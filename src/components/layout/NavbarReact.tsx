@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon, Menu, X } from 'lucide-react';
 
 const navLinks = [
-  { href: '#inicio', label: 'Inicio' },
-  { href: '#sobre-evento', label: 'Sobre el Evento' },
-  { href: '#cronograma', label: 'Programa' },
-  { href: '#ponentes', label: 'Ponentes' },
-  { href: '#tarifas', label: 'Inversión' },
-  { href: '#faq', label: 'FAQ' },
-  { href: '#contacto', label: 'Contacto' },
+  { href: '/#inicio', label: 'Inicio' },
+  { href: '/#sobre-evento', label: 'Sobre el Evento' },
+  { href: '/#cronograma', label: 'Programa' },
+  { href: '/#ponentes', label: 'Ponentes' },
+  { href: '/#tarifas', label: 'Inversión' },
+  { href: '/#faq', label: 'FAQ' },
+  { href: '/#contacto', label: 'Contacto' },
   { href: '/registro', label: 'Registro' },
 ];
 
@@ -71,8 +71,8 @@ export const NavbarReact: React.FC<NavbarProps> = ({
   };
 
   const headerClass = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 md:px-12 ${isScrolled || isMenuOpen
-      ? 'bg-[#07140F]/80 backdrop-blur-lg border-b border-white/5 py-3 shadow-md shadow-black/10'
-      : 'bg-transparent border-b border-transparent py-5'
+    ? 'bg-[#07140F]/80 backdrop-blur-lg border-b border-white/5 py-3 shadow-md shadow-black/10'
+    : 'bg-transparent border-b border-transparent py-5'
     }`;
 
   return (
@@ -81,7 +81,7 @@ export const NavbarReact: React.FC<NavbarProps> = ({
         <div className="container mx-auto flex items-center justify-between">
           {/* Logo */}
           <a
-            href="#inicio"
+            href="/"
             className="flex items-center focus-visible:outline-2 focus-visible:outline-accent rounded-lg"
             aria-label="Volver al inicio"
           >
@@ -101,8 +101,8 @@ export const NavbarReact: React.FC<NavbarProps> = ({
                   key={link.href}
                   href={link.href}
                   className={`font-display text-[11px] tracking-widest uppercase transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-secondary ${isRegister
-                      ? 'border border-secondary/40 text-secondary hover:bg-primary hover:text-[#0D1F17] px-4 py-1.5 rounded-full font-bold shadow-sm shadow-secondary/5'
-                      : 'text-white/70 hover:text-white'
+                    ? 'bg-primary hover:bg-white border border-secondary/40 px-4 py-1.5 rounded-full font-bold'
+                    : 'text-white/70 hover:text-white'
                     }`}
                 >
                   {link.label}

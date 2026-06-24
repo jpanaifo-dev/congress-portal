@@ -5,18 +5,17 @@ import Hero from '../components/sections/Hero.astro';
 import About from '../components/sections/About.astro';
 import Schedule from '../components/sections/Schedule.astro';
 import Speakers from '../components/sections/Speakers.astro';
-import GallerySection from '../components/sections/GallerySection.astro';
 import Contact from '../components/sections/Contact.astro';
 import Footer from '../components/layout/Footer.astro';
 import { StickyBottomBanner } from '../components/layout/StickyBottomBanner';
 import { fetchConfig } from '../lib/supabase';
 
 const config = await fetchConfig();
-const startDateStr = config.edition?.start_date 
-  ? `${config.edition.start_date}T08:00:00-05:00` 
-  : "2026-07-02T08:00:00-05:00";
-const eventName = config.event?.name || "III Encuentro Científico";
-const editionName = config.edition?.name?.es || "";
+const startDateStr = config.edition?.start_date
+  ? `${config.edition.start_date}T08:00:00-05:00`
+  : '2026-07-02T08:00:00-05:00';
+const eventName = config.event?.name || 'III Encuentro Científico';
+const editionName = config.edition?.name?.es || '';
 ---
 
 <Layout>
@@ -36,25 +35,19 @@ const editionName = config.edition?.name?.es || "";
 
     <!-- Speakers Profile Cards Section -->
     <Speakers />
-    <!-- Community Masonry Photos Gallery Section -->
-    <GallerySection />
 
     <!-- Contact & Direct Location Map Section -->
     <Contact />
   </main>
 
-
   <!-- University Branded Footer -->
   <Footer />
 
   <!-- Sticky Countdown and Registration Quick-Bar -->
-  <StickyBottomBanner 
-    client:load 
-    targetDateStr={startDateStr} 
-    eventName={eventName} 
-    editionName={editionName} 
+  <StickyBottomBanner
+    client:load
+    targetDateStr={startDateStr}
+    eventName={eventName}
+    editionName={editionName}
   />
-  
-  <!-- Spacer to allow scrolling past the sticky footer banner -->
-  <div class="h-24 sm:h-20"></div>
 </Layout>
