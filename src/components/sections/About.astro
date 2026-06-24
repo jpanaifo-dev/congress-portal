@@ -1,13 +1,23 @@
 ---
 import * as Icons from 'lucide-react';
-import { fetchConfig, fetchThematicLines } from '../../lib/supabase';
+import { fetchConfig, fetchThematicLines, fetchEventTickets } from '../../lib/supabase';
 
 const config = await fetchConfig();
 const editionId = config.edition?.id || "";
 const eventName = config.event?.name || "III Encuentro Científico";
 
-// Fetch thematic lines
+// Fetch thematic lines and tickets
 const thematicLines = editionId ? await fetchThematicLines(editionId) : [];
+const dbTickets = editionId ? await fetchEventTickets(editionId) : [];
+
+// Category Formatter
+function formatCategory(name: string): string {
+  const norm = name.toUpperCase();
+  if (norm === 'PREGADO' || norm === 'PREGRADO') return 'Pregrado';
+  if (norm === 'POSTGRADO') return 'Postgrado';
+  if (norm === 'PUBLICO GENERAL') return 'Público General';
+  return name;
+}
 
 // Section texts from database settings
 const sectionSettings = config.event?.settings?.landing_sections?.about;
@@ -82,7 +92,7 @@ const paragraph = sectionSettings?.paragraph
           {tagline}
         </span>
         <h2
-          class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-5xl text-light leading-tight"
+          class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl uppercase text-light leading-tight"
         >
           {boldTitle ? boldTitle + " " : ""}<span class="text-light/60">{regularTitle}</span>
         </h2>
@@ -117,8 +127,39 @@ const paragraph = sectionSettings?.paragraph
         </div>
       )}
 
+      <!-- Certifications Pricing Block (Dynamic from Database event_tickets) -->
+      {dbTickets.length > 0 && (
+        <div class="mb-16">
+          <p class="text-sm sm:text-base text-light/80 font-semibold mb-6 leading-relaxed">
+            Derechos de Certificación:
+          </p>
 
-
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
+            {dbTickets.map((ticket: any) => {
+              const category = formatCategory(ticket.name);
+              const isPopular = ticket.name.toUpperCase().includes('POSTGRADO');
+              return (
+                <div 
+                  class={`relative glass-card rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 hover:scale-[1.01] ${
+                    isPopular 
+                      ? 'border-secondary bg-secondary/5 shadow-[0_0_20px_rgba(76,175,80,0.06)]' 
+                      : 'border-accent/15 hover:border-accent/30'
+                  }`}
+                >
+                  <div>
+                    <span class="text-xs font-bold text-accent uppercase tracking-widest block mb-1.5">{category}</span>
+                    <div class="flex items-baseline gap-1 text-light">
+                      <span class="text-sm font-extrabold">S/.</span>
+                      <span class="text-2xl font-display font-black leading-none">{Number(ticket.price).toFixed(2)}</span>
+                    </div>
+                    <span class="text-[9px] text-light/50 font-medium mt-2 block">Pago único por derecho de certificado firmado</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <!-- Action Footer -->
       <div class="flex flex-wrap items-center gap-4 text-sm text-light/60">

@@ -212,7 +212,7 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
   if (loading) {
     return (
       <div className="w-full max-w-4xl mx-auto flex flex-col gap-12 relative z-10">
-        <div className="flex flex-col items-center justify-center py-20 gap-3 bg-dark/40 backdrop-blur-md rounded-3xl border border-accent/10 p-8">
+        <div className="flex flex-col items-center justify-center py-20 gap-3 glass-card rounded-3xl p-8">
           <svg className="w-8 h-8 text-secondary animate-spin" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -226,7 +226,7 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
   if (displaySchedule.length === 0) {
     return (
       <div className="w-full max-w-4xl mx-auto flex flex-col gap-12 relative z-10">
-        <div className="w-full text-center py-16 bg-dark/40 backdrop-blur-md rounded-3xl border border-accent/10 p-8 flex flex-col items-center justify-center gap-4">
+        <div className="w-full text-center py-16 glass-card rounded-3xl p-8 flex flex-col items-center justify-center gap-4">
           <Calendar className="w-12 h-12 text-accent/40 mx-auto" />
           <h3 className="font-display font-bold text-lg text-light">No hay actividades registradas</h3>
           <p className="text-xs sm:text-sm text-light/65 max-w-md mx-auto text-center">
@@ -271,39 +271,50 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
                   </div>
 
                   {/* Card Container */}
-                  <div className={`rounded-2xl p-5 sm:p-6 transition-all duration-300 border bg-dark/40 backdrop-blur-sm ${
-                    isKeynote ? 'border-secondary/25 shadow-lg shadow-secondary/5' : 'border-accent/10 hover:border-accent/20 shadow-md'
+                  <div className={`rounded-2xl p-5 sm:p-6 transition-all duration-300 relative overflow-hidden border ${
+                    isKeynote ? 'border-secondary/25 shadow-lg shadow-secondary/5 bg-[#0D1F17]' : 'glass-card border-accent/10 hover:border-accent/20 shadow-md'
                   }`}>
+                    {isKeynote && (
+                      <>
+                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&q=80&w=400&h=300')] bg-cover bg-center -z-10 opacity-30"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0D1F17]/95 via-[#0D1F17]/80 to-[#0D1F17]/50 -z-10"></div>
+                      </>
+                    )}
+
                     <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
-                        <span className={`text-xs font-bold flex items-center gap-1.5 ${isKeynote ? 'text-secondary' : 'text-accent'}`}>
+                        <span className={`text-xs font-bold flex items-center gap-1.5 ${isKeynote ? 'text-[#fcd34d]' : 'text-secondary'}`}>
                           <Clock className="w-4 h-4" />
                           {act.time}
                         </span>
-                        <span className="text-[10px] text-light/50">•</span>
-                        <span className="text-xs text-light/60 flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5 text-accent" />
+                        <span className={`text-[10px] ${isKeynote ? 'text-white/40' : 'text-light/50'}`}>•</span>
+                        <span className={`text-xs flex items-center gap-1 ${isKeynote ? 'text-white/70' : 'text-light/60'}`}>
+                          <MapPin className={`w-3.5 h-3.5 ${isKeynote ? 'text-[#fcd34d]' : 'text-accent'}`} />
                           {act.location}
                         </span>
                       </div>
-                      <span className={`text-[9px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md border ${getBadgeStyle(act.type)}`}>
+                      <span className={`text-[9px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md border ${
+                        isKeynote ? 'bg-[#fcd34d]/10 text-[#fcd34d] border-[#fcd34d]/25' : getBadgeStyle(act.type)
+                      }`}>
                         {translateType(act.type)}
                       </span>
                     </div>
 
-                    <h3 className={`font-display font-extrabold text-base sm:text-lg mb-2 leading-snug text-light ${
-                      isKeynote ? 'text-glow-secondary' : 'group-hover:text-secondary transition-colors'
+                    <h3 className={`font-display font-extrabold text-base sm:text-lg mb-2 leading-snug ${
+                      isKeynote ? 'text-glow-secondary text-[#fcd34d]' : 'text-light group-hover:text-secondary transition-colors'
                     }`}>
                       {act.title}
                     </h3>
                     
-                    <p className="text-xs sm:text-sm text-light/75 leading-relaxed mb-4">
+                    <p className={`text-xs sm:text-sm leading-relaxed mb-4 ${
+                      isKeynote ? 'text-white/80' : 'text-light/75'
+                    }`}>
                       {act.description}
                     </p>
 
                     {/* Speaker block */}
                     {speaker && (
-                      <div className="mt-4 pt-4 border-t border-accent/10 flex flex-col gap-4">
+                      <div className={`mt-4 pt-4 border-t flex flex-col gap-4 ${isKeynote ? 'border-white/10' : 'border-accent/10'}`}>
                         <div className="flex items-center gap-3">
                           <img
                             src={speaker.photoUrl}
@@ -312,8 +323,8 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
                             loading="lazy"
                           />
                           <div className="flex flex-col min-w-0">
-                            <span className="text-xs sm:text-sm font-extrabold text-light truncate">{speaker.name}</span>
-                            <span className="text-[10px] sm:text-xs text-accent truncate">{speaker.specialty} • <span className="text-light/55">{speaker.institution}</span></span>
+                            <span className={`text-xs sm:text-sm font-extrabold truncate ${isKeynote ? 'text-white' : 'text-light'}`}>{speaker.name}</span>
+                            <span className={`text-[10px] sm:text-xs truncate ${isKeynote ? 'text-[#fcd34d]' : 'text-accent'}`}>{speaker.specialty} • <span className={isKeynote ? 'text-white/60' : 'text-light/55'}>{speaker.institution}</span></span>
                           </div>
                         </div>
                         

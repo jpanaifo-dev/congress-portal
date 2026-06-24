@@ -178,30 +178,50 @@ export async function fetchSessions(editionId: string) {
 // 3. Fetch Speakers
 export async function fetchSpeakers(editionId: string) {
   try {
-    // Get speakers through session_speakers filtered by the active edition sessions
-    const data = await supabaseRequest(
-      `session_speakers?select=is_main_speaker,event_participants(id,profiles(id,first_name,last_name,avatar_url,bio,dedication,institution,social_links)),event_sessions!inner(edition_id)&event_sessions.edition_id=eq.${editionId}`
-    );
+    // 1. Fetch participant roles to identify 'speaker' and 'keynote-speaker' slugs
+    const roles = await supabaseRequest('participant_roles?select=id,slug');
+    const speakerRoleIds = new Set<string>();
     
-    // Deduplicate speakers by profile id
-    const speakersMap = new Map();
-    data.forEach((row: any) => {
-      const profile = row.event_participants?.profiles;
-      if (profile && !speakersMap.has(profile.id)) {
-        speakersMap.set(profile.id, {
-          id: profile.id,
-          full_name: `${profile.first_name} ${profile.last_name}`.trim(),
-          specialty: profile.dedication || (profile.expertise_areas?.[0] || 'Investigador'),
-          bio: profile.bio || '',
-          photo_url: profile.avatar_url || '',
-          institution: profile.institution || '',
-          socials: typeof profile.social_links === 'string' ? JSON.parse(profile.social_links) : (profile.social_links || {})
-        });
-      }
-    });
-    return Array.from(speakersMap.values());
+    if (roles && roles.length > 0) {
+      roles.forEach((r: any) => {
+        if (r.slug === 'speaker' || r.slug === 'keynote-speaker') {
+          speakerRoleIds.add(r.id);
+        }
+      });
+    }
+
+    // 2. Fetch event participants for this edition
+    const participants = await supabaseRequest(
+      `event_participants?edition_id=eq.${editionId}&select=id,role_id,profiles(id,first_name,last_name,avatar_url,bio,dedication,institution,social_links)`
+    );
+
+    const speakersList: any[] = [];
+    const seenProfileIds = new Set<string>();
+
+    if (participants && participants.length > 0) {
+      participants.forEach((part: any) => {
+        // Filter by the speaker role IDs we identified
+        if (speakerRoleIds.has(part.role_id) || part.role_id === 'cd7f72c1-51a1-41b3-a36c-fdea56707d30') {
+          const profile = part.profiles;
+          if (profile && !seenProfileIds.has(profile.id)) {
+            seenProfileIds.add(profile.id);
+            speakersList.push({
+              id: profile.id,
+              full_name: `${profile.first_name} ${profile.last_name}`.trim(),
+              specialty: profile.dedication || (profile.expertise_areas?.[0] || 'Ponente'),
+              bio: profile.bio || '',
+              photo_url: profile.avatar_url || '',
+              institution: profile.institution || 'UNAP',
+              socials: typeof profile.social_links === 'string' ? JSON.parse(profile.social_links) : (profile.social_links || {})
+            });
+          }
+        }
+      });
+    }
+
+    return speakersList;
   } catch (err) {
-    console.error('Error loading speakers:', err);
+    console.error('Error loading speakers from event_participants:', err);
     return [];
   }
 }

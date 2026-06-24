@@ -60,40 +60,53 @@ export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
-      {speakers.map((spk) => (
-        <div key={spk.id} className="glass-card rounded-2xl overflow-hidden border border-accent/10 hover:border-secondary/35 transition-all duration-300 group flex flex-col justify-between">
-          <div>
-            {/* Speaker Photo container */}
-            <div className="relative overflow-hidden aspect-square border-b border-accent/10">
+    <div className="w-full flex flex-col items-center">
+      {/* 5-column responsive clean grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10 w-full">
+        {speakers.map((spk) => (
+          <div key={spk.id} className="group flex flex-col text-left transition-all duration-300 hover:scale-[1.01]">
+            {/* Portrait Speaker Photo */}
+            <div className="relative overflow-hidden aspect-[4/5] rounded-3xl bg-light/5 dark:bg-white/5 border border-accent/10 hover:border-secondary/35 transition-all duration-300 shadow-sm">
               <img
                 src={spk.photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=400'}
                 alt={spk.full_name}
                 loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-dark/65 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-dark/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
 
-            {/* Content Details */}
-            <div className="p-6 flex flex-col gap-3">
-              <div>
-                <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-secondary mb-1">
-                  {spk.specialty}
-                </span>
-                <h3 className="font-display font-bold text-lg text-light group-hover:text-secondary transition-colors">
-                  {spk.full_name}
-                </h3>
-                {spk.institution && (
-                  <span className="text-[10px] text-light/50 font-medium block mt-1">{spk.institution}</span>
-                )}
-              </div>
+            {/* Clean Details below the photo */}
+            <div className="mt-4 flex flex-col gap-1">
+              <h3 className="font-display font-bold text-base sm:text-lg text-light group-hover:text-secondary transition-colors leading-snug">
+                {spk.full_name}
+              </h3>
+              <p className="text-xs sm:text-sm text-light/70 font-medium leading-normal">
+                {spk.specialty}{spk.institution ? `, ${spk.institution}` : ''}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
 
-              <p className="text-xs text-light/75 leading-relaxed">{spk.bio}</p>
+      {/* Dynamic Overlapping Avatar Group Stack */}
+      {speakers.length > 0 && (
+        <div className="flex flex-col items-center gap-3 mt-16">
+          <div className="flex -space-x-3.5 overflow-hidden">
+            {speakers.slice(0, 4).map((spk) => (
+              <img
+                key={`avatar-${spk.id}`}
+                className="inline-block h-10 w-10 rounded-full ring-2 ring-dark object-cover"
+                src={spk.photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100&h=100'}
+                alt={spk.full_name}
+              />
+            ))}
+            <div className="flex items-center justify-center h-10 w-10 rounded-full ring-2 ring-dark bg-secondary/15 border border-secondary/40 text-secondary text-xs font-black font-display select-none">
+              +{speakers.length}
             </div>
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 };
