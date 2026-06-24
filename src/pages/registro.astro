@@ -1,12 +1,26 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { RegistrationForm } from '../features/registration/components/RegistrationForm';
-import { fetchConfig } from '../lib/supabase';
+import { fetchConfig, fetchThematicLines, fetchEventTickets } from '../lib/supabase';
 
 const config = await fetchConfig();
 const editionId = config.edition?.id || "";
 const mainEventId = config.event?.id || "";
 const eventName = config.event?.name || "III Encuentro Científico";
+
+// Fetch thematic lines & ticket categories for registration form
+const thematicLines = editionId ? await fetchThematicLines(editionId) : [];
+const dbTickets = editionId ? await fetchEventTickets(editionId) : [];
+
+// Helper to format ticket category name
+function formatCategory(name: string): string {
+  const norm = name.toUpperCase();
+  if (norm === 'PREGADO' || norm === 'PREGRADO') return 'Pregrado';
+  if (norm === 'POSTGRADO') return 'Postgrado';
+  if (norm === 'PUBLICO GENERAL') return 'Público General';
+  return name;
+}
+const registrationCategories = dbTickets.map(t => formatCategory(t.name));
 ---
 
 <Layout title={`Registro de Participantes - ${eventName}`}>
@@ -31,9 +45,16 @@ const eventName = config.event?.name || "III Encuentro Científico";
           </p>
         </div>
 
-        <RegistrationForm client:load editionId={editionId} mainEventId={mainEventId} />
+        <RegistrationForm 
+          client:load 
+          editionId={editionId} 
+          mainEventId={mainEventId} 
+          thematicLines={thematicLines}
+          registrationCategories={registrationCategories}
+        />
       </div>
     </main>
+
 
     <!-- Minimalist Footer -->
     <footer class="w-full py-8 px-6 border-t border-accent/10 text-center relative z-10 bg-dark/35 backdrop-blur-sm">

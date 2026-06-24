@@ -7,7 +7,6 @@ import Schedule from '../components/sections/Schedule.astro';
 import Speakers from '../components/sections/Speakers.astro';
 import Fees from '../components/sections/Fees.astro';
 import GallerySection from '../components/sections/GallerySection.astro';
-import Faq from '../components/sections/Faq.astro';
 import Contact from '../components/sections/Contact.astro';
 import Footer from '../components/layout/Footer.astro';
 import { StickyBottomBanner } from '../components/layout/StickyBottomBanner';
@@ -47,12 +46,10 @@ const editionName = config.edition?.name?.es || "";
     <!-- Community Masonry Photos Gallery Section -->
     <GallerySection />
 
-    <!-- Frequently Asked Questions Section -->
-    <Faq />
-
     <!-- Contact & Direct Location Map Section -->
     <Contact />
   </main>
+
 
   <!-- University Branded Footer -->
   <Footer />

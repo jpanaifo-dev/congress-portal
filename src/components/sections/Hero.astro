@@ -79,12 +79,12 @@ if (config.edition?.start_date && config.edition?.end_date) {
     <div class="max-w-5xl flex flex-col gap-6 text-left my-auto">
       
       <!-- Edition Header Eyebrow Tag -->
-      <div class="w-fit flex items-center gap-2 bg-secondary/15 text-secondary border border-secondary/25 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">
-        Edición: {editionTitle}
+      <div class="w-fit flex items-center gap-2 text-amber-500 text-sm md:text-base font-bold uppercase tracking-widest">
+        {editionTitle}
       </div>
 
       <h1
-        class="font-display text-5xl sm:text-7xl leading-[0.9] tracking-tight text-white uppercase max-w-4xl"
+        class="font-display text-4xl sm:text-5xl md:text-6xl leading-[0.9] tracking-tight text-white uppercase max-w-4xl"
       >
         <span class="font-black">{boldPart}</span>{" "}
         <span class="font-medium text-white/80">{regularPart}</span>

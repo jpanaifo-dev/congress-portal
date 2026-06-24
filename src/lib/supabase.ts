@@ -206,6 +206,27 @@ export async function fetchSpeakers(editionId: string) {
   }
 }
 
+// 3b. Fetch Thematic Lines
+export async function fetchThematicLines(editionId: string) {
+  try {
+    return await supabaseRequest(`thematic_lines?edition_id=eq.${editionId}&is_active=eq.true&select=*`);
+  } catch (err) {
+    console.error('Error loading thematic lines:', err);
+    return [];
+  }
+}
+
+// 3c. Fetch Event Tickets
+export async function fetchEventTickets(editionId: string) {
+  try {
+    return await supabaseRequest(`event_tickets?edition_id=eq.${editionId}&is_active=eq.true&order=price.asc`);
+  } catch (err) {
+    console.error('Error loading event tickets:', err);
+    return [];
+  }
+}
+
+
 // 4. Registration Validation
 export async function checkProfileRegistration(email: string, docType: string, docNumber: string, editionId: string) {
   // Check if a profile with the email or doc number exists, and return its ID and edition participants

@@ -40,9 +40,9 @@ const registrationSchema = z.object({
     .string()
     .min(3, { message: 'Ingrese el nombre de su institución.' })
     .max(120, { message: 'El nombre de la institución es demasiado largo.' }),
-  participantType: z.enum(['Pregrado', 'Postgrado', 'Público General'], {
-    message: 'Seleccione un tipo de participante válido.',
-  }),
+  participantType: z
+    .string()
+    .min(2, { message: 'Seleccione un tipo de participante válido.' }),
   researchArea: z
     .string()
     .min(3, { message: 'Seleccione o ingrese su área de investigación.' }),
@@ -50,13 +50,41 @@ const registrationSchema = z.object({
 
 const queryClient = new QueryClient();
 
+interface ThematicLine {
+  id: string;
+  name: string;
+}
+
 interface RegistrationFormProps {
   editionId?: string;
   mainEventId?: string;
+  thematicLines?: ThematicLine[];
+  registrationCategories?: string[];
 }
 
 // Internal Form Content Component that uses useMutation
-const RegistrationFormContent: React.FC<RegistrationFormProps> = ({ editionId, mainEventId }) => {
+const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
+  editionId,
+  mainEventId,
+  thematicLines,
+  registrationCategories
+}) => {
+  const DEFAULT_AREAS = [
+    "Ciencias de la Salud",
+    "Ciencias Naturales",
+    "Ingenierías y Tecnología",
+    "Ciencias Sociales y Políticas"
+  ];
+  const DEFAULT_CATEGORIES = ["Pregrado", "Postgrado", "Público General"];
+
+  const areas = thematicLines && thematicLines.length > 0
+    ? thematicLines.map(t => t.name)
+    : DEFAULT_AREAS;
+
+  const categories = registrationCategories && registrationCategories.length > 0
+    ? registrationCategories
+    : DEFAULT_CATEGORIES;
+
   const [docCheckStatus, setDocCheckStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState<RegistrationInput | null>(null);
@@ -387,9 +415,9 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({ editionId, m
                 {...register('participantType')}
                 className="w-full bg-dark/50 border border-accent/15 rounded-xl px-4 py-3 text-sm text-light focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               >
-                <option value="Pregrado">Pregrado</option>
-                <option value="Postgrado">Postgrado</option>
-                <option value="Público General">Público General</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
               </select>
               {errors.participantType && (
                 <span className="text-xs text-red-400 font-medium mt-0.5" role="alert">
@@ -412,10 +440,9 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({ editionId, m
                 aria-describedby={errors.researchArea ? 'researchArea-error' : undefined}
               >
                 <option value="">-- Seleccione una área --</option>
-                <option value="Ciencias de la Salud">Ciencias de la Salud</option>
-                <option value="Ciencias Naturales">Ciencias Naturales</option>
-                <option value="Ingenierías y Tecnología">Ingenierías y Tecnología</option>
-                <option value="Ciencias Sociales y Políticas">Ciencias Sociales y Políticas</option>
+                {areas.map((area) => (
+                  <option key={area} value={area}>{area}</option>
+                ))}
               </select>
               {errors.researchArea && (
                 <span id="researchArea-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
@@ -522,10 +549,20 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({ editionId, m
 };
 
 // Exported component with QueryClientProvider wrapper
-export const RegistrationForm: React.FC<RegistrationFormProps> = ({ editionId, mainEventId }) => {
+export const RegistrationForm: React.FC<RegistrationFormProps> = ({
+  editionId,
+  mainEventId,
+  thematicLines,
+  registrationCategories
+}) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <RegistrationFormContent editionId={editionId} mainEventId={mainEventId} />
+      <RegistrationFormContent
+        editionId={editionId}
+        mainEventId={mainEventId}
+        thematicLines={thematicLines}
+        registrationCategories={registrationCategories}
+      />
     </QueryClientProvider>
   );
 };

@@ -1,38 +1,50 @@
 ---
 import { SpeakersList } from '../../features/home/components/SpeakersList';
-import { fetchConfig } from '../../lib/supabase';
+import { fetchConfig, fetchSpeakers } from '../../lib/supabase';
 
 const config = await fetchConfig();
 const editionId = config.edition?.id || "";
+
+// Verify speakers exist in DB
+const speakers = editionId ? await fetchSpeakers(editionId) : [];
+const hasSpeakers = speakers && speakers.length > 0;
+
+const sectionSettings = config.event?.settings?.landing_sections?.speakers;
+const tagline = sectionSettings?.tagline || "Ponentes e Invitados";
+const title = sectionSettings?.title || "Investigadores y Líderes Académicos";
+const description = sectionSettings?.description || "Contamos con la participación de destacados científicos de nivel internacional, especialistas en conservación, medicina tropical, ciencia de datos y gobernanza territorial.";
 ---
 
-<section id="ponentes" class="relative py-24 bg-dark/30 overflow-hidden">
-  <!-- Glowing forest ambient backdrop -->
-  <div
-    class="absolute top-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"
-  >
-  </div>
-  <div
-    class="absolute bottom-1/4 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none"
-  >
-  </div>
-
-  <div class="container mx-auto px-6 md:px-12 relative z-10">
-    <!-- Section Header -->
-    <div class="text-center mx-auto mb-16 flex flex-col gap-4">
-      <span class="text-xs font-bold text-secondary uppercase tracking-widest">
-        Ponentes e Invitados
-      </span>
-      <h2 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-light">
-        Investigadores y Líderes Académicos
-      </h2>
-      <p class="text-sm sm:text-base text-light/75 leading-relaxed">
-        Contamos con la participación de destacados científicos de nivel internacional,
-        especialistas en conservación, medicina tropical, ciencia de datos y gobernanza territorial.
-      </p>
+{hasSpeakers && (
+  <section id="ponentes" class="relative py-24 bg-dark/30 overflow-hidden">
+    <!-- Glowing forest ambient backdrop -->
+    <div
+      class="absolute top-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"
+    >
+    </div>
+    <div
+      class="absolute bottom-1/4 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none"
+    >
     </div>
 
-    <!-- Speakers Grid (Dynamically loaded from Database) -->
-    <SpeakersList client:visible editionId={editionId} />
-  </div>
-</section>
+    <div class="container mx-auto px-6 md:px-12 relative z-10">
+      <!-- Section Header -->
+      <div class="text-center mx-auto mb-16 flex flex-col gap-4">
+        <span class="text-xs font-bold text-secondary uppercase tracking-widest">
+          {tagline}
+        </span>
+        <h2 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-light">
+          {title}
+        </h2>
+        <p class="text-sm sm:text-base text-light/75 leading-relaxed">
+          {description}
+        </p>
+      </div>
+
+
+      <!-- Speakers Grid (Dynamically loaded from Database) -->
+      <SpeakersList client:visible editionId={editionId} />
+    </div>
+  </section>
+)}
+
