@@ -3,9 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Loader2, Send, ArrowRight, FileCheck } from 'lucide-react';
-import type { RegistrationInput } from '../../../types';
 import { checkProfileRegistration, createRegistration, fetchConfig } from '../../../lib/supabase';
 import confetti from 'canvas-confetti';
 
@@ -23,11 +21,6 @@ const registrationSchema = z.object({
   email: z
     .string()
     .email({ message: 'Ingrese un correo electrónico válido.' }),
-  phone: z
-    .string()
-    .min(9, { message: 'El teléfono debe tener al menos 9 dígitos.' })
-    .max(15, { message: 'El teléfono es demasiado largo.' })
-    .regex(/^[+0-9\s]+$/, { message: 'El teléfono debe contener solo números, espacios o "+".' }),
   docType: z.enum(['DNI', 'CARNET_EXTRANJERIA', 'PASAPORTE'], {
     message: 'Seleccione un tipo de documento válido.',
   }),
@@ -40,13 +33,12 @@ const registrationSchema = z.object({
     .string()
     .min(3, { message: 'Ingrese el nombre de su institución.' })
     .max(120, { message: 'El nombre de la institución es demasiado largo.' }),
-  participantType: z
+  ticketReference: z
     .string()
-    .min(2, { message: 'Seleccione un tipo de participante válido.' }),
-  researchArea: z
-    .string()
-    .min(3, { message: 'Seleccione o ingrese su área de investigación.' }),
+    .min(2, { message: 'Seleccione un tipo de certificación válido.' }),
 });
+
+type RegistrationFormInput = z.infer<typeof registrationSchema>;
 
 const queryClient = new QueryClient();
 
@@ -62,24 +54,12 @@ interface RegistrationFormProps {
   registrationCategories?: string[];
 }
 
-// Internal Form Content Component that uses useMutation
 const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
   editionId,
   mainEventId,
-  thematicLines,
   registrationCategories
 }) => {
-  const DEFAULT_AREAS = [
-    "Ciencias de la Salud",
-    "Ciencias Naturales",
-    "Ingenierías y Tecnología",
-    "Ciencias Sociales y Políticas"
-  ];
   const DEFAULT_CATEGORIES = ["Pregrado", "Postgrado", "Público General"];
-
-  const areas = thematicLines && thematicLines.length > 0
-    ? thematicLines.map(t => t.name)
-    : DEFAULT_AREAS;
 
   const categories = registrationCategories && registrationCategories.length > 0
     ? registrationCategories
@@ -87,32 +67,29 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
 
   const [docCheckStatus, setDocCheckStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submittedData, setSubmittedData] = useState<RegistrationInput | null>(null);
+  const [submittedData, setSubmittedData] = useState<RegistrationFormInput | null>(null);
 
   const {
     register,
     handleSubmit,
-    reset,
     getValues,
     formState: { errors },
-  } = useForm<RegistrationInput>({
+    reset
+  } = useForm<RegistrationFormInput>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       firstNames: '',
       lastNames: '',
       email: '',
-      phone: '',
       docType: 'DNI',
       documentNumber: '',
       institution: '',
-      participantType: 'Pregrado',
-      researchArea: '',
+      ticketReference: categories[0] || 'Pregrado',
     },
   });
 
-  // API handler with Supabase REST integration and validation
   const registrationMutation = useMutation({
-    mutationFn: async (data: RegistrationInput) => {
+    mutationFn: async (data: RegistrationFormInput) => {
       let activeEditionId = editionId;
       let activeMainEventId = mainEventId;
 
@@ -146,10 +123,8 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
         lastNames: data.lastNames,
         docType: data.docType,
         docNumber: data.documentNumber,
-        phone: data.phone,
         institution: data.institution,
-        researchArea: data.researchArea,
-        participantType: data.participantType,
+        ticketReference: data.ticketReference,
         editionId: activeEditionId,
         mainEventId: activeMainEventId
       });
@@ -169,32 +144,13 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
           origin: { y: 0.6 },
           colors: ['#4ade80', '#fbbf24', '#38bdf8', '#ec4899', '#f8fafc']
         });
-
-        // Dynamic multi-burst sidebar effects for extra premium feel
-        setTimeout(() => {
-          confetti({
-            particleCount: 60,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0, y: 0.75 }
-          });
-        }, 200);
-
-        setTimeout(() => {
-          confetti({
-            particleCount: 60,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1, y: 0.75 }
-          });
-        }, 400);
       } catch (e) {
         console.error('Confetti animation error:', e);
       }
     },
   });
 
-  const onSubmit = (data: RegistrationInput) => {
+  const onSubmit = (data: RegistrationFormInput) => {
     registrationMutation.mutate(data);
   };
 
@@ -205,13 +161,8 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
       <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-primary/5 rounded-full blur-2xl"></div>
 
       {!isSubmitted ? (
-        <motion.form
-          key="registration-form"
+        <form
           onSubmit={handleSubmit(onSubmit)}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.3 }}
           className="flex flex-col gap-6 relative z-10"
           noValidate
         >
@@ -233,8 +184,9 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                 id="firstNames"
                 placeholder="Ej: Juan Carlos"
                 {...register('firstNames')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.firstNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
+                  errors.firstNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                }`}
                 aria-invalid={errors.firstNames ? 'true' : 'false'}
                 aria-describedby={errors.firstNames ? 'firstNames-error' : undefined}
               />
@@ -255,8 +207,9 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                 id="lastNames"
                 placeholder="Ej: Pérez Gómez"
                 {...register('lastNames')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.lastNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
+                  errors.lastNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                }`}
                 aria-invalid={errors.lastNames ? 'true' : 'false'}
                 aria-describedby={errors.lastNames ? 'lastNames-error' : undefined}
               />
@@ -317,8 +270,9 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                       setDocCheckStatus('idle');
                     }
                   }}
-                  className={`w-full bg-dark/50 border rounded-xl pl-4 pr-10 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                    }`}
+                  className={`w-full bg-dark/50 border rounded-xl pl-4 pr-10 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
+                    errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                  }`}
                   aria-invalid={errors.documentNumber ? 'true' : 'false'}
                   aria-describedby={errors.documentNumber ? 'documentNumber-error' : undefined}
                 />
@@ -349,8 +303,9 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                 id="email"
                 placeholder="Ej: jperez@unap.edu.pe"
                 {...register('email')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.email ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
+                  errors.email ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                }`}
                 aria-invalid={errors.email ? 'true' : 'false'}
                 aria-describedby={errors.email ? 'email-error' : undefined}
               />
@@ -361,30 +316,8 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
               )}
             </div>
 
-            {/* Phone */}
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="phone" className="text-xs font-semibold text-accent uppercase tracking-wider">
-                Teléfono / Celular
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                placeholder="Ej: +51 912345678"
-                {...register('phone')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.phone ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
-                aria-invalid={errors.phone ? 'true' : 'false'}
-                aria-describedby={errors.phone ? 'phone-error' : undefined}
-              />
-              {errors.phone && (
-                <span id="phone-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
-                  {errors.phone.message}
-                </span>
-              )}
-            </div>
-
             {/* Institution */}
-            <div className="flex flex-col gap-1.5 sm:col-span-2">
+            <div className="flex flex-col gap-1.5">
               <label htmlFor="institution" className="text-xs font-semibold text-accent uppercase tracking-wider">
                 Institución / Universidad
               </label>
@@ -393,8 +326,9 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                 id="institution"
                 placeholder="Ej: Universidad Nacional de la Amazonía Peruana"
                 {...register('institution')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.institution ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
+                  errors.institution ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
+                }`}
                 aria-invalid={errors.institution ? 'true' : 'false'}
                 aria-describedby={errors.institution ? 'institution-error' : undefined}
               />
@@ -405,48 +339,23 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
               )}
             </div>
 
-            {/* Participant Type Selection */}
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="participantType" className="text-xs font-semibold text-accent uppercase tracking-wider">
-                Tipo de Participante
+            {/* Ticket select - PREGRADO, POSTGRADO or GENERAL */}
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <label htmlFor="ticketReference" className="text-xs font-semibold text-accent uppercase tracking-wider">
+                Tipo de Certificación Deseada
               </label>
               <select
-                id="participantType"
-                {...register('participantType')}
+                id="ticketReference"
+                {...register('ticketReference')}
                 className="w-full bg-dark/50 border border-accent/15 rounded-xl px-4 py-3 text-sm text-light focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
-              {errors.participantType && (
+              {errors.ticketReference && (
                 <span className="text-xs text-red-400 font-medium mt-0.5" role="alert">
-                  {errors.participantType.message}
-                </span>
-              )}
-            </div>
-
-            {/* Research Area / Area of Interest */}
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="researchArea" className="text-xs font-semibold text-accent uppercase tracking-wider">
-                Área de Investigación
-              </label>
-              <select
-                id="researchArea"
-                {...register('researchArea')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${errors.researchArea ? 'border-red-500/60' : 'border-accent/15'
-                  }`}
-                aria-invalid={errors.researchArea ? 'true' : 'false'}
-                aria-describedby={errors.researchArea ? 'researchArea-error' : undefined}
-              >
-                <option value="">-- Seleccione una área --</option>
-                {areas.map((area) => (
-                  <option key={area} value={area}>{area}</option>
-                ))}
-              </select>
-              {errors.researchArea && (
-                <span id="researchArea-error" className="text-xs text-red-400 font-medium mt-0.5" role="alert">
-                  {errors.researchArea.message}
+                  {errors.ticketReference.message}
                 </span>
               )}
             </div>
@@ -465,7 +374,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
           <button
             type="submit"
             disabled={registrationMutation.isPending || docCheckStatus === 'checking' || docCheckStatus === 'taken'}
-            className="mt-4 w-full bg-primary hover:bg-accent disabled:bg-primary/30 disabled:text-light/50 text-dark font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            className="mt-4 w-full bg-primary hover:bg-accent disabled:bg-primary/30 disabled:text-light/50 text-[#0D1F17] font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
           >
             {registrationMutation.isPending ? (
               <>
@@ -485,15 +394,9 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
           >
             Volver al Inicio
           </a>
-        </motion.form>
+        </form>
       ) : (
-        <motion.div
-          key="success-container"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-          className="flex flex-col items-center text-center p-2 relative z-10"
-        >
+        <div className="flex flex-col items-center text-center p-2 relative z-10">
           <div className="w-16 h-16 bg-primary/20 rounded-full border border-secondary/40 flex items-center justify-center text-secondary mb-6 shadow-[0_0_20px_rgba(76,175,80,0.25)]">
             <CheckCircle2 className="w-10 h-10" />
           </div>
@@ -520,10 +423,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
               <span className="text-light font-semibold col-span-2 truncate">{submittedData?.email}</span>
 
               <span className="text-light/50 font-medium col-span-1">Modalidad:</span>
-              <span className="text-secondary font-bold col-span-2">Certificación {submittedData?.participantType}</span>
-
-              <span className="text-light/50 font-medium col-span-1">Área:</span>
-              <span className="text-light font-semibold col-span-2">{submittedData?.researchArea}</span>
+              <span className="text-secondary font-bold col-span-2">Certificación {submittedData?.ticketReference}</span>
             </div>
           </div>
 
@@ -542,13 +442,12 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
               Volver al Inicio
             </a>
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );
 };
 
-// Exported component with QueryClientProvider wrapper
 export const RegistrationForm: React.FC<RegistrationFormProps> = ({
   editionId,
   mainEventId,

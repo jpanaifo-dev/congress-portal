@@ -283,10 +283,11 @@ export async function createRegistration(data: {
   lastNames: string;
   docType: string;
   docNumber: string;
-  phone: string;
+  phone?: string;
   institution: string;
-  researchArea: string;
-  participantType: string;
+  researchArea?: string;
+  participantType?: string;
+  ticketReference?: string;
   editionId: string;
   mainEventId: string;
 }) {
@@ -300,8 +301,8 @@ export async function createRegistration(data: {
     identity_document_number: data.docNumber,
     phone: data.phone || null,
     institution: data.institution || null,
-    dedication: data.participantType,
-    areas_of_interest: [data.researchArea],
+    dedication: data.participantType || null,
+    areas_of_interest: data.researchArea ? [data.researchArea] : null,
     onboarding_completed: true,
     global_role: 'user',
     updated_at: new Date().toISOString()
@@ -392,6 +393,7 @@ export async function createRegistration(data: {
     role_id: roleId,
     check_in_status: false,
     requires_certificate: true,
+    ticket_reference: data.ticketReference || null,
     attendance_mode: 'in_person',
     created_at: new Date().toISOString()
   };
