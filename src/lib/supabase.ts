@@ -1,4 +1,5 @@
 // Client to query Supabase REST API (PostgREST) using native fetch
+import { sendWelcomeEmail } from '../utils/email';
 
 // Helper for generic REST requests
 async function supabaseRequest(path: string, options: RequestInit = {}) {
@@ -398,8 +399,24 @@ export async function createRegistration(data: {
     created_at: new Date().toISOString()
   };
 
-  return await supabaseRequest('event_participants', {
+  const result = await supabaseRequest('event_participants', {
     method: 'POST',
     body: JSON.stringify(participantPayload)
   });
+
+  // ── Fire-and-forget: Send welcome email ──────────────
+  // This never blocks the registration response.
+  sendWelcomeEmail({
+    participantName: `${data.firstNames} ${data.lastNames}`.trim(),
+    participantEmail: data.email,
+    institution: data.institution,
+    ticketCategory: data.ticketReference || 'Participante',
+    documentType: data.docType,
+    documentNumber: data.docNumber,
+    eventName: 'III Encuentro Científico',
+  }).catch((err) => {
+    console.error('[Registration] Error al enviar email de bienvenida:', err);
+  });
+
+  return result;
 }
