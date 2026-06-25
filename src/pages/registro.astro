@@ -20,35 +20,94 @@ function formatCategory(name: string): string {
   if (norm === 'PUBLICO GENERAL') return 'Público General';
   return name;
 }
-const registrationCategories = dbTickets.map((t) => formatCategory(t.name));
+const registrationCategories = dbTickets.map((t: any) => formatCategory(t.name));
+
+const shortDescription =
+  config.event?.short_description ||
+  'Participe del evento científico más importante de la Amazonía peruana, organizado por la Escuela de Postgrado de la UNAP.';
+const eventLocation = config.edition?.location || config.event?.location || 'Iquitos, Perú';
+const eventModality = config.edition?.modality || config.event?.modality || 'Modalidad Híbrida';
+const editionTitle = config.edition?.name?.es || 'Tercera Edición';
+
+let formattedDates = '02 y 03 de Julio, 2026';
+if (config.edition?.start_date && config.edition?.end_date) {
+  try {
+    const start = new Date(config.edition.start_date + 'T00:00:00');
+    const end = new Date(config.edition.end_date + 'T00:00:00');
+    const startDay = String(start.getDate()).padStart(2, '0');
+    const endDay = String(end.getDate()).padStart(2, '0');
+    const startMonth = start.toLocaleDateString('es-ES', { month: 'long' });
+    const endMonth = end.toLocaleDateString('es-ES', { month: 'long' });
+    const startYear = start.getFullYear();
+    const endYear = end.getFullYear();
+
+    if (startYear !== endYear) {
+      formattedDates = `${startDay} de ${startMonth}, ${startYear} al ${endDay} de ${endMonth}, ${endYear}`;
+    } else if (startMonth !== endMonth) {
+      formattedDates = `${startDay} de ${startMonth} al ${endDay} de ${endMonth}, ${startYear}`;
+    } else if (startDay !== endDay) {
+      const capMonth = startMonth.charAt(0).toUpperCase() + startMonth.slice(1);
+      formattedDates = `${startDay} y ${endDay} de ${capMonth}, ${startYear}`;
+    } else {
+      const capMonth = startMonth.charAt(0).toUpperCase() + startMonth.slice(1);
+      formattedDates = `${startDay} de ${capMonth}, ${startYear}`;
+    }
+  } catch (e) {
+    console.error('Error formatting dates:', e);
+  }
+}
 ---
 
 <Layout title={`Registro de Participantes - ${eventName}`}>
-  <!-- Dynamic Rainforest background wrapper -->
   <div
-    class="min-h-screen flex flex-col justify-between amazon-gradient-bg relative overflow-hidden selection:bg-primary selection:text-white"
+    class="w-full min-h-screen lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row bg-background text-foreground selection:bg-primary selection:text-white"
   >
-    <!-- Forest glow overlays -->
+    <!-- Lado Izquierdo: Formulario y Pie de página -->
     <div
-      class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"
+      class="w-full lg:w-1/2 h-auto lg:h-screen lg:overflow-y-auto overflow-x-hidden flex flex-col items-center justify-between p-6 sm:py-10 relative bg-background border-r border-border/10 shrink-0"
     >
-    </div>
-    <div
-      class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"
-    >
-    </div>
-
-    <!-- Main Registration Section -->
-    <main class="flex-grow flex items-center justify-center py-8 px-4 sm:px-6 relative z-10">
-      <div class="w-full max-w-4xl">
-        <div class="text-center mx-auto mb-8 max-w-2xl flex flex-col gap-3">
-          <span class="text-xs font-bold text-secondary uppercase tracking-widest">
-            Registro Oficial
+      <!-- Cabecera / Navegación de retorno -->
+      <header
+        class="relative z-10 flex items-center justify-between mb-8 lg:mb-12 max-w-2xl mx-auto w-full"
+      >
+        <a href="/" class="flex items-center gap-2 group cursor-pointer w-full">
+          <span
+            class="text-xs sm:text-sm font-bold text-foreground/50 group-hover:text-foreground transition-colors flex items-center gap-2"
+          >
+            <svg
+              class="w-4 h-4 transition-transform group-hover:-translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Volver al Inicio
           </span>
-          <h1 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-light">
-            Ficha de Inscripción Digital
+        </a>
+        <img
+          src="/images/postgrado_brandwhite.webp"
+          alt="EPG UNAP"
+          class="h-8 w-auto lg:hidden opacity-90 dark:invert-0 invert"
+        />
+      </header>
+
+      <!-- Contenedor del Formulario -->
+      <main class="relative z-10 my-auto w-full max-w-2xl mx-auto lg:mx-0 w-full">
+        <div class="mb-4">
+          <span
+            class="text-xs font-bold text-secondary uppercase tracking-widest bg-secondary/10 border border-secondary/20 px-2.5 py-1 rounded-md"
+          >
+            Inscripción Digital
+          </span>
+          <h1
+            class="font-display font-extrabold text-3xl sm:text-4xl text-foreground mt-4 tracking-tight leading-tight"
+          >
+            Ficha de Registro
           </h1>
-          <p class="text-xs sm:text-sm text-light/75 leading-relaxed">
+          <p class="text-xs sm:text-sm text-muted-foreground mt-3 leading-relaxed">
             Completa tus datos personales y académicos para reservar tu certificación oficial
             emitida por la Escuela de Postgrado de la UNAP.
           </p>
@@ -61,25 +120,143 @@ const registrationCategories = dbTickets.map((t) => formatCategory(t.name));
           thematicLines={thematicLines}
           registrationCategories={registrationCategories}
         />
-      </div>
-    </main>
+      </main>
 
-    <!-- Minimalist Footer -->
-    <footer
-      class="w-full py-8 px-6 border-t border-accent/10 text-center relative z-10 bg-dark/35 backdrop-blur-sm"
-    >
-      <div
-        class="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-light/50"
+      <!-- Pie de página integrado a la columna del formulario -->
+      <footer
+        class="relative z-10 mt-12 pt-6 border-t border-border/50 text-[11px] text-muted-foreground flex flex-col sm:flex-row justify-between gap-4"
       >
         <p>
           © 2026 Universidad Nacional de la Amazonía Peruana. Escuela de Postgrado. Todos los
           derechos reservados.
         </p>
-        <div class="flex gap-6">
-          <a href="/#faq" class="hover:text-light transition-colors">Preguntas Frecuentes</a>
-          <a href="/#contacto" class="hover:text-light transition-colors">Contacto & Soporte</a>
+      </footer>
+    </div>
+
+    <!-- Lado Derecho: Imagen y Mensaje (Sólo visible desde lg en adelante) -->
+    <div
+      class="hidden lg:flex lg:w-1/2 h-screen relative overflow-hidden flex-col justify-between p-16 select-none bg-dark shrink-0"
+    >
+      <!-- Imagen de Fondo del Evento -->
+      <img
+        src={config.event?.cover_url ||
+          'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&q=80&w=1600'}
+        alt="Amazonas Forest"
+        class="absolute inset-0 w-full h-full object-cover filter grayscale contrast-110 brightness-[0.40] saturate-[0.60]"
+      />
+      <!-- Gradiente oscuro y blur profesional sobre la imagen -->
+      <div
+        class="absolute inset-0 bg-gradient-to-tr from-[#06100B]/98 via-[#06100B]/80 to-[#06100B]/85 backdrop-blur-[1px]"
+      >
+      </div>
+
+      <!-- Cabecera del lado derecho (Logo EPG UNAP) -->
+      <div class="relative z-10 flex items-center">
+        <img
+          src="/images/postgrado_brandwhite.webp"
+          alt="Logo Postgrado UNAP"
+          class="h-12 w-auto opacity-95"
+        />
+      </div>
+
+      <!-- Mensaje Profesional Centrado -->
+      <div class="relative z-10 max-w-lg my-auto flex flex-col gap-6">
+        <span
+          class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 w-fit text-xs font-bold text-amber-400 uppercase tracking-widest"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+          {editionTitle}
+        </span>
+
+        <h2
+          class="font-display font-extrabold text-3xl xl:text-4xl text-white leading-tight uppercase tracking-tight"
+        >
+          {eventName}
+        </h2>
+
+        <p class="text-sm xl:text-base text-white/80 leading-relaxed italic">
+          "{shortDescription}"
+        </p>
+
+        <div class="grid grid-cols-1 gap-4 mt-4 border-t border-white/10 pt-6">
+          <div class="flex items-center gap-3.5 text-white/90 text-sm">
+            <div
+              class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-primary"
+            >
+              <svg
+                class="w-4 h-4 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+            <div>
+              <span class="text-[11px] block font-bold text-primary uppercase tracking-wider"
+                >Fecha del Evento</span
+              >
+              <span class="text-sm font-semibold text-white/95">{formattedDates}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3.5 text-white/90 text-sm">
+            <div
+              class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-primary"
+            >
+              <svg
+                class="w-4 h-4 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </div>
+            <div>
+              <span class="text-[11px] block font-bold text-primary uppercase tracking-wider"
+                >Ubicación</span
+              >
+              <span class="text-sm font-semibold text-white/95">{eventLocation}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3.5 text-white/90 text-sm">
+            <div
+              class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-primary"
+            >
+              <svg
+                class="w-4 h-4 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c0 2 2.5 3 6 3s6-1 6-3v-5"></path>
+              </svg>
+            </div>
+            <div>
+              <span class="text-[11px] block font-bold text-primary uppercase tracking-wider"
+                >Modalidad</span
+              >
+              <span class="text-sm font-semibold text-white/95">{eventModality}</span>
+            </div>
+          </div>
         </div>
       </div>
-    </footer>
+
+      <!-- Pie de página del lado derecho -->
+      <div class="relative z-10 text-[11px] text-white/40 flex justify-between">
+        <span>Escuela de Postgrado UNAP</span>
+        <span>Ciencia que transforma la Amazonía</span>
+      </div>
+    </div>
   </div>
 </Layout>

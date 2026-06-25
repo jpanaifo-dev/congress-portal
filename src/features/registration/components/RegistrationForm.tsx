@@ -155,10 +155,10 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-dark/60 backdrop-blur-xl rounded-3xl p-6 lg:p-8 border relative overflow-hidden">
+    <div className="w-full relative overflow-hidden">
       {/* Decorative leaf glows */}
-      <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
-      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-primary/5 rounded-full blur-2xl"></div>
+      <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
 
       {!isSubmitted ? (
         <form
@@ -166,17 +166,11 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
           className="flex flex-col gap-6 relative z-10"
           noValidate
         >
-          <div className="text-center sm:text-left mb-2">
-            <p className="text-sm text-light/75 mt-1.5">
-              Complete el formulario con sus datos reales para reservar su cupo académico en el Encuentro.
-            </p>
-          </div>
-
           {/* Form Fields Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Nombres */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="firstNames" className="text-xs font-semibold text-accent uppercase tracking-wider">
+              <label htmlFor="firstNames" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Nombres
               </label>
               <input
@@ -184,9 +178,8 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                 id="firstNames"
                 placeholder="Ej: Juan Carlos"
                 {...register('firstNames')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                  errors.firstNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                }`}
+                className={`w-full bg-background border rounded-xl px-4 py-3 text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all ${errors.firstNames ? 'border-red-500 focus:ring-red-500' : 'border-border/80 hover:border-foreground/30'
+                  }`}
                 aria-invalid={errors.firstNames ? 'true' : 'false'}
                 aria-describedby={errors.firstNames ? 'firstNames-error' : undefined}
               />
@@ -199,7 +192,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
 
             {/* Apellidos */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="lastNames" className="text-xs font-semibold text-accent uppercase tracking-wider">
+              <label htmlFor="lastNames" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Apellidos
               </label>
               <input
@@ -207,9 +200,8 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                 id="lastNames"
                 placeholder="Ej: Pérez Gómez"
                 {...register('lastNames')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                  errors.lastNames ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                }`}
+                className={`w-full bg-background border rounded-xl px-4 py-3 text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all ${errors.lastNames ? 'border-red-500 focus:ring-red-500' : 'border-border/80 hover:border-foreground/30'
+                  }`}
                 aria-invalid={errors.lastNames ? 'true' : 'false'}
                 aria-describedby={errors.lastNames ? 'lastNames-error' : undefined}
               />
@@ -222,17 +214,17 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
 
             {/* Tipo de Documento */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="docType" className="text-xs font-semibold text-accent uppercase tracking-wider">
+              <label htmlFor="docType" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Tipo de Documento
               </label>
               <select
                 id="docType"
                 {...register('docType')}
-                className="w-full bg-dark/50 border border-accent/15 rounded-xl px-4 py-3 text-sm text-light focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
+                className="w-full bg-background border border-border/80 hover:border-foreground/30 rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
               >
-                <option value="DNI">DNI</option>
-                <option value="CARNET_EXTRANJERIA">Carnet de Extranjería</option>
-                <option value="PASAPORTE">Pasaporte</option>
+                <option value="DNI" className="bg-background text-foreground">DNI</option>
+                <option value="CARNET_EXTRANJERIA" className="bg-background text-foreground">Carnet de Extranjería</option>
+                <option value="PASAPORTE" className="bg-background text-foreground">Pasaporte</option>
               </select>
               {errors.docType && (
                 <span className="text-xs text-red-400 font-medium mt-0.5" role="alert">
@@ -243,7 +235,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
 
             {/* Número de Documento */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="documentNumber" className="text-xs font-semibold text-accent uppercase tracking-wider">
+              <label htmlFor="documentNumber" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Número de Documento
               </label>
               <div className="relative">
@@ -270,9 +262,8 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                       setDocCheckStatus('idle');
                     }
                   }}
-                  className={`w-full bg-dark/50 border rounded-xl pl-4 pr-10 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                    errors.documentNumber ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                  }`}
+                  className={`w-full bg-background border rounded-xl pl-4 pr-10 py-3 text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all ${errors.documentNumber ? 'border-red-500 focus:ring-red-500' : 'border-border/80 hover:border-foreground/30'
+                    }`}
                   aria-invalid={errors.documentNumber ? 'true' : 'false'}
                   aria-describedby={errors.documentNumber ? 'documentNumber-error' : undefined}
                 />
@@ -295,7 +286,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
 
             {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-xs font-semibold text-accent uppercase tracking-wider">
+              <label htmlFor="email" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Correo Electrónico
               </label>
               <input
@@ -303,9 +294,8 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                 id="email"
                 placeholder="Ej: jperez@unap.edu.pe"
                 {...register('email')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                  errors.email ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                }`}
+                className={`w-full bg-background border rounded-xl px-4 py-3 text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-border/80 hover:border-foreground/30'
+                  }`}
                 aria-invalid={errors.email ? 'true' : 'false'}
                 aria-describedby={errors.email ? 'email-error' : undefined}
               />
@@ -318,7 +308,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
 
             {/* Institution */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="institution" className="text-xs font-semibold text-accent uppercase tracking-wider">
+              <label htmlFor="institution" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Institución / Universidad
               </label>
               <input
@@ -326,9 +316,8 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
                 id="institution"
                 placeholder="Ej: Universidad Nacional de la Amazonía Peruana"
                 {...register('institution')}
-                className={`w-full bg-dark/50 border rounded-xl px-4 py-3 text-sm text-light placeholder-light/30 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all ${
-                  errors.institution ? 'border-red-500/60 focus:ring-red-500' : 'border-accent/15'
-                }`}
+                className={`w-full bg-background border rounded-xl px-4 py-3 text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all ${errors.institution ? 'border-red-500 focus:ring-red-500' : 'border-border/80 hover:border-foreground/30'
+                  }`}
                 aria-invalid={errors.institution ? 'true' : 'false'}
                 aria-describedby={errors.institution ? 'institution-error' : undefined}
               />
@@ -341,16 +330,16 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
 
             {/* Ticket select - PREGRADO, POSTGRADO or GENERAL */}
             <div className="flex flex-col gap-1.5 sm:col-span-2">
-              <label htmlFor="ticketReference" className="text-xs font-semibold text-accent uppercase tracking-wider">
+              <label htmlFor="ticketReference" className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Tipo de Certificación Deseada
               </label>
               <select
                 id="ticketReference"
                 {...register('ticketReference')}
-                className="w-full bg-dark/50 border border-accent/15 rounded-xl px-4 py-3 text-sm text-light focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
+                className="w-full bg-background border border-border/80 hover:border-foreground/30 rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
               >
                 {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat} value={cat} className="bg-background text-foreground">{cat}</option>
                 ))}
               </select>
               {errors.ticketReference && (
@@ -374,7 +363,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
           <button
             type="submit"
             disabled={registrationMutation.isPending || docCheckStatus === 'checking' || docCheckStatus === 'taken'}
-            className="mt-4 w-full bg-primary hover:bg-accent disabled:bg-primary/30 disabled:text-light/50 text-[#0D1F17] font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            className="mt-4 w-full bg-primary hover:bg-primary/90 disabled:bg-primary/50 disabled:text-primary-foreground/50 text-[#0D1F17] font-display font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
           >
             {registrationMutation.isPending ? (
               <>
@@ -388,12 +377,6 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
               </>
             )}
           </button>
-          <a
-            href="/"
-            className="w-full text-center inline-block mt-4 text-xs font-semibold text-light/50 hover:text-light transition-colors hover:underline cursor-pointer"
-          >
-            Volver al Inicio
-          </a>
         </form>
       ) : (
         <div className="flex flex-col items-center text-center p-2 relative z-10">
@@ -401,28 +384,28 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
             <CheckCircle2 className="w-10 h-10" />
           </div>
 
-          <h3 className="font-display font-bold text-2xl text-light mb-2">¡Inscripción Exitosa!</h3>
-          <p className="text-sm text-light/80 max-w-md mb-8">
+          <h3 className="font-display font-bold text-2xl text-foreground mb-2">¡Inscripción Exitosa!</h3>
+          <p className="text-sm text-muted-foreground max-w-md mb-8">
             Su solicitud ha sido recibida con éxito. Se ha enviado un correo de confirmación con los pasos detallados para realizar el pago de la certificación.
           </p>
 
           {/* Receipt Summary Card */}
-          <div className="w-full bg-primary/10 border border-accent/15 rounded-2xl p-5 mb-8 text-left flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-accent border-b border-accent/10 pb-2.5">
+          <div className="w-full bg-muted/20 border border-border/80 rounded-2xl p-5 mb-8 text-left flex flex-col gap-3">
+            <div className="flex items-center gap-2 text-primary border-b border-border pb-2.5">
               <FileCheck className="w-5 h-5 text-secondary" />
               <span className="font-display font-semibold text-sm">Resumen de Registro</span>
             </div>
             <div className="grid grid-cols-3 text-xs gap-y-2.5">
-              <span className="text-light/50 font-medium col-span-1">Participante:</span>
-              <span className="text-light font-semibold col-span-2 truncate">{submittedData?.firstNames} {submittedData?.lastNames}</span>
+              <span className="text-muted-foreground font-medium col-span-1">Participante:</span>
+              <span className="text-foreground font-semibold col-span-2 truncate">{submittedData?.firstNames} {submittedData?.lastNames}</span>
 
-              <span className="text-light/50 font-medium col-span-1">Documento:</span>
-              <span className="text-light font-semibold col-span-2">{submittedData?.docType}: {submittedData?.documentNumber}</span>
+              <span className="text-muted-foreground font-medium col-span-1">Documento:</span>
+              <span className="text-foreground font-semibold col-span-2">{submittedData?.docType}: {submittedData?.documentNumber}</span>
 
-              <span className="text-light/50 font-medium col-span-1">Correo:</span>
-              <span className="text-light font-semibold col-span-2 truncate">{submittedData?.email}</span>
+              <span className="text-muted-foreground font-medium col-span-1">Correo:</span>
+              <span className="text-foreground font-semibold col-span-2 truncate">{submittedData?.email}</span>
 
-              <span className="text-light/50 font-medium col-span-1">Modalidad:</span>
+              <span className="text-muted-foreground font-medium col-span-1">Modalidad:</span>
               <span className="text-secondary font-bold col-span-2">Certificación {submittedData?.ticketReference}</span>
             </div>
           </div>
@@ -430,14 +413,14 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
           <div className="flex flex-col sm:flex-row gap-3 mt-4">
             <button
               onClick={() => setIsSubmitted(false)}
-              className="inline-flex items-center justify-center gap-2 text-xs font-semibold text-secondary hover:text-accent border border-secondary/20 hover:border-accent/40 bg-transparent py-2.5 px-5 rounded-full transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 text-xs font-semibold text-secondary hover:text-primary border border-secondary/20 hover:border-primary/40 bg-transparent py-2.5 px-5 rounded-full transition-all cursor-pointer"
             >
               Registrar otra persona
               <ArrowRight className="w-4 h-4" />
             </button>
             <a
               href="/"
-              className="inline-flex items-center justify-center gap-2 text-xs font-semibold text-light/70 hover:text-light border border-light/10 hover:border-light/20 bg-light/5 py-2.5 px-5 rounded-full transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground border border-border hover:bg-muted/10 py-2.5 px-5 rounded-full transition-all cursor-pointer"
             >
               Volver al Inicio
             </a>
