@@ -166,13 +166,6 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
     : 0;
   const currentDayData = displaySchedule[activeDayIndex] || displaySchedule[0];
 
-  const getGridColsClass = (count: number) => {
-    if (count <= 1) return 'lg:grid-cols-1 w-full';
-    if (count === 2) return 'lg:grid-cols-2 w-full';
-    if (count === 3) return 'lg:grid-cols-3 w-full';
-    return 'lg:grid-cols-4 w-full';
-  };
-
   const translateType = (type: string) => {
     switch (type) {
       case 'keynote': return 'Conferencia';
@@ -209,7 +202,8 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
         {/* Skeleton Timeline Cards */}
         <div className="flex flex-col gap-4 w-full">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.01] w-full flex flex-col md:flex-row gap-4 md:gap-8 items-start">
+            <div key={i} className="rounded-md p-6 pl-8 border border-white/[0.06] bg-white/[0.01] w-full flex flex-col md:flex-row gap-4 md:gap-8 items-start relative overflow-hidden">
+              <div className="absolute top-0 left-0 bottom-0 w-[4px] bg-white/[0.06]" />
               <div className="flex flex-col gap-2 w-48 shrink-0">
                 <div className="h-4 w-16 bg-white/[0.06] rounded"></div>
                 <div className="h-3 w-20 bg-white/[0.04] rounded"></div>
@@ -238,9 +232,9 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
 
   return (
     <div className="w-full relative z-10">
-      {/* Cards Selector Row */}
+      {/* Sleek, minimalist tabs selector */}
       <div
-        className={`flex overflow-x-auto snap-x gap-5 pb-8 lg:grid ${getGridColsClass(displaySchedule.length)} lg:gap-6 lg:overflow-visible lg:pb-12 container mx-auto px-1 scrollbar-thin scrollbar-thumb-primary/20`}
+        className="flex flex-wrap items-center justify-start gap-3 pb-6 border-b border-white/[0.05] mb-8"
         role="tablist"
         aria-label="Bloques del programa académico"
       >
@@ -271,30 +265,19 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
               aria-selected={isSelected}
               aria-controls="program-detail-panel"
               onClick={() => setSelectedBlock(blockKey)}
-              className={`snap-start shrink-0 w-[240px] sm:w-auto relative rounded-2xl flex flex-col gap-3 p-5 text-left group transition-all duration-300 hover:translate-y-[-2px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jsyellow/50 ${
-                isSelected
-                  ? 'bg-jsyellow/[0.04] border-2 border-jsyellow/60 scale-[1.01]'
-                  : 'bg-white/[0.01] hover:bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.15]'
-              }`}
+              className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-3 border ${isSelected
+                ? 'bg-jsyellow/[0.06] border-jsyellow/60 text-jsyellow'
+                : 'bg-white/[0.01] border-white/[0.08] hover:border-white/[0.2] text-light/60 hover:text-light'
+                }`}
             >
-              <div className="flex items-center justify-between w-full text-light/40 group-hover:text-light/60 transition-colors font-mono text-[10px] tracking-widest uppercase">
-                <span>{monthName}</span>
-                <span>{weekdayShort}</span>
-              </div>
-
-              <div className="flex items-baseline gap-3 mt-1">
-                <span className="text-4xl font-display font-bold text-light leading-none">
-                  {dateNum}
-                </span>
-                <div className="flex flex-col">
-                  <h3 className="font-display font-bold text-xs text-light/90 uppercase">
-                    DÍA {dayNumber}
-                  </h3>
-                  <span className="text-[10px] text-light/50">
-                    {dayData.activities.length} {dayData.activities.length === 1 ? 'actividad' : 'actividades'}
-                  </span>
-                </div>
-              </div>
+              <span className="font-mono text-[10px] tracking-wider uppercase opacity-80">DÍA {dayNumber}</span>
+              <span className="h-3.5 w-[1px] bg-white/20"></span>
+              <span className="font-sans text-light/90">
+                {dateNum} {monthName.slice(0, 3)}
+              </span>
+              <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded-md text-light/50 font-normal">
+                {dayData.activities.length}
+              </span>
             </button>
           );
         })}
@@ -334,12 +317,18 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className={`rounded-2xl p-6 transition-all duration-300 border ${
-                          isKeynote
-                            ? 'bg-jsyellow/[0.02] border-jsyellow/40 text-light'
-                            : 'bg-white/[0.01] hover:bg-white/[0.03] border-white/[0.06] hover:border-white/[0.15]'
-                        } flex flex-col md:flex-row gap-4 md:gap-8 items-start`}
+                        className={`rounded-md p-6 pl-8 transition-all duration-300 border border-zinc-800/80 hover:border-zinc-700 relative overflow-hidden group ${isKeynote
+                          ? 'bg-jsyellow/[0.02] text-light shadow-[0_4px_20px_rgba(251,191,36,0.03)]'
+                          : 'bg-white/[0.01] hover:bg-white/[0.03]'
+                          } flex flex-col md:flex-row gap-4 md:gap-8 items-start`}
                       >
+                        {/* Solid Left Accent Line */}
+                        <div
+                          className={`absolute top-0 left-0 bottom-0 w-[4px] transition-colors duration-300 ${isKeynote
+                            ? 'bg-jsyellow'
+                            : 'bg-white/20 group-hover:bg-white/40'
+                            }`}
+                        />
                         {/* Time, Type, Location Column */}
                         <div className="flex flex-col gap-2 shrink-0 md:w-48 text-left">
                           <span className={`text-base font-bold font-mono ${isKeynote ? 'text-jsyellow' : 'text-light/90'}`}>
@@ -360,7 +349,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
 
                         {/* Title, Description & Speaker Column */}
                         <div className="flex-1 flex flex-col gap-2 text-left">
-                          <h4 className={`font-display font-bold text-base sm:text-lg leading-snug ${isKeynote ? 'text-jsyellow' : 'text-light'}`}>
+                          <h4 className={`font-display font-bold text-base sm:text-2xl leading-snug ${isKeynote ? 'text-jsyellow' : 'text-light'}`}>
                             {act.title}
                           </h4>
                           {act.description && (
