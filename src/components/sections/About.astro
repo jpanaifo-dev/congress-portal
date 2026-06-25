@@ -85,104 +85,134 @@ const paragraph = sectionSettings?.paragraph
 
 <section
   id="sobre-evento"
-  class="relative py-24 bg-dark overflow-hidden border-b border-white/[0.05]"
+  class="relative py-20 bg-dark overflow-hidden border-b border-white/[0.03]"
 >
-  <div class="container mx-auto px-6 md:px-12 relative z-10">
-    <div class="mx-auto flex flex-col text-left">
-      <!-- Accent Definition Block -->
-      <div class="relative border-l-[6px] border-jsyellow pl-8 mb-8">
-        <span class="text-[11px] font-mono tracking-widest text-light/40 uppercase block mb-3">
-          {tagline}
-        </span>
-        <h2
-          class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl uppercase text-light leading-tight"
-        >
-          {boldTitle ? boldTitle + ' ' : ''}<span class="text-light/60">{regularTitle}</span>
-        </h2>
-      </div>
+  <!-- Subtle decorative grid lines background -->
+  <div
+    class="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:100%_40px] pointer-events-none opacity-25"
+  >
+  </div>
 
-      <!-- Description Paragraph -->
-      <div class="max-w-3xl mb-16">
-        <p class="text-base sm:text-lg text-light/70 leading-relaxed font-sans">
-          {paragraph}
-        </p>
-      </div>
+  <div class="container mx-auto px-6 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+      <!-- Left Column: Core Info -->
+      <div class="lg:col-span-7 flex flex-col">
+        <!-- Tagline & Heading -->
+        <div class="relative pl-6 mb-8 border-l-2 border-jsyellow/50">
+          <span
+            class="text-[11px] font-mono tracking-widest text-jsyellow uppercase block mb-3 font-semibold"
+          >
+            {tagline}
+          </span>
+          <h2
+            class="font-display font-bold text-2xl sm:text-3xl md:text-4xl uppercase text-light leading-tight tracking-tight"
+          >
+            {boldTitle ? boldTitle + ' ' : ''}<span class="text-light/50 font-medium"
+              >{regularTitle}</span
+            >
+          </h2>
+        </div>
 
-      <!-- Topics / Insights Section -->
-      {
-        thematicLines.length > 0 && (
-          <div class="mb-16">
-            <p class="text-sm sm:text-base text-light/80 font-medium mb-6 leading-relaxed">
-              Estas son las líneas temáticas:
-            </p>
+        <!-- Description Paragraph -->
+        <div class="mb-10 max-w-2xl">
+          <p class="text-sm sm:text-base text-light/70 leading-relaxed font-sans">
+            {paragraph}
+          </p>
+        </div>
 
-            <div class="flex flex-col gap-4 max-w-xl">
-              {thematicLines.map((line) => (
-                <div class="flex items-center gap-3.5 group cursor-default">
-                  <div class="w-6 h-6 rounded-full border border-jsyellow flex items-center justify-center text-secondary shrink-0 transition-transform duration-300 group-hover:scale-110">
-                    <Icons.Check className="w-4 h-4" strokeWidth={3} />
+        <!-- Topics / Insights Section (Thematic Lines) -->
+        {
+          thematicLines.length > 0 && (
+            <div class="mb-10">
+              <p class="text-xs sm:text-sm text-light/40 uppercase font-mono tracking-wider mb-5">
+                Líneas Temáticas
+              </p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {thematicLines.map((line: any) => (
+                  <div class="flex items-center gap-3.5 group cursor-default p-3 rounded-xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300">
+                    <div class="w-5.5 h-5.5 rounded-full border border-jsyellow/40 flex items-center justify-center text-jsyellow shrink-0 transition-transform duration-300 group-hover:scale-105 group-hover:border-jsyellow bg-jsyellow/5">
+                      <Icons.Check className="w-3 h-3" strokeWidth={3.5} />
+                    </div>
+                    <span class="text-xs sm:text-sm font-semibold text-light/70 group-hover:text-light transition-colors duration-300">
+                      {line.name}
+                    </span>
                   </div>
-                  <span class="text-sm sm:text-base font-bold text-light/80 group-hover:text-light transition-colors duration-300">
-                    {line.name}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )
-      }
+          )
+        }
 
-      <!-- Certifications Pricing Block (Dynamic from Database event_tickets) -->
-      {
-        dbTickets.length > 0 && (
-          <div class="mb-16">
-            <p class="text-sm sm:text-base text-light/80 font-semibold mb-6 leading-relaxed">
-              Derechos de Certificación:
-            </p>
+        <!-- Action Footer -->
+        <div
+          class="flex items-center gap-4 text-xs sm:text-sm text-light/50 border-t border-white/[0.05] pt-6"
+        >
+          <span>¿Quieres participar en el encuentro?</span>
+          <a
+            href="/registro"
+            class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl border border-jsyellow/40 hover:border-jsyellow hover:bg-jsyellow text-light hover:text-dark font-medium transition-all duration-300"
+          >
+            Inscribirse al Evento
+            <Icons.ArrowRight className="w-3.5 h-3.5" />
+          </a>
+        </div>
+      </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl">
-              {dbTickets.map((ticket: any) => {
-                const category = formatCategory(ticket.name);
-                const isPopular = ticket.name.toUpperCase().includes('POSTGRADO');
-                return (
-                  <div
-                    class={`relative glass-card rounded-2xl p-6 border flex flex-col justify-between transition-all duration-300 hover:scale-[1.01] ${
-                      isPopular
-                        ? 'border-secondary bg-primary/5 shadow-[0_0_20px_rgba(76,175,80,0.06)]'
-                        : 'border-accent/15 hover:border-accent/30'
-                    }`}
-                  >
-                    <div>
-                      <span class="text-xs font-bold text-accent uppercase tracking-widest block mb-1.5">
-                        {category}
-                      </span>
-                      <div class="flex items-baseline gap-1 text-light">
-                        <span class="text-sm font-extrabold">S/.</span>
-                        <span class="text-2xl font-display font-black leading-none">
+      <!-- Right Column: Pricing & Certifications right side card -->
+      <div class="lg:col-span-5 w-full">
+        {
+          dbTickets.length > 0 && (
+            <div class="bg-white/[0.02] border border-white/[0.05] rounded-3xl p-6 md:p-8 backdrop-blur-md relative overflow-hidden group">
+              <div class="absolute -top-24 -right-24 w-48 h-48 bg-jsyellow/5 rounded-full blur-3xl pointer-events-none group-hover:bg-jsyellow/10 transition-colors duration-500" />
+
+              <h3 class="text-xs uppercase tracking-widest text-light/40 font-mono mb-6">
+                Derechos de Certificación
+              </h3>
+
+              <div class="flex flex-col gap-4">
+                {dbTickets.map((ticket: any) => {
+                  const category = formatCategory(ticket.name);
+                  const isPopular = ticket.name.toUpperCase().includes('POSTGRADO');
+                  return (
+                    <div
+                      class={`relative rounded-2xl p-5 border flex items-center justify-between transition-all duration-300 ${
+                        isPopular
+                          ? 'border-jsyellow/50 bg-jsyellow/[0.03]'
+                          : 'border-white/[0.08] bg-white/[0.01] hover:border-white/[0.15]'
+                      }`}
+                    >
+                      {isPopular && (
+                        <span class="absolute -top-2.5 right-4 bg-jsyellow text-dark text-[9px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full font-mono">
+                          Recomendado
+                        </span>
+                      )}
+                      <div>
+                        <span class="text-xs font-semibold text-light/80 uppercase tracking-wider block mb-1">
+                          {category}
+                        </span>
+                        <span class="text-[10px] text-light/40 font-normal block">
+                          Pago único por derecho de certificado firmado
+                        </span>
+                      </div>
+                      <div class="flex items-baseline gap-0.5 text-light text-right">
+                        <span class="text-xs font-semibold text-jsyellow">S/.</span>
+                        <span class="text-xl font-bold font-sans">
                           {Number(ticket.price).toFixed(2)}
                         </span>
                       </div>
-                      <span class="text-[9px] text-light/50 font-medium mt-2 block">
-                        Pago único por derecho de certificado firmado
-                      </span>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )
-      }
+                  );
+                })}
+              </div>
 
-      <!-- Action Footer -->
-      <div class="flex flex-wrap items-center gap-4 text-sm text-light/60">
-        <span>¿Quieres participar en el encuentro?</span>
-        <a
-          href="/registro"
-          class="px-6 py-2 rounded-full border border-jsyellow text-light hover:bg-jsyellow hover:text-dark transition-all duration-300 font-medium tracking-wide"
-        >
-          Participar
-        </a>
+              <p class="text-[10px] text-light/40 text-center mt-5 leading-relaxed">
+                * Los costos de certificación corresponden a las tasas académicas vigentes del
+                evento.
+              </p>
+            </div>
+          )
+        }
       </div>
     </div>
   </div>

@@ -36,6 +36,7 @@ const registrationSchema = z.object({
   ticketReference: z
     .string()
     .min(2, { message: 'Seleccione un tipo de certificación válido.' }),
+  acceptTerms: z.boolean().refine(value => value === true, { message: 'Debe aceptar los términos, condiciones y tratamiento de datos.' }),
 });
 
 type RegistrationFormInput = z.infer<typeof registrationSchema>;
@@ -85,6 +86,7 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
       documentNumber: '',
       institution: '',
       ticketReference: categories[0] || 'Pregrado',
+      acceptTerms: false,
     },
   });
 
@@ -345,6 +347,34 @@ const RegistrationFormContent: React.FC<RegistrationFormProps> = ({
               {errors.ticketReference && (
                 <span className="text-xs text-red-400 font-medium mt-0.5" role="alert">
                   {errors.ticketReference.message}
+                </span>
+              )}
+            </div>
+
+            {/* Términos y Condiciones */}
+            <div className="flex flex-col gap-1.5 sm:col-span-2 mt-2">
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  id="acceptTerms"
+                  {...register('acceptTerms')}
+                  className="mt-1 w-4 h-4 rounded border-border/80 text-primary focus:ring-primary focus:ring-offset-background bg-background cursor-pointer accent-secondary"
+                />
+                <span className="text-xs sm:text-sm text-muted-foreground/90 leading-relaxed font-sans">
+                  Acepto los{' '}
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-secondary hover:text-primary underline transition-colors">
+                    Términos y Condiciones
+                  </a>{' '}
+                  y autorizo el{' '}
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-secondary hover:text-primary underline transition-colors">
+                    tratamiento de mis datos personales
+                  </a>{' '}
+                  con fines de inscripción y comunicación del evento.
+                </span>
+              </label>
+              {errors.acceptTerms && (
+                <span className="text-xs text-red-400 font-medium pl-7" role="alert">
+                  {errors.acceptTerms.message}
                 </span>
               )}
             </div>
