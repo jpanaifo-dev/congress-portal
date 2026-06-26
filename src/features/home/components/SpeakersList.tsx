@@ -3,9 +3,10 @@ import { fetchSpeakers, fetchConfig } from '../../../lib/supabase';
 
 interface SpeakersListProps {
   editionId?: string;
+  maxItems?: number;
 }
 
-export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId }) => {
+export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId, maxItems }) => {
   const [speakers, setSpeakers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [dbError, setDbError] = useState<string | null>(null);
@@ -68,11 +69,13 @@ export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId }) => {
     );
   }
 
+  const displayedSpeakers = maxItems ? speakers.slice(0, maxItems) : speakers;
+
   return (
     <div className="w-full flex flex-col items-center">
       {/* 5-column responsive clean grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10 w-full">
-        {speakers.map((spk) => (
+        {displayedSpeakers.map((spk) => (
           <div key={spk.id} className="group flex flex-col text-left transition-all duration-300 hover:scale-[1.01]">
             {/* Portrait Speaker Photo */}
             <div className="relative overflow-hidden aspect-[4/5] rounded-3xl bg-light/5 dark:bg-white/5 border border-accent/10 hover:border-secondary/35 transition-all duration-300 shadow-sm">

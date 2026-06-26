@@ -53,7 +53,7 @@ const description = sectionSettings?.description || "Contamos con la participaci
 
 
       <!-- Speakers Grid (Dynamically loaded from Database) -->
-      <SpeakersList client:visible editionId={editionId} />
+      <SpeakersList client:visible editionId={editionId} maxItems={5} />
     </div>
   </section>
 )}
