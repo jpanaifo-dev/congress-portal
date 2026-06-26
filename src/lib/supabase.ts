@@ -398,8 +398,35 @@ export async function createRegistration(data: {
     created_at: new Date().toISOString()
   };
 
-  return await supabaseRequest('event_participants', {
+  const result = await supabaseRequest('event_participants', {
     method: 'POST',
     body: JSON.stringify(participantPayload)
   });
+
+  // ── Fire-and-forget: Send welcome email via server API ──────────
+  // Calls the server-side endpoint where the Resend API key is available.
+  // This never blocks the registration response.
+  const emailPayload = {
+    participantName: `${data.firstNames} ${data.lastNames}`.trim(),
+    participantEmail: data.email,
+    institution: data.institution,
+    ticketCategory: data.ticketReference || 'Participante',
+    documentType: data.docType,
+    documentNumber: data.docNumber,
+    eventName: 'III Encuentro Científico',
+  };
+
+  const baseUrl = typeof window !== 'undefined'
+    ? window.location.origin
+    : 'http://localhost:4321';
+
+  fetch(`${baseUrl}/api/send-welcome-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(emailPayload),
+  }).catch((err) => {
+    console.error('[Registration] Error al enviar email de bienvenida:', err);
+  });
+
+  return result;
 }
