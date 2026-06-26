@@ -1,13 +1,13 @@
 ---
 import { Timeline } from '../../features/home/components/Timeline';
-import { fetchConfig, fetchSessions } from '../../lib/supabase';
+import { fetchConfig, fetchActivities } from '../../lib/supabase';
 
 const config = await fetchConfig();
 const editionId = config.edition?.id || "";
 
-// Verify sessions exist in DB
-const sessions = editionId ? await fetchSessions(editionId) : [];
-const hasSessions = sessions && sessions.length > 0;
+// Verify activities exist in DB
+const activities = editionId ? await fetchActivities(editionId) : [];
+const hasSessions = activities && activities.length > 0;
 
 const sectionSettings = config.event?.settings?.landing_sections?.schedule;
 const tagline = sectionSettings?.tagline || "Cronograma Académico";

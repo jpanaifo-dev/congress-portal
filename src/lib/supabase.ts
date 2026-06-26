@@ -178,6 +178,18 @@ export async function fetchSessions(editionId: string) {
   }
 }
 
+// 2b. Fetch Event Activities (cronograma)
+export async function fetchActivities(editionId: string) {
+  try {
+    return await supabaseRequest(
+      `event_activities?edition_id=eq.${editionId}&status=neq.DRAFT&select=*,speaker:event_participants(id,profile:profiles(id,first_name,last_name,avatar_url,bio,dedication,institution,expertise_areas,social_links))&order=start_time.asc`
+    );
+  } catch (err) {
+    console.error('Error loading activities:', err);
+    return [];
+  }
+}
+
 // 3. Fetch Speakers
 export async function fetchSpeakers(editionId: string) {
   try {

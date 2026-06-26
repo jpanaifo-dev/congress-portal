@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchSessions, fetchConfig } from '../../../lib/supabase';
+import { fetchActivities, fetchConfig } from '../../../lib/supabase';
 
 interface TimelineProps {
   editionId?: string;
@@ -22,7 +22,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
           activeEditionId = config.edition?.id || "";
         }
         if (activeEditionId) {
-          const list = await fetchSessions(activeEditionId);
+          const list = await fetchActivities(activeEditionId);
           setSessions(list);
         }
       } catch (err: any) {
@@ -46,19 +46,17 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
 
   if (sessions.length > 0) {
     const grouped: { [date: string]: any[] } = {};
-    sessions.forEach(sess => {
+    sessions.forEach((sess: any) => {
+      if (!sess.speaker?.profile) return;
+
       let dateKey = 'Fecha desconocida';
 
       let start_time_date = new Date();
       let end_time_date = new Date();
       try {
-        if (sess.start_time && sess.start_time.includes('T')) {
-          start_time_date = new Date(sess.start_time);
-          end_time_date = new Date(sess.end_time);
-        } else if (sess.session_date && sess.start_time) {
-          start_time_date = new Date(`${sess.session_date}T${sess.start_time}`);
-          end_time_date = new Date(`${sess.session_date}T${sess.end_time}`);
-        }
+        // event_activities: start_time/end_time are full timestamps
+        start_time_date = new Date(sess.start_time);
+        end_time_date = new Date(sess.end_time);
       } catch (e) {
         console.error(e);
       }
@@ -87,69 +85,33 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
         console.error(e);
       }
 
-      const speakerData = sess.session_speakers?.[0]?.event_participants?.profile;
-      const locationName = sess.facility?.name || sess.location || 'Auditorio Principal';
+      const speakerProfile = sess.speaker?.profile;
+      const locationName = sess.custom_location || 'Auditorio Principal';
 
       grouped[dateKey].push({
         id: sess.id,
         time: timeStr,
-        title: sess.title,
+        title: sess.activity_name,
         description: sess.description || '',
-        type: sess.type || sess.session_type || 'presentation',
+        type: sess.activity_mode || 'presentation',
         location: locationName,
-        speaker: speakerData ? {
-          name: `${speakerData.first_name} ${speakerData.last_name}`.trim(),
-          specialty: speakerData.dedication || (speakerData.expertise_areas?.[0] || 'Investigador'),
-          photoUrl: speakerData.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=400'
+        speaker: speakerProfile ? {
+          name: `${speakerProfile.first_name} ${speakerProfile.last_name}`.trim(),
+          specialty: speakerProfile.dedication || (speakerProfile.expertise_areas?.[0] || 'Investigador'),
+          photoUrl: speakerProfile.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=400',
+          institution: speakerProfile.institution || 'UNAP'
         } : null
       });
     });
 
     const sortedDates = Object.keys(grouped).sort((a, b) => {
-      const sessA = sessions.find(s => {
-        let st_date = new Date();
+      const firstA = grouped[a]?.[0];
+      const firstB = grouped[b]?.[0];
+      if (firstA && firstB) {
         try {
-          if (s.start_time && s.start_time.includes('T')) {
-            st_date = new Date(s.start_time);
-          } else if (s.session_date && s.start_time) {
-            st_date = new Date(`${s.session_date}T${s.start_time}`);
-          }
-        } catch { }
-        const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-        const formatted = st_date.toLocaleDateString('es-ES', options);
-        const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
-        return key === a;
-      });
-      const sessB = sessions.find(s => {
-        let st_date = new Date();
-        try {
-          if (s.start_time && s.start_time.includes('T')) {
-            st_date = new Date(s.start_time);
-          } else if (s.session_date && s.start_time) {
-            st_date = new Date(`${s.session_date}T${s.start_time}`);
-          }
-        } catch { }
-        const options: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
-        const formatted = st_date.toLocaleDateString('es-ES', options);
-        const key = formatted.charAt(0).toUpperCase() + formatted.slice(1);
-        return key === b;
-      });
-      if (sessA && sessB) {
-        let timeA = new Date();
-        let timeB = new Date();
-        try {
-          if (sessA.start_time && sessA.start_time.includes('T')) {
-            timeA = new Date(sessA.start_time);
-          } else if (sessA.session_date && sessA.start_time) {
-            timeA = new Date(`${sessA.session_date}T${sessA.start_time}`);
-          }
-          if (sessB.start_time && sessB.start_time.includes('T')) {
-            timeB = new Date(sessB.start_time);
-          } else if (sessB.session_date && sessB.start_time) {
-            timeB = new Date(`${sessB.session_date}T${sessB.start_time}`);
-          }
-        } catch { }
-        return timeA.getTime() - timeB.getTime();
+          return new Date(firstA.id ? sessions.find((s: any) => s.id === firstA.id)?.start_time : 0).getTime()
+            - new Date(firstB.id ? sessions.find((s: any) => s.id === firstB.id)?.start_time : 0).getTime();
+        } catch { return 0; }
       }
       return 0;
     });
@@ -372,7 +334,7 @@ export const Timeline: React.FC<TimelineProps> = ({ editionId }) => {
                                   {speaker.name}
                                 </span>
                                 <span className="text-[10px] text-light/50 truncate">
-                                  {speaker.specialty}
+                                  {speaker.specialty}{speaker.institution ? ` • ${speaker.institution}` : ''}
                                 </span>
                               </div>
                             </div>
