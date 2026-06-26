@@ -396,13 +396,13 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
                   </div>
                 ) : (
                   /* ========== TABLE VIEW ========== */
-                  <div className="w-full overflow-x-auto mt-6 border border-gray-300 rounded-sm">
+                  <div className="w-full overflow-x-auto mt-6 border border-white/[0.08] rounded-xl">
                     <table className="w-full text-left border-separate border-spacing-0">
                       <thead>
-                        <tr className="border-b border-gray-300">
-                          <th className="py-3 px-4 text-[10px] uppercase tracking-widest font-bold text-jsyellow w-40 border-r border-gray-300 bg-gray-100">Horario</th>
-                          <th className="py-3 px-4 text-[10px] uppercase tracking-widest font-bold text-jsyellow border-r border-gray-300 bg-gray-100">Actividad</th>
-                          <th className="py-3 px-4 text-[10px] uppercase tracking-widest font-bold text-jsyellow w-64 bg-gray-100">Ponente</th>
+                        <tr className="border-b border-white/[0.08]">
+                          <th className="py-3 px-4 text-[10px] uppercase tracking-widest font-bold text-jsyellow w-40 border-r border-white/[0.08] bg-white/[0.03]">Horario</th>
+                          <th className="py-3 px-4 text-[10px] uppercase tracking-widest font-bold text-jsyellow border-r border-white/[0.08] bg-white/[0.03]">Actividad</th>
+                          <th className="py-3 px-4 text-[10px] uppercase tracking-widest font-bold text-jsyellow w-64 bg-white/[0.03]">Ponente</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -412,13 +412,13 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
                           return (
                             <tr
                               key={act.id}
-                              className={`border-b border-gray-300 transition-colors hover:bg-gray-100/50 ${isEven ? 'bg-gray-50' : 'bg-gray-100'
+                              className={`border-b border-white/[0.06] transition-colors hover:bg-white/[0.03] ${isEven ? 'bg-white/[0.01]' : 'bg-white/[0.03]'
                                 }`}
                             >
-                              <td className="py-4 px-4 border-r border-gray-300">
+                              <td className="py-4 px-4 border-r border-white/[0.06]">
                                 <span className="text-sm font-bold font-mono text-light/90">{act.time}</span>
                               </td>
-                              <td className="py-4 px-4 border-r border-gray-300">
+                              <td className="py-4 px-4 border-r border-white/[0.06]">
                                 <div className="flex flex-col gap-1">
                                   <span className={`text-sm font-bold ${act.type === 'keynote' ? 'text-jsyellow' : 'text-light'}`}>
                                     {act.title}
