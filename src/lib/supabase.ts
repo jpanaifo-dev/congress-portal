@@ -1,5 +1,4 @@
 // Client to query Supabase REST API (PostgREST) using native fetch
-import { sendWelcomeEmail } from '../utils/email';
 
 // Helper for generic REST requests
 async function supabaseRequest(path: string, options: RequestInit = {}) {
@@ -404,9 +403,10 @@ export async function createRegistration(data: {
     body: JSON.stringify(participantPayload)
   });
 
-  // ── Fire-and-forget: Send welcome email ──────────────
+  // ── Fire-and-forget: Send welcome email via server API ──────────
+  // Calls the server-side endpoint where the Resend API key is available.
   // This never blocks the registration response.
-  sendWelcomeEmail({
+  const emailPayload = {
     participantName: `${data.firstNames} ${data.lastNames}`.trim(),
     participantEmail: data.email,
     institution: data.institution,
@@ -414,6 +414,16 @@ export async function createRegistration(data: {
     documentType: data.docType,
     documentNumber: data.docNumber,
     eventName: 'III Encuentro Científico',
+  };
+
+  const baseUrl = typeof window !== 'undefined'
+    ? window.location.origin
+    : 'http://localhost:4321';
+
+  fetch(`${baseUrl}/api/send-welcome-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(emailPayload),
   }).catch((err) => {
     console.error('[Registration] Error al enviar email de bienvenida:', err);
   });
