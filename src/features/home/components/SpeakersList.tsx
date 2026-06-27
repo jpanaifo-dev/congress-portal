@@ -36,13 +36,13 @@ export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId, maxItems 
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10 w-full animate-pulse">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-10 w-full animate-pulse">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex flex-col text-left">
-            <div className="aspect-[4/5] rounded-3xl bg-white/5 border border-white/5 relative overflow-hidden" />
+            <div className="aspect-square rounded-3xl bg-white/10 border border-white/5 relative overflow-hidden" />
             <div className="mt-4 flex flex-col gap-2">
-              <div className="h-5 w-3/4 bg-white/10 rounded" />
-              <div className="h-4 w-1/2 bg-white/5 rounded" />
+              <div className="h-5 w-3/4 bg-white/20 rounded" />
+              <div className="h-4 w-1/2 bg-white/15 rounded" />
             </div>
           </div>
         ))}
@@ -74,11 +74,11 @@ export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId, maxItems 
   return (
     <div className="w-full flex flex-col items-center">
       {/* 5-column responsive clean grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10 w-full">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-10 w-full">
         {displayedSpeakers.map((spk) => (
           <div key={spk.id} className="group flex flex-col text-left transition-all duration-300 hover:scale-[1.01]">
             {/* Portrait Speaker Photo */}
-            <div className="relative overflow-hidden aspect-[4/5] rounded-3xl bg-light/5 dark:bg-white/5 border border-accent/10 hover:border-secondary/35 transition-all duration-300 shadow-sm">
+            <div className="relative overflow-hidden aspect-square rounded-3xl bg-light/5 dark:bg-white/5 border border-accent/10 hover:border-secondary/35 transition-all duration-300 shadow-sm">
               <img
                 src={spk.photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400&h=400'}
                 alt={spk.full_name}
