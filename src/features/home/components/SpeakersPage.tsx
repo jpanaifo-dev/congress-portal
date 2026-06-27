@@ -35,12 +35,12 @@ export function SpeakersPage() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <div className="aspect-[3/4] rounded-2xl bg-white/5 mb-4" />
-            <div className="h-5 bg-white/10 rounded w-3/4 mb-2" />
-            <div className="h-4 bg-white/10 rounded w-1/2" />
+          <div key={i} className="animate-pulse flex flex-col items-center">
+            <div className="w-full aspect-square rounded-2xl bg-white/10 border border-white/5 mb-4" />
+            <div className="h-5 bg-white/20 rounded w-3/4 mb-2" />
+            <div className="h-4 bg-white/15 rounded w-1/2" />
           </div>
         ))}
       </div>
@@ -56,13 +56,13 @@ export function SpeakersPage() {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
       {speakers.map((speaker) => (
         <div
           key={speaker.id}
           className="group relative flex flex-col items-center text-center"
         >
-          <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden mb-5 bg-white/5">
+          <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-4 bg-white/5 border border-white/5">
             {speaker.photo_url ? (
               <img
                 src={speaker.photo_url}
@@ -80,8 +80,8 @@ export function SpeakersPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             {speaker.bio && (
-              <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <p className="text-white/80 text-xs leading-relaxed line-clamp-4">{speaker.bio}</p>
+              <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                <p className="text-white/80 text-[10px] sm:text-xs leading-relaxed line-clamp-3">{speaker.bio}</p>
               </div>
             )}
           </div>
