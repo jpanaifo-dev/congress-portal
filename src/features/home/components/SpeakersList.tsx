@@ -39,10 +39,10 @@ export const SpeakersList: React.FC<SpeakersListProps> = ({ editionId, maxItems 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10 w-full animate-pulse">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex flex-col text-left">
-            <div className="aspect-[4/5] rounded-3xl bg-white/5 border border-white/5 relative overflow-hidden" />
+            <div className="aspect-[4/5] rounded-3xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 relative overflow-hidden" />
             <div className="mt-4 flex flex-col gap-2">
-              <div className="h-5 w-3/4 bg-white/10 rounded" />
-              <div className="h-4 w-1/2 bg-white/5 rounded" />
+              <div className="h-5 w-3/4 bg-black/10 dark:bg-white/10 rounded" />
+              <div className="h-4 w-1/2 bg-black/5 dark:bg-white/5 rounded" />
             </div>
           </div>
         ))}

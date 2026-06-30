@@ -38,9 +38,9 @@ export function SpeakersPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="animate-pulse">
-            <div className="aspect-[3/4] rounded-2xl bg-white/5 mb-4" />
-            <div className="h-5 bg-white/10 rounded w-3/4 mb-2" />
-            <div className="h-4 bg-white/10 rounded w-1/2" />
+            <div className="aspect-[3/4] rounded-2xl bg-black/5 dark:bg-white/5 mb-4" />
+            <div className="h-5 bg-black/10 dark:bg-white/10 rounded w-3/4 mb-2" />
+            <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-1/2" />
           </div>
         ))}
       </div>

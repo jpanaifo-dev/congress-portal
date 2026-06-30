@@ -148,11 +148,11 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
       <div className="w-full relative z-10 animate-pulse">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-12">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl p-5 bg-white/[0.01] border border-white/[0.06] flex items-baseline gap-3">
-              <div className="h-8 w-8 bg-white/[0.04] rounded-lg"></div>
+            <div key={i} className="rounded-2xl p-5 bg-black/[0.03] dark:bg-white/[0.01] border border-black/[0.08] dark:border-white/[0.06] flex items-baseline gap-3">
+              <div className="h-8 w-8 bg-black/[0.06] dark:bg-white/[0.04] rounded-lg"></div>
               <div className="flex flex-col gap-2 flex-1">
-                <div className="h-3 w-12 bg-white/[0.04] rounded"></div>
-                <div className="h-3.5 w-24 bg-white/[0.06] rounded"></div>
+                <div className="h-3 w-12 bg-black/[0.06] dark:bg-white/[0.04] rounded"></div>
+                <div className="h-3.5 w-24 bg-black/[0.08] dark:bg-white/[0.06] rounded"></div>
               </div>
             </div>
           ))}
@@ -162,15 +162,15 @@ export const CompleteProgram: React.FC<CompleteProgramProps> = ({ editionId }) =
         </div>
         <div className="flex flex-col gap-4 w-full">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-md p-6 pl-8 border border-white/[0.06] bg-white/[0.01] w-full flex flex-col md:flex-row gap-4 md:gap-8 items-start relative overflow-hidden">
-              <div className="absolute top-0 left-0 bottom-0 w-[4px] bg-white/[0.06]" />
+            <div key={i} className="rounded-md p-6 pl-8 border border-black/[0.08] dark:border-white/[0.06] bg-black/[0.03] dark:bg-white/[0.01] w-full flex flex-col md:flex-row gap-4 md:gap-8 items-start relative overflow-hidden">
+              <div className="absolute top-0 left-0 bottom-0 w-[4px] bg-black/[0.08] dark:bg-white/[0.06]" />
               <div className="flex flex-col gap-2 w-48 shrink-0">
-                <div className="h-4 w-16 bg-white/[0.06] rounded"></div>
-                <div className="h-3 w-20 bg-white/[0.04] rounded"></div>
+                <div className="h-4 w-16 bg-black/[0.08] dark:bg-white/[0.06] rounded"></div>
+                <div className="h-3 w-20 bg-black/[0.06] dark:bg-white/[0.04] rounded"></div>
               </div>
               <div className="flex-1 flex flex-col gap-2">
-                <div className="h-5 w-3/4 bg-white/[0.06] rounded"></div>
-                <div className="h-3.5 w-1/2 bg-white/[0.04] rounded"></div>
+                <div className="h-5 w-3/4 bg-black/[0.08] dark:bg-white/[0.06] rounded"></div>
+                <div className="h-3.5 w-1/2 bg-black/[0.06] dark:bg-white/[0.04] rounded"></div>
               </div>
             </div>
           ))}
