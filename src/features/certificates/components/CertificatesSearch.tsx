@@ -253,7 +253,7 @@ export const CertificatesSearch: React.FC = () => {
         <span className="text-xs font-bold text-primary dark:text-secondary uppercase tracking-widest bg-primary/10 dark:bg-secondary/10 px-3 py-1 rounded-full">
           Consulta Digital de Diplomas
         </span>
-        <h1 className="font-display text-4xl sm:text-5xl text-foreground font-extrabold tracking-tight">
+        <h1 className="font-display text-4xl sm:text-5xl text-foreground  tracking-tight">
           Descarga de Certificados
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
