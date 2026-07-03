@@ -250,42 +250,42 @@ export const CertificatesSearch: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto space-y-12">
       {/* Header Info */}
       <div className="text-center space-y-4 max-w-2xl mx-auto">
-        <span className="text-xs font-bold text-secondary uppercase tracking-widest bg-secondary/10 px-3 py-1 rounded-full">
+        <span className="text-xs font-bold text-primary dark:text-secondary uppercase tracking-widest bg-primary/10 dark:bg-secondary/10 px-3 py-1 rounded-full">
           Consulta Digital de Diplomas
         </span>
-        <h1 className="font-display text-4xl sm:text-5xl text-white font-extrabold tracking-tight">
+        <h1 className="font-display text-4xl sm:text-5xl text-foreground font-extrabold tracking-tight">
           Descarga de Certificados
         </h1>
-        <p className="text-sm sm:text-base text-light/75 leading-relaxed">
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
           Ingrese su número de documento de identidad para buscar, verificar y descargar sus certificados oficiales firmados digitalmente por la EPG UNAP.
         </p>
       </div>
 
       {/* Search Input Box */}
-      <div className="bg-[#0c1f17]/55 backdrop-blur-xl border border-white/5 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-none">
         {/* Glow decorative */}
-        <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-primary/5 dark:bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
 
         <form onSubmit={handleSearch} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label htmlFor="docType" className="text-xs font-bold text-light/50 uppercase tracking-wider block">
+              <label htmlFor="docType" className="text-xs font-bold text-muted-foreground/85 uppercase tracking-wider block">
                 Tipo de Documento
               </label>
               <select
                 id="docType"
                 value={docType}
                 onChange={(e) => setDocType(e.target.value as any)}
-                className="w-full h-12 bg-black/40 border border-white/10 rounded-xl px-4 text-sm font-medium text-light focus:outline-none focus:border-secondary transition-all cursor-pointer"
+                className="w-full h-12 bg-background border border-border rounded-xl px-4 text-sm font-medium text-foreground focus:outline-none focus:border-primary transition-all cursor-pointer focus:ring-1 focus:ring-primary"
               >
-                <option value="DNI" className="bg-[#07140f] text-light">DNI (Perú)</option>
-                <option value="PASAPORTE" className="bg-[#07140f] text-light">Pasaporte</option>
-                <option value="CARNET_EXTRANJERIA" className="bg-[#07140f] text-light">Carnet de Extranjería</option>
+                <option value="DNI" className="bg-background text-foreground">DNI (Perú)</option>
+                <option value="PASAPORTE" className="bg-background text-foreground">Pasaporte</option>
+                <option value="CARNET_EXTRANJERIA" className="bg-background text-foreground">Carnet de Extranjería</option>
               </select>
             </div>
 
             <div className="md:col-span-2 space-y-2">
-              <label htmlFor="docNumber" className="text-xs font-bold text-light/50 uppercase tracking-wider block">
+              <label htmlFor="docNumber" className="text-xs font-bold text-muted-foreground/85 uppercase tracking-wider block">
                 Número de Documento
               </label>
               <div className="relative">
@@ -295,13 +295,13 @@ export const CertificatesSearch: React.FC = () => {
                   placeholder="Ingrese el número de su documento"
                   value={docNumber}
                   onChange={(e) => setDocNumber(e.target.value)}
-                  className="w-full h-12 bg-black/40 border border-white/10 rounded-xl pl-4 pr-12 text-sm font-semibold text-light focus:outline-none focus:border-secondary transition-all"
+                  className="w-full h-12 bg-background border border-border rounded-xl pl-4 pr-12 text-sm font-semibold text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-all focus:ring-1 focus:ring-primary"
                   required
                 />
                 <button
                   type="submit"
                   disabled={loading || !docNumber.trim()}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 size-8 bg-primary hover:bg-secondary disabled:bg-white/10 disabled:text-white/30 text-white rounded-lg flex items-center justify-center transition-colors cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 size-8 bg-primary hover:bg-emerald-700 disabled:bg-muted disabled:text-muted-foreground text-white rounded-lg flex items-center justify-center transition-colors cursor-pointer"
                   aria-label="Buscar certificados"
                 >
                   {loading ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
@@ -323,8 +323,8 @@ export const CertificatesSearch: React.FC = () => {
               exit={{ opacity: 0 }}
               className="text-center py-16 space-y-4"
             >
-              <Loader2 className="size-10 text-secondary animate-spin mx-auto" />
-              <p className="text-sm font-medium text-light/60">Buscando certificados emitidos...</p>
+              <Loader2 className="size-10 text-primary animate-spin mx-auto" />
+              <p className="text-sm font-medium text-muted-foreground">Buscando certificados emitidos...</p>
             </motion.div>
           ) : errorMsg ? (
             <motion.div
@@ -332,7 +332,7 @@ export const CertificatesSearch: React.FC = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="bg-destructive/10 border border-destructive/20 rounded-2xl p-6 text-center text-destructive flex flex-col items-center gap-3"
+              className="bg-destructive/10 border border-destructive/20 rounded-2xl p-6 text-center text-destructive flex flex-col items-center gap-3 shadow-none"
             >
               <ShieldAlert className="size-8" />
               <p className="text-sm font-bold">{errorMsg}</p>
@@ -343,18 +343,18 @@ export const CertificatesSearch: React.FC = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="bg-white/5 border border-white/5 rounded-3xl p-12 text-center space-y-4 flex flex-col items-center"
+              className="bg-card border border-border rounded-3xl p-12 text-center space-y-4 flex flex-col items-center shadow-none"
             >
-              <div className="size-16 bg-white/5 rounded-2xl flex items-center justify-center text-light/40">
+              <div className="size-16 bg-muted rounded-2xl flex items-center justify-center text-muted-foreground">
                 <AlertCircle className="size-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-display font-bold text-lg text-white">No se encontraron certificados</h3>
-                <p className="text-sm text-light/60 max-w-md mx-auto leading-relaxed">
-                  No hemos encontrado certificados emitidos y activos asociados al número de documento <span className="font-mono font-bold text-white">{docNumber}</span>.
+                <h3 className="font-display font-bold text-lg text-foreground">No se encontraron certificados</h3>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                  No hemos encontrado certificados emitidos y activos asociados al número de documento <span className="font-mono font-bold text-foreground">{docNumber}</span>.
                 </p>
               </div>
-              <p className="text-xs text-light/40 leading-normal max-w-sm">
+              <p className="text-xs text-muted-foreground/80 leading-normal max-w-sm">
                 Recuerde que los certificados se habilitan gradualmente tras validar el pago de la certificación y el 80% de asistencia.
               </p>
             </motion.div>
@@ -374,7 +374,7 @@ export const CertificatesSearch: React.FC = () => {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="bg-[#0b1b14]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col justify-between relative overflow-hidden"
+                    className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden shadow-none"
                   >
                     {/* Glowing effect inside card */}
                     <div className="absolute -bottom-10 -right-10 w-[150px] h-[150px] bg-secondary/5 rounded-full blur-[60px] pointer-events-none" />
@@ -386,26 +386,26 @@ export const CertificatesSearch: React.FC = () => {
                           <span className="text-[10px] font-bold text-secondary uppercase tracking-widest block">
                             {res.editionName} - {res.year}
                           </span>
-                          <h3 className="font-display font-black text-white text-base leading-snug mt-1">
+                          <h3 className="font-display font-black text-foreground text-base leading-snug mt-1">
                             {res.eventName}
                           </h3>
                         </div>
-                        <div className="size-10 bg-primary/10 rounded-xl flex items-center justify-center text-secondary shrink-0">
+                        <div className="size-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary dark:text-secondary shrink-0">
                           <Award className="size-5" />
                         </div>
                       </div>
 
-                      {/* Validation text requested by user */}
-                      <div className="bg-black/30 border border-white/5 rounded-xl p-4 space-y-2 text-xs">
-                        <div className="flex items-center gap-2 text-emerald-450 font-bold">
+                      {/* Validation text */}
+                      <div className="bg-muted/40 dark:bg-black/20 border border-border dark:border-white/5 rounded-xl p-4 space-y-2 text-xs">
+                        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold">
                           <CheckCircle className="size-3.5" />
                           <span>Certificación Validada y Oficial</span>
                         </div>
-                        <p className="text-light/75 leading-relaxed">
-                          La Escuela de Postgrado de la UNAP acredita formalmente que <span className="font-bold text-white">{res.participantName}</span> cumplió con todos los requisitos académicos y de asistencia vigentes para el otorgamiento del diploma de <span className="font-semibold text-secondary lowercase">{res.template.name}</span>.
+                        <p className="text-muted-foreground leading-relaxed">
+                          La Escuela de Postgrado de la UNAP acredita formalmente que <span className="font-bold text-foreground">{res.participantName}</span> cumplió con todos los requisitos académicos y de asistencia vigentes para el otorgamiento del diploma de <span className="font-semibold text-primary dark:text-secondary lowercase">{res.template.name}</span>.
                         </p>
-                        <div className="flex justify-between items-center text-[10px] text-light/45 pt-1 border-t border-white/5">
-                          <span>Código: <strong className="font-mono text-white/70">{res.certificate.validation_code}</strong></span>
+                        <div className="flex justify-between items-center text-[10px] text-muted-foreground/80 pt-1 border-t border-border dark:border-white/5">
+                          <span>Código: <strong className="font-mono text-foreground">{res.certificate.validation_code}</strong></span>
                           <span>Descargas: {res.certificate.downloads_count || 0}</span>
                         </div>
                       </div>
@@ -416,7 +416,7 @@ export const CertificatesSearch: React.FC = () => {
                       <button
                         onClick={() => handleDownload(res, 'pdf')}
                         disabled={isDownloading}
-                        className="flex-1 h-10 bg-primary hover:bg-secondary disabled:bg-white/10 disabled:text-white/40 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-colors cursor-pointer shadow-md shadow-primary/10 animate-hover"
+                        className="flex-1 h-10 bg-primary hover:bg-emerald-700 disabled:bg-muted disabled:text-muted-foreground text-white rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-colors cursor-pointer shadow-none"
                       >
                         {isDownloading && downloadFormat === 'pdf' ? (
                           <>
@@ -434,7 +434,7 @@ export const CertificatesSearch: React.FC = () => {
                       <button
                         onClick={() => handleDownload(res, 'png')}
                         disabled={isDownloading}
-                        className="h-10 px-4 bg-white/5 hover:bg-white/10 disabled:bg-white/5 disabled:text-white/30 border border-white/10 hover:border-white/20 text-light rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer"
+                        className="h-10 px-4 bg-muted dark:bg-white/5 hover:bg-muted/80 dark:hover:bg-white/10 disabled:bg-muted dark:disabled:bg-white/5 border border-border dark:border-white/10 text-foreground dark:text-zinc-200 rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-all cursor-pointer shadow-none"
                       >
                         {isDownloading && downloadFormat === 'png' ? (
                           <Loader2 className="size-3.5 animate-spin" />

@@ -451,14 +451,14 @@ export async function fetchCertificatesByDocNumber(docNumber: string): Promise<a
     if (!profiles || profiles.length === 0) return [];
     
     const profileIds = profiles.map((p: any) => p.id);
-    const profileMap = new Map(profiles.map((p: any) => [p.id, `${p.first_name} ${p.last_name}`.trim()]));
+    const profileMap = new Map<string, string>(profiles.map((p: any) => [p.id, `${p.first_name} ${p.last_name}`.trim()]));
 
     // 2. Fetch event participants
     const participants = await supabaseRequest(`event_participants?profile_id=in.(${profileIds.join(',')})&select=id,profile_id,edition_id,main_event_id`);
     if (!participants || participants.length === 0) return [];
 
     const participantIds = participants.map((p: any) => p.id);
-    const participantMap = new Map(participants.map((p: any) => [p.id, p]));
+    const participantMap = new Map<string, any>(participants.map((p: any) => [p.id, p]));
 
     // 3. Fetch certificates
     const certificates = await supabaseRequest(`participant_certificates?participant_id=in.(${participantIds.join(',')})&is_revoked=eq.false&select=*`);
@@ -470,7 +470,7 @@ export async function fetchCertificatesByDocNumber(docNumber: string): Promise<a
     const templates = await supabaseRequest(`certificate_templates?id=in.(${templateIds.join(',')})&is_active=eq.true&is_published=eq.true&select=*`);
     if (!templates || templates.length === 0) return [];
 
-    const templateMap = new Map(templates.map((t: any) => [t.id, t]));
+    const templateMap = new Map<string, any>(templates.map((t: any) => [t.id, t]));
 
     // Filter certificates that have a valid template
     const validCertificates = certificates.filter((c: any) => templateMap.has(c.template_id));
@@ -482,14 +482,14 @@ export async function fetchCertificatesByDocNumber(docNumber: string): Promise<a
     if (editionIds.length > 0) {
       editions = await supabaseRequest(`editions?id=in.(${editionIds.join(',')})&select=id,name,year,main_event_id`);
     }
-    const editionMap = new Map(editions.map((e: any) => [e.id, e]));
+    const editionMap = new Map<string, any>(editions.map((e: any) => [e.id, e]));
 
     const mainEventIds = Array.from(new Set(participants.map((p: any) => p.main_event_id).filter(Boolean)));
     let mainEvents: any[] = [];
     if (mainEventIds.length > 0) {
       mainEvents = await supabaseRequest(`main_events?id=in.(${mainEventIds.join(',')})&select=id,name`);
     }
-    const eventMap = new Map(mainEvents.map((ev: any) => [ev.id, ev]));
+    const eventMap = new Map<string, any>(mainEvents.map((ev: any) => [ev.id, ev]));
 
     // 6. Map and return
     return validCertificates.map((cert: any) => {
