@@ -442,3 +442,181 @@ export async function createRegistration(data: {
 
   return result;
 }
+
+// 6. Fetch Certificates by Document Number
+export async function fetchCertificatesByDocNumber(docNumber: string): Promise<any[]> {
+  try {
+    // 1. Search profile
+    const profiles = await supabaseRequest(`profiles?identity_document_number=eq.${docNumber}&select=id,first_name,last_name`);
+    if (!profiles || profiles.length === 0) return [];
+    
+    const profileIds = profiles.map((p: any) => p.id);
+    const profileMap = new Map(profiles.map((p: any) => [p.id, `${p.first_name} ${p.last_name}`.trim()]));
+
+    // 2. Fetch event participants
+    const participants = await supabaseRequest(`event_participants?profile_id=in.(${profileIds.join(',')})&select=id,profile_id,edition_id,main_event_id`);
+    if (!participants || participants.length === 0) return [];
+
+    const participantIds = participants.map((p: any) => p.id);
+    const participantMap = new Map(participants.map((p: any) => [p.id, p]));
+
+    // 3. Fetch certificates
+    const certificates = await supabaseRequest(`participant_certificates?participant_id=in.(${participantIds.join(',')})&is_revoked=eq.false&select=*`);
+    if (!certificates || certificates.length === 0) return [];
+
+    const templateIds = Array.from(new Set(certificates.map((c: any) => c.template_id)));
+
+    // 4. Fetch active and published templates
+    const templates = await supabaseRequest(`certificate_templates?id=in.(${templateIds.join(',')})&is_active=eq.true&is_published=eq.true&select=*`);
+    if (!templates || templates.length === 0) return [];
+
+    const templateMap = new Map(templates.map((t: any) => [t.id, t]));
+
+    // Filter certificates that have a valid template
+    const validCertificates = certificates.filter((c: any) => templateMap.has(c.template_id));
+    if (validCertificates.length === 0) return [];
+
+    // 5. Fetch editions and main events
+    const editionIds = Array.from(new Set(templates.map((t: any) => t.edition_id)));
+    let editions: any[] = [];
+    if (editionIds.length > 0) {
+      editions = await supabaseRequest(`editions?id=in.(${editionIds.join(',')})&select=id,name,year,main_event_id`);
+    }
+    const editionMap = new Map(editions.map((e: any) => [e.id, e]));
+
+    const mainEventIds = Array.from(new Set(participants.map((p: any) => p.main_event_id).filter(Boolean)));
+    let mainEvents: any[] = [];
+    if (mainEventIds.length > 0) {
+      mainEvents = await supabaseRequest(`main_events?id=in.(${mainEventIds.join(',')})&select=id,name`);
+    }
+    const eventMap = new Map(mainEvents.map((ev: any) => [ev.id, ev]));
+
+    // 6. Map and return
+    return validCertificates.map((cert: any) => {
+      const part = participantMap.get(cert.participant_id);
+      const profileName = part ? profileMap.get(part.profile_id) : '';
+      const template = templateMap.get(cert.template_id);
+      const edition = template ? editionMap.get(template.edition_id) : null;
+      const mainEvent = part ? eventMap.get(part.main_event_id) : null;
+
+      const editionNameEs = edition?.name?.es || edition?.name || 'Edición';
+      const eventNameVal = mainEvent?.name || 'Evento Científico';
+
+      return {
+        certificate: cert,
+        template,
+        participantName: profileName || 'Participante',
+        eventName: eventNameVal,
+        editionName: editionNameEs,
+        year: edition?.year || new Date().getFullYear(),
+      };
+    });
+  } catch (err) {
+    console.error('Error fetching certificates by document number:', err);
+    return [];
+  }
+}
+
+// 7. Increment Certificate Downloads
+export async function incrementCertificateDownloads(
+  certificateId: string,
+  currentCount: number,
+  metadata?: { ipAddress?: string; userAgent?: string }
+): Promise<void> {
+  try {
+    // 1. Update count
+    await supabaseRequest(`participant_certificates?id=eq.${certificateId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        downloads_count: currentCount + 1,
+      }),
+    });
+
+    // 2. Create log
+    await supabaseRequest('certificate_tracking_logs', {
+      method: 'POST',
+      body: JSON.stringify({
+        certificate_id: certificateId,
+        action_type: 'download',
+        ip_address: metadata?.ipAddress || '127.0.0.1',
+        user_agent: metadata?.userAgent || 'browser',
+        created_at: new Date().toISOString(),
+      }),
+    });
+  } catch (err) {
+    console.error('Error logging certificate download:', err);
+  }
+}
+
+// 8. Verify Certificate by Code
+export async function verifyCertificateByCode(code: string): Promise<any | null> {
+  try {
+    // 1. Fetch certificate
+    const certs = await supabaseRequest(`participant_certificates?validation_code=eq.${code}&select=*`);
+    if (!certs || certs.length === 0) return null;
+    const cert = certs[0];
+
+    // 2. Fetch template
+    const templates = await supabaseRequest(`certificate_templates?id=eq.${cert.template_id}&select=*`);
+    const template = templates && templates.length > 0 ? templates[0] : null;
+
+    // 3. Fetch edition and event
+    let edition = null;
+    let event = null;
+    if (template) {
+      const editions = await supabaseRequest(`editions?id=eq.${template.edition_id}&select=*`);
+      edition = editions && editions.length > 0 ? editions[0] : null;
+      if (edition) {
+        const events = await supabaseRequest(`main_events?id=eq.${edition.main_event_id}&select=*`);
+        event = events && events.length > 0 ? events[0] : null;
+      }
+    }
+
+    // 4. Fetch participant full name
+    let participantName = 'Participante';
+    const participants = await supabaseRequest(`event_participants?id=eq.${cert.participant_id}&select=id,profile_id`);
+    if (participants && participants.length > 0) {
+      const part = participants[0];
+      const profiles = await supabaseRequest(`profiles?id=eq.${part.profile_id}&select=first_name,last_name`);
+      if (profiles && profiles.length > 0) {
+        participantName = `${profiles[0].first_name || ''} ${profiles[0].last_name || ''}`.trim();
+      }
+    }
+
+    // 5. Increment validations count and log if NOT revoked
+    if (!cert.is_revoked && typeof window !== 'undefined') {
+      const newCount = (cert.validations_count || 0) + 1;
+      
+      // Fire-and-forget: increment count
+      supabaseRequest(`participant_certificates?id=eq.${cert.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          validations_count: newCount,
+        }),
+      }).catch(err => console.error("Error updating validation count:", err));
+
+      // Fire-and-forget: insert log
+      supabaseRequest('certificate_tracking_logs', {
+        method: 'POST',
+        body: JSON.stringify({
+          certificate_id: cert.id,
+          action_type: 'validation',
+          ip_address: '127.0.0.1',
+          user_agent: navigator.userAgent || 'browser',
+          created_at: new Date().toISOString(),
+        }),
+      }).catch(err => console.error("Error logging certificate validation:", err));
+    }
+
+    return {
+      certificate: cert,
+      template,
+      edition,
+      event,
+      participantName,
+    };
+  } catch (err) {
+    console.error('Error verifying certificate:', err);
+    return null;
+  }
+}

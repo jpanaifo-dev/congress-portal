@@ -7,6 +7,7 @@ const navLinks = [
   { href: '/#sobre-evento', label: 'Sobre el Evento' },
   { href: '/#cronograma', label: 'Programa' },
   { href: '/#ponentes', label: 'Ponentes' },
+  { href: '/certificados', label: 'Certificados' },
   { href: '/#contacto', label: 'Contacto' },
   { href: '/registro', label: 'Registro' },
 ];
